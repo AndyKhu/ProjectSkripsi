@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Image, Grid } from 'semantic-ui-react'
-import img1 from '../../assets/image/4.jpg';
-import img2 from '../../assets/image/5.jpg';
-import img3 from '../../assets/image/6.jpg';
+import img1 from '../assets/image/4.jpg';
+import img2 from '../assets/image/5.jpg';
+import img3 from '../assets/image/6.jpg';
 
 class Home extends Component {
   render() {

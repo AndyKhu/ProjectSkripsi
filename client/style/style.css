@@ -1,4 +1,4 @@
-body { padding-top:49px; background-color: rgba(249, 247, 247, 0.58) }
+body {background-color: rgba(249, 247, 247, 0.58) }
 .red{
   color:red;
 }
@@ -39,6 +39,9 @@ body { padding-top:49px; background-color: rgba(249, 247, 247, 0.58) }
 .margin-45{
   margin-top: 45px;
 }
+.margin-top-60{
+  margin-top: 60px;
+}
 .reset-padding-i{
   padding: 0 !important;
 }
@@ -71,19 +74,22 @@ body { padding-top:49px; background-color: rgba(249, 247, 247, 0.58) }
 .navbar-nav .nav-item+.nav-item{
   margin-left: 3rem;
 }
+
 .custom-navbar{
-  background-color: #FFFFFF;
+  background-color: #3E2723;
   box-shadow: 0 2px 5px rgba(144,202,249,0.1);
-  border-bottom: 3px solid #90CAF9;
+  border-bottom: 3px solid #ff5c28;
   font-family: 'Cabin', sans-serif;
 }
-.navbar-light .navbar-brand{
-  color:#03A9F4;
+.navbar-light .navbar-brand,.navbar-light .navbar-nav .nav-link,.navbar-light .navbar-nav .nav-link:focus,.navbar-light .navbar-brand:focus{
+  color:#FFFFFF;
 }
-
+.navbar-light .navbar-nav .nav-link:hover,.navbar-light .navbar-brand:hover{
+  color: #ff5c28;
+}
 .grid-c{
   background-color: #FFFFFF;
-  border:2px solid #dedede
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.24);
 }
 .reset-segment-border > .column > .segment{
   border: none;

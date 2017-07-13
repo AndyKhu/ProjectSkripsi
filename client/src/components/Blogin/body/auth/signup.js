@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { reduxForm , Field} from 'redux-form';
-import * as Actions from '../../../actions';
+import * as Actions from '../../../../actions';
 import { connect } from 'react-redux';
 import { Container , Input ,Popup ,Icon,Modal} from 'semantic-ui-react';
 

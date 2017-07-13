@@ -15,7 +15,7 @@ export function signinUser({username,password}){
         .then(response=>{
           dispatch({type: AUTH_USER});
           localStorage.setItem('token',response.data.token);
-          browserHistory.push('/feature');
+          browserHistory.push('/content');
         })
         .catch(()=>{
           dispatch(authError('Bad Login Info'));
@@ -29,7 +29,7 @@ export function signupUser({username,email,password}){
     .then(response=>{
       dispatch({type: AUTH_USER});
       localStorage.setItem('token',response.data.token);
-      browserHistory.push('/feature');
+      browserHistory.push('/content');
     })
     .catch(error =>dispatch(authError(error.response.data.error)));
   }

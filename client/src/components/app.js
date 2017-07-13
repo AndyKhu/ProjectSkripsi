@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import Header from './header/header';
+import Header from './Blogin/header/header';
 
 export default class App extends Component {
   render() {
     return (
-      <div>
+      <div className="margin-top-60">
         <Header/>
         {this.props.children}
       </div>

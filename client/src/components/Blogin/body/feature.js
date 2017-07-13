@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Icon,Grid, Image, Segment, Container } from 'semantic-ui-react';
-import img2 from '../../assets/image/5.jpg';
+import img2 from '../assets/image/5.jpg';
 
 class Feature extends Component {
   render() {
