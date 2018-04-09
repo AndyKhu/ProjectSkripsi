@@ -1,0 +1,12 @@
+.footer-card{
+    position: relative;
+    height: 50px;
+}
+.footer-card button{
+    position: absolute;
+    right: 10px;
+}
+.fav-cont{
+    min-height: 500px;
+    overflow-y: scroll;
+}

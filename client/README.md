@@ -1,25 +1,21 @@
-# ReduxSimpleStarter
+# client
 
-Interested in learning [Redux](https://www.udemy.com/react-redux/)?
+> A Vue.js project
 
-### Getting Started
+## Build Setup
 
-There are two methods for getting started with this repo.
+``` bash
+# install dependencies
+npm install
 
-#### Familiar with Git?
-Checkout this repo, install dependencies, then start the gulp process with the following:
+# serve with hot reload at localhost:8080
+npm run dev
 
+# build for production with minification
+npm run build
+
+# build for production and view the bundle analyzer report
+npm run build --report
 ```
-> git clone https://github.com/StephenGrider/ReduxSimpleStarter.git
-> cd ReduxSimpleStarter
-> npm install
-> npm start
-```
 
-#### Not Familiar with Git?
-Click [here](https://github.com/StephenGrider/ReactStarter/releases) then download the .zip file.  Extract the contents of the zip file, then open your terminal, change to the project directory, and:
-
-```
-> npm install
-> npm start
-```
+For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

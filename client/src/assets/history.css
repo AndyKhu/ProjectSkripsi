@@ -1,0 +1,9 @@
+.tabs__bar{
+    border-bottom: 1px solid #dedede;
+}
+.nopadding{
+    padding: 0px;
+}
+#inp{
+    padding: 20px;
+}
