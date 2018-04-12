@@ -9,9 +9,15 @@
         - body-parser                    | v. ^1.18.2
         - nodemon (Development)          | v. ^1.17.3
         - sequelize-cli (Global)         | v. 4.0.0
-        - sequelize                      | v. ^4.37.6    
-        - pg                             | ^7.4.1
-        - pg-hstore                      | ^2.3.2
+        - sequelize                      | v. ^4.3.2 
+        - pg                             | v. ^7.4.1
+        - pg-hstore                      | v. ^2.3.2
+        - passportjs                     | v. ^0.4.0
+        - passport-local                 | v. ^1.0.0
+        - passport-jwt                   | v. ^4.0.0
+        - express-session                | v. ^1.15.6
+        - bcrypt-nodejs                  | v. 0.0.3
+        - jwt-simple                     | v. ^0.5.1
     - Environment(additional) :
         - NODE_ENV : 'development'
         - PORT : 8000
