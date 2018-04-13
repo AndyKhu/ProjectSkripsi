@@ -10,8 +10,8 @@
                     </v-layout>
                     <v-layout row justify-center class="btn-cont"> 
                         <v-flex lg8 class="tx-center">
-                            <v-btn href="#/signin" outline class="btn-cst">Login</v-btn>
-                            <v-btn href="#/signin" outline class="btn-cst">Take a Look</v-btn>
+                            <v-btn href="signin" outline class="btn-cst">Login</v-btn>
+                            <v-btn href="signin" outline class="btn-cst">Take a Look</v-btn>
                         </v-flex>
                     </v-layout>
                 </v-flex>

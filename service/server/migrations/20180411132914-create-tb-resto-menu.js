@@ -36,7 +36,7 @@ module.exports = {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',
         references: {
-          model: 'Tb_Resto',
+          model: 'Tb_Restos',
           key: 'Id',
           as: 'Id_Resto',
         }

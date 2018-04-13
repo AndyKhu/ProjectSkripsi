@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) =>
-    queryInterface.createTable('Tb_Resto', {
+    queryInterface.createTable('Tb_Restos', {
       Id: {
         allowNull: false,
         primaryKey: true,
@@ -50,12 +50,12 @@ module.exports = {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',
         references: {
-          model: 'Tb_User',
+          model: 'Tb_Users',
           key: 'Id',
           as: 'Id_User',
         },
       },
     }),
   down: (queryInterface /* , Sequelize */) =>
-    queryInterface.dropTable('Tb_Resto'),
+    queryInterface.dropTable('Tb_Restos'),
 };

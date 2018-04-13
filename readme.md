@@ -1,4 +1,10 @@
 # tool used in this project
+- Client
+    - vue-cli
+    - vuetify                   | v. ^1.0.14
+    - material-design-icons     | v. ^3.0.1
+    - vuex                      | v. ^3.0.1
+    - axios                     | v. ^0.18.0
 - Server 
     - reference : 
         - https://github.com/waiyaki/postgres-express-node-tutorial
@@ -18,6 +24,7 @@
         - express-session                | v. ^1.15.6
         - bcrypt-nodejs                  | v. 0.0.3
         - jwt-simple                     | v. ^0.5.1
+        - cors                           | v. ^2.8.4
     - Environment(additional) :
         - NODE_ENV : 'development'
         - PORT : 8000

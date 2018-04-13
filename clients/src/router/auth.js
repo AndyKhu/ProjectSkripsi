@@ -38,27 +38,28 @@ export default {
   },
 
   login (context, creds, redirect) {
-    var self = this
-    var username = creds.username
+    // var self = this
+    var email = creds.username
     var password = creds.password
-    axios.post(`${ROOT_URL}/api/login`, {username, password})
+    axios.post(`${ROOT_URL}/api/login`, {email, password})
     .then(response => {
-      localStorage.setItem('id_token', response.data.token)
-      localStorage.setItem('user_role', response.data.type)
-      localStorage.setItem('username', response.data.username)
-      localStorage.setItem('userid', response.data.id)
-      self.user = {
-        username: response.data.username,
-        role: response.data.type,
-        authenticated: true,
-        userid: response.data.id
-      }
-      location.reload()
-      if (self.user.role === 'user') {
-        context.$router.push('/main')
-      } else if (self.user.role === 'admin') {
-        context.$router.push('/main')
-      }
+      console.log(response)
+      // localStorage.setItem('id_token', response.data.token)
+      // localStorage.setItem('user_role', response.data.Type)
+      // localStorage.setItem('username', response.data.Email)
+      // localStorage.setItem('userid', response.data.Id)
+      // self.user = {
+      //   username: response.data.username,
+      //   role: response.data.type,
+      //   authenticated: true,
+      //   userid: response.data.id
+      // }
+      // location.reload()
+      // if (self.user.role === 'user') {
+      //   context.$router.push('/main')
+      // } else if (self.user.role === 'admin') {
+      //   context.$router.push('/main')
+      // }
     })
   },
 

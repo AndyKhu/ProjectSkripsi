@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) =>
-    queryInterface.createTable('Tb_User_Favorite', {
+    queryInterface.createTable('Tb_User_Favorites', {
       Id: {
         allowNull: false,
         primaryKey: true,
@@ -18,7 +18,7 @@ module.exports = {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',
         references: {
-          model: 'Tb_User',
+          model: 'Tb_Users',
           key: 'Id',
           as: 'Id_User',
         },
@@ -27,12 +27,12 @@ module.exports = {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',
         references: {
-          model: 'Tb_Resto',
+          model: 'Tb_Restos',
           key: 'Id',
           as: 'Id_Resto',
         }
       }
     }),
   down: (queryInterface /* , Sequelize */) =>
-    queryInterface.dropTable('Tb_User_Favorite'),
+    queryInterface.dropTable('Tb_User_Favorites'),
 };
