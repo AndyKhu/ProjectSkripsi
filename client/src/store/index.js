@@ -5,9 +5,9 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    ROOT_URL: 'http://localhost:8000',
+    ROOT_URL: 'http://localhost:8001',
     errorMsg: null,
-    User: {}
+    User: null
   },
   mutations: {
     resetErrorMsg: (state, value) => {

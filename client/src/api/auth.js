@@ -5,6 +5,7 @@ export default {
       .then(res => {
         localStorage.setItem('authToken', res.data.token)
         context.$store.dispatch('setUser', res.data.user)
+        context.$router.push('/main')
       }).catch((err) => {
         context.$store.dispatch('setErrorMsg', {codeS: err.response.status, type: 'error'})
       })

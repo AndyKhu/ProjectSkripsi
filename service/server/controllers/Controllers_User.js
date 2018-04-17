@@ -4,7 +4,8 @@ const config = require('../config/sconfig')
 const bcrypt = require('bcrypt-nodejs')
 function tokenForUser(user){
   const timestamp = new Date().getTime()
-  return jwt.encode({ sub: user.id, iat: timestamp },config.secret)
+  const ax = {sub: user.Id, iat: timestamp}
+  return jwt.encode(ax,config.secret)
 }
 module.exports = {
   signup(req,res,next){

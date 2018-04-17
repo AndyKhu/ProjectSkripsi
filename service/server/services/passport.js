@@ -42,17 +42,24 @@ const localLogin = new localStrategy(localOptions,function(req,email,password,do
 })
 
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  algorithms: 'HS256',
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: config.secret
 }
 
 const jwtlogin = new JwtStrategy(jwtOptions, function(payload,done){
+  const today = new Date().getTime(),
+        jwtS = Math.abs(today - payload.iat)/36e5
+  if(today >= payload.iat && jwtS <= 24){
     Tb_User.findById(payload.sub)
     .then(user => {
         if(!user){return done(null,false)}
         else{return done(null,user)}
     })
     .catch(error => {return done(error,false)})
+  }else{
+    return done(null,false)
+  }
 })
 passport.use('L-signup',LocalSignup)
 passport.use('jwt',jwtlogin)
