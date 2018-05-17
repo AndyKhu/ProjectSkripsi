@@ -30,6 +30,12 @@ module.exports = (sequelize, DataTypes) => {
     CloseTime: {
       type: DataTypes.DATE,
     },
+    OpenDay: {
+      type: DataTypes.INTEGER,
+    },
+    CloseDay: {
+      type: DataTypes.INTEGER,
+    },
     Address: {
       type: DataTypes.STRING,
     },
@@ -42,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
     Tb_Resto.belongsTo(models.Tb_User, {
       foreignKey: 'Id_User',
       onDelete: 'CASCADE',
+    }),
+    Tb_Resto.hasMany(models.Tb_Resto_Fac, {
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
     })
   }
   return Tb_Resto

@@ -54,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
     Tb_User.hasMany(models.Tb_User_Favorite, {
       foreignKey: 'Id_User',
       as: 'UserFavorite',
+    }),
+    Tb_User.hasOne(models.Tb_Resto, {
+      foreignKey: 'Id_User',
+      as: 'userResto',
     })
   }
   return Tb_User

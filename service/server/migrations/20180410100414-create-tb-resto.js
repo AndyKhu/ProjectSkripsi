@@ -31,6 +31,12 @@ module.exports = {
       CloseTime: {
         type: Sequelize.DATE,
       },
+      OpenDay: {
+        type: Sequelize.INTEGER,
+      },
+      CloseDay: {
+        type: Sequelize.INTEGER,
+      },
       Address: {
         type: Sequelize.STRING,
       },

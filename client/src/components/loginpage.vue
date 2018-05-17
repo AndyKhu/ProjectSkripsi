@@ -29,8 +29,10 @@
                       id="password"
                       v-model="password"
                       :rules="passwordRules"
-                      required
-                      type="password">
+                      :append-icon="password!=''?el ? 'visibility' : 'visibility_off' : ''"
+                      :append-icon-cb="() => (el = !el)"
+                      :type="el ? 'password' : 'text'"
+                      required>
                     </v-text-field>
                     <span style="color:#757575">Not Registered ? <router-link to="signup">Create an Account</router-link></span>
                     <v-alert :type="getMessage().type || 'info'" :value="getMessage() !== null"
@@ -57,12 +59,13 @@ export default {
     return {
       email: '',
       emailRules: [
-        (v) => !!v || 'Username required'
+        (v) => !!v || 'Email required'
       ],
       password: '',
       passwordRules: [
         (v) => !!v || 'Password required'
-      ]
+      ],
+      el: true
     }
   },
   methods: {

@@ -1,5 +1,7 @@
 const passport = require('passport')
 const Tb_User = require('../models').Tb_User
+const Tb_Resto = require('../models').Tb_Resto
+const Tb_Resto_Fac = require('../models').Tb_Resto_Fac
 const UserC = require('../controllers').UserC
 const config = require('../config/sconfig')
 const JwtStrategy = require('passport-jwt').Strategy
@@ -51,7 +53,19 @@ const jwtlogin = new JwtStrategy(jwtOptions, function(payload,done){
   const today = new Date().getTime(),
         jwtS = Math.abs(today - payload.iat)/36e5
   if(today >= payload.iat && jwtS <= 24){
-    Tb_User.findById(payload.sub)
+    Tb_User.findById(payload.sub, 
+      {
+        include: [{
+          model: Tb_Resto,
+          as: 'userResto',
+          include: [
+            {
+              model: Tb_Resto_Fac,
+              attributes: ['Id','Icon','Id_Resto','Name']
+            }
+          ]
+        }] 
+    })
     .then(user => {
         if(!user){return done(null,false)}
         else{return done(null,user)}

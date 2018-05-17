@@ -1,4 +1,6 @@
 const Tb_User = require('../models').Tb_User
+const Tb_Resto = require('../models').Tb_Resto
+const Tb_Resto_Fac = require('../models').Tb_Resto_Fac
 const jwt = require('jwt-simple')
 const config = require('../config/sconfig')
 const bcrypt = require('bcrypt-nodejs')
@@ -8,6 +10,9 @@ function tokenForUser(user){
   return jwt.encode(ax,config.secret)
 }
 module.exports = {
+  checkAuth (req,res,next){
+    res.send({user:req.user})
+  },
   signup(req,res,next){
     res.send({token:tokenForUser(req.user),user:req.user})
   },
@@ -15,7 +20,20 @@ module.exports = {
     res.send({token:tokenForUser(req.user),user:req.user})
   },
   login (data,done) {
-    Tb_User.findOne({ where: {Email: data.email} })
+    Tb_User.findOne(
+      { 
+        where: {Email: data.email},
+        include: [{
+          model: Tb_Resto,
+          as: 'userResto',
+          include: [
+            {
+              model: Tb_Resto_Fac,
+              attributes: ['Id','Icon','Id_Resto','Name']
+            }
+          ]
+        }] 
+      })
     .then(user => {
         if(!user){return done(null,false)}
         else{

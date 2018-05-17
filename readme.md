@@ -5,6 +5,8 @@
     - material-design-icons     | v. ^3.0.1
     - vuex                      | v. ^3.0.1
     - axios                     | v. ^0.18.0
+    - vuelidate                 | v. ^0.6.2
+    - Moment                    | v. ^2.22.1
 - Server 
     - reference : 
         - https://github.com/waiyaki/postgres-express-node-tutorial
