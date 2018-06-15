@@ -44,7 +44,7 @@ function checkAuth (to, from, next, type) {
         next()
       } else {
         next({
-          path: '/main',
+          name: 'ListResto',
           query: { redirect: to.fullPath }
         })
       }

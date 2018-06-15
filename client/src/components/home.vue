@@ -2,7 +2,7 @@
   <v-app>
     <v-toolbar fixed color="primary" dark class="white--text nav-top-cst">
         <v-icon>restaurant_menu</v-icon>
-        <router-link class="default" :to="{name: 'Main'}">
+        <router-link class="default" :to="{name: 'ListResto'}">
         <v-toolbar-title>Rabbito</v-toolbar-title>
         </router-link>
       <v-spacer></v-spacer>

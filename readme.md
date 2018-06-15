@@ -27,6 +27,9 @@
         - bcrypt-nodejs                  | v. 0.0.3
         - jwt-simple                     | v. ^0.5.1
         - cors                           | v. ^2.8.4
+        - multer                         | v. ^1.3.0
+        - del                            | v. ^3.0.0
+        - querystring                    | v. ^0.2.0
     - Environment(additional) :
         - NODE_ENV : 'development'
         - PORT : 8000

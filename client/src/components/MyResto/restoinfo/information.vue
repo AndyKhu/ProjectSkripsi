@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-lg v-if="loaded">
+  <v-container fluid grid-list-lg>
     <v-layout row wrap>
       <v-flex xs12 lg8 offset-lg2>
         <v-card class="card-content">
@@ -16,6 +16,7 @@
                       label="Restaurant Name"
                       :error-messages="nameErrors"
                       required
+                      @input="input"
                       placeholder=" ">
                     </v-text-field>
                   </v-flex>
@@ -24,6 +25,7 @@
                       mask= "#############"
                       v-model="data.Phone"
                       label="Phone Number"
+                      @input="input"
                       placeholder=" ">
                     </v-text-field>
                   </v-flex>
@@ -34,6 +36,7 @@
                         <number-text-field
                           v-model="data.PriceFrom"
                           :error-messages="PriceErrors"
+                          @input="input"
                           class="pa-0"
                           type="number"
                           prefix="Rp."/>
@@ -46,6 +49,7 @@
                           v-model="data.PriceEnd"
                           :error-messages="PriceErrors"
                           class="pa-0"
+                          @input="input"
                           type="number"
                           prefix="Rp."/>
                       </v-flex>
@@ -55,6 +59,7 @@
                     <v-text-field
                       v-model="data.Website"
                       label="Website"
+                      @input="input"
                       placeholder=" ">
                     </v-text-field>
                   </v-flex>
@@ -68,6 +73,7 @@
                           single-line
                           max-height="200"
                           class="pa-0"
+                          @input="input"
                           item-text="caption"
                           item-value="value"
                           autocomplete
@@ -84,6 +90,7 @@
                           max-height="200"
                           single-line
                           class="pa-0"
+                          @input="input"
                           item-text="caption"
                           item-value="value"
                           autocomplete
@@ -96,6 +103,7 @@
                     <v-text-field
                       v-model="data.Type"
                       label="Dinning Style"
+                      @input="input"
                       :error-messages="typeErrors"
                       placeholder=" ">
                     </v-text-field>
@@ -104,13 +112,13 @@
                     <label style="font-size:12px; color: rgba(0,0,0,.54)">Time Of Operation</label>
                     <v-layout row wrap>
                       <v-flex xs5 class="pt-0">
-                        <DateTimePicker timeOnly format="HH:mm" v-model="data.OpenTime" :label="null" :tclass="'pa-0'"/>
+                        <DateTimePicker @input="input" timeOnly format="HH:mm" v-model="data.OpenTime" :label="null" :tclass="'pa-0'"/>
                       </v-flex>
                       <v-flex xs2 class="text-xs-center">
                         -
                       </v-flex>
                       <v-flex xs5 class="pt-0">
-                        <DateTimePicker timeOnly format="HH:mm" v-model="data.CloseTime" :label="null" :tclass="'pa-0'"/>
+                        <DateTimePicker @input="input" timeOnly format="HH:mm" v-model="data.CloseTime" :label="null" :tclass="'pa-0'"/>
                       </v-flex>
                     </v-layout>
                   </v-flex>
@@ -118,6 +126,7 @@
                     <v-text-field
                       v-model="data.Address"
                       label="Address"
+                      @input="input"
                       placeholder=" ">
                     </v-text-field>
                   </v-flex>
@@ -125,6 +134,7 @@
                     <v-text-field
                       v-model="data.Description"
                       textarea multi-line rows="3"
+                      @input="input"
                       label="Restaurant Description"
                       placeholder=" ">
                     </v-text-field>
@@ -135,36 +145,24 @@
           </v-flex>
         </v-card>
       </v-flex>
-      <v-speed-dial
-        v-model="fab"
-        fixed bottom right direction="top" :open-on-hover="false" transition="slide-y-reverse-transition">
-        <v-btn slot="activator"
-          v-model="fab" color="blue darken-2" small dark fab hover>
-          <v-icon class="d-flex">more_vert</v-icon>
-          <v-icon class="d-flex">close</v-icon>
-        </v-btn>
-        <v-btn @click="save" fab small dark color="green"><v-icon class="d-flex">save</v-icon></v-btn>
-        <router-link :to="{name: 'RestoFac'}"><v-btn fab small dark color="indigo"><v-icon class="d-flex">chevron_right</v-icon></v-btn></router-link>
-      </v-speed-dial>
     </v-layout>
   </v-container>
-  <div v-else>Loading</div>
 </template>
 <script>
 import { validationMixin } from 'vuelidate'
 import { required } from 'vuelidate/lib/validators'
-import axios from 'axios'
-import auth from '@/api/auth.js'
-
 export default {
+  props: {
+    value: {
+      type: Object,
+      required: false
+    }
+  },
   mixins: [validationMixin],
   name: 'Resto-Info',
-  components: {
-  },
   data: () => ({
-    loaded: false,
+    data: {},
     fab: false,
-    User: null,
     Day: [
       { caption: 'Monday', value: 1 },
       { caption: 'Tuesday', value: 2 },
@@ -173,21 +171,6 @@ export default {
       { caption: 'Friday', value: 5 },
       { caption: 'Saturday', value: 6 },
       { caption: 'Sunday', value: 7 }],
-    data: {
-      Name: '',
-      Phone: null,
-      Description: null,
-      PriceFrom: null,
-      PriceEnd: null,
-      Website: null,
-      OpenTime: null,
-      CloseTime: null,
-      OpenDay: null,
-      CloseDay: null,
-      Address: null,
-      Type: '',
-      Id_User: null
-    },
     edited: false
   }),
   computed: {
@@ -239,77 +222,12 @@ export default {
     }
   },
   methods: {
-    save () {
-      if (this.validate()) {
-        this.data.Id = this.User.userResto == null ? '' : this.User.userResto.Id
-        this.data.Id_User = this.User.Id
-        axios.post(`${this.$store.getters.ROOT_URL}/api/save/resto`, this.data)
-          .then(res => {
-            this.$store.dispatch('setDialogMsg', {
-              txtmsg: 'Save Success',
-              status: true,
-              color: 'success'
-            })
-          }).catch((res) => {
-            this.$store.dispatch('setDialogMsg', {
-              txtmsg: 'Save Failed',
-              status: true,
-              color: 'error'
-            })
-          })
-      } else {
-        this.$v.$touch()
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Save Failed',
-          status: true,
-          color: 'error'
-        })
-      }
-    },
-    validate () {
-      if (this.data.Name === null || this.data.Name === '') {
-        return false
-      } else if (this.data.Type === null || this.data.Type === '') {
-        return false
-      } else if (this.data.OpenDay > this.data.CloseDay) {
-        return false
-      }
-      return true
+    input (value) {
+      this.$emit('input', this.data)
     }
   },
   mounted () {
-    if (this.$store.getters['getUser'] === null) {
-      auth.getUser(this).then(() => {
-        this.User = this.$store.getters['getUser']
-        if (this.User.userResto != null) {
-          this.data = this.User.userResto
-        }
-        this.loaded = true
-      })
-    } else {
-      this.User = this.$store.getters['getUser']
-      if (this.User.userResto != null) {
-        this.data = this.User.userResto
-      }
-      this.loaded = true
-    }
+    this.data = this.value
   }
 }
 </script>
-<style scoped>
-form{
-  font-family: arial;
-}
-.item-tittle{
-  border-bottom: 1px solid #E0E0E0;
-  font-size: 18px;
-  color: #616161;
-  font-family: arial;
-}
-.item-content{
-  font-family: serif;
-}
-.card-content{
-  min-height: 550px;
-}
-</style>

@@ -5,8 +5,8 @@ import signUp from '@/components/signup'
 import NotFoundPage from '@/components/NotFoundPage'
 import Home from '@/components/home'
 import Myresto from '@/components/MyResto/index'
-import RestoInfo from '@/components/MyResto/restoinfo'
-import RestoFac from '@/components/MyResto/restofac'
+import RestoInfo from '@/components/MyResto/restoinfo/index'
+import ListResto from '@/components/listresto'
 
 Vue.use(Router)
 
@@ -26,10 +26,14 @@ export default new Router({
     },
     {
       path: '/main',
-      name: 'Main',
       meta: { requiresAuth: true },
       component: Home,
       children: [
+        {
+          path: '/',
+          name: 'ListResto',
+          component: ListResto
+        },
         {
           path: 'myresto',
           name: 'MyResto',
@@ -39,11 +43,6 @@ export default new Router({
           path: 'myresto/info',
           name: 'RestoInfo',
           component: RestoInfo
-        },
-        {
-          path: 'myresto/fac',
-          name: 'RestoFac',
-          component: RestoFac
         }
       ]
     },

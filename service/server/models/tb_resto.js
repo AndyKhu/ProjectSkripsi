@@ -53,6 +53,16 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       sourceKey: 'Id'
+    }),
+    Tb_Resto.hasMany(models.Tb_Gallery, {
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
+    }),
+    Tb_Resto.hasMany(models.Tb_Resto_Menu, {
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
     })
   }
   return Tb_Resto

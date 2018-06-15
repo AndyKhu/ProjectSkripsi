@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-lg v-if="loaded">
+  <v-container fluid grid-list-lg>
     <v-layout row wrap>
       <v-flex xs12 lg8 offset-lg2>
         <v-card class="card-content">
@@ -53,33 +53,19 @@
           </v-flex>
         </v-card>
       </v-flex>
-      <v-speed-dial
-        v-model="fab"
-        fixed bottom right direction="top" :open-on-hover="false" transition="slide-y-reverse-transition">
-        <v-btn slot="activator"
-          v-model="fab" color="blue darken-2" small dark fab hover>
-          <v-icon class="d-flex">more_vert</v-icon>
-          <v-icon class="d-flex">close</v-icon>
-        </v-btn>
-        <v-btn @click="save" fab small dark color="green"><v-icon class="d-flex">save</v-icon></v-btn>
-        <router-link :to="{name: 'RestoFac'}"><v-btn fab small dark color="indigo"><v-icon class="d-flex">chevron_right</v-icon></v-btn></router-link>
-      </v-speed-dial>
     </v-layout>
   </v-container>
-  <div v-else>Loading</div>
 </template>
 <script>
-import auth from '@/api/auth.js'
-
 export default {
   name: 'Resto-Fac',
-  components: {
+  props: {
+    value: {
+      type: Array,
+      required: false
+    }
   },
   data: () => ({
-    loaded: false,
-    User: null,
-    fab: false,
-    a: [],
     fn: '',
     selecticons: 'help',
     icons: [
@@ -98,51 +84,19 @@ export default {
   }),
   methods: {
     add () {
-      this.items.push({value: true, Name: this.fn, Icon: this.selecticons, Id_Resto: this.User.userResto.Id})
+      this.items.push({Name: this.fn, Icon: this.selecticons})
       this.fn = ''
       this.selecticons = 'help'
+      this.$emit('input', this.items)
     },
     deleteItem (item) {
       const index = this.items.indexOf(item)
       this.items.splice(index, 1)
-    },
-    save () {
-      console.log(this.items)
+      this.$emit('input', this.items)
     }
   },
   mounted () {
-    if (this.$store.getters['getUser'] === null) {
-      auth.getUser(this).then(() => {
-        this.User = this.$store.getters['getUser']
-        if (this.User.userResto != null) {
-          this.items = this.User.userResto.Tb_Resto_Facs
-        }
-        this.loaded = true
-      })
-    } else {
-      this.User = this.$store.getters['getUser']
-      if (this.User.userResto != null) {
-        this.items = this.User.userResto.Tb_Resto_Facs
-      }
-      this.loaded = true
-    }
+    this.items = this.value
   }
 }
 </script>
-<style scoped>
-form{
-  font-family: arial;
-}
-.item-tittle{
-  border-bottom: 1px solid #E0E0E0;
-  font-size: 18px;
-  color: #616161;
-  font-family: arial;
-}
-.item-content{
-  font-family: serif;
-}
-.card-content{
-  min-height: 550px;
-}
-</style>

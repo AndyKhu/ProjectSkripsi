@@ -1,6 +1,8 @@
 const Tb_User = require('../models').Tb_User
 const Tb_Resto = require('../models').Tb_Resto
 const Tb_Resto_Fac = require('../models').Tb_Resto_Fac
+const Tb_Gallery = require('../models').Tb_Gallery
+const Tb_Resto_Menu = require('../models').Tb_Resto_Menu
 const jwt = require('jwt-simple')
 const config = require('../config/sconfig')
 const bcrypt = require('bcrypt-nodejs')
@@ -30,6 +32,14 @@ module.exports = {
             {
               model: Tb_Resto_Fac,
               attributes: ['Id','Icon','Id_Resto','Name']
+            },
+            {
+              model: Tb_Gallery,
+              attributes: ['Id','Type','PID','Pname','Ptype']
+            },
+            {
+              model: Tb_Resto_Menu,
+              attributes: ['Id','Name','Price','Description','PID','Pname','Ptype','Type']
             }
           ]
         }] 
