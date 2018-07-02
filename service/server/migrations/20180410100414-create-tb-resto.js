@@ -16,6 +16,9 @@ module.exports = {
       Description: {
         type: Sequelize.STRING,
       },
+      ReservePrice: {
+        type: Sequelize.DOUBLE,
+      },
       PriceFrom: {
         type: Sequelize.DOUBLE,
       },
@@ -42,7 +45,9 @@ module.exports = {
       },
       Type: {
         type: Sequelize.STRING,
-        allowNull: false,
+      },
+      Rate: {
+        type: Sequelize.DOUBLE,
       },
       createdAt: {
         allowNull: false,

@@ -6,32 +6,53 @@ import store from './store'
 import router from './router'
 import Vuetify from 'vuetify'
 import axios from 'axios'
+import moment from 'moment'
 import 'vuetify/dist/vuetify.min.css'
 import 'material-design-icons/iconfont/material-icons.css'
-import DateTimePicker from '@/components/helper/DateTimePicker.vue'
-import NumberTextField from '@/components/helper/numberTextField.vue'
+import timePicker from '@/components/helper/formComponent/timePicker.vue'
+import formTextField from '@/components/helper/formComponent/formTextField.vue'
+import formNumberField from '@/components/helper/formComponent/numberTextField.vue'
+import formNumberingSeats from '@/components/helper/formComponent/formNumberingSeats.vue'
+import formComboBox from '@/components/helper/formComponent/formComboBox.vue'
+import formPR from '@/components/helper/formComponent/priceRangeTextField.vue'
+import formDR from '@/components/helper/formComponent/dayRangeTextField.vue'
+import formTR from '@/components/helper/formComponent/timeRangeTextField.vue'
+import formUploadImg from '@/components/helper/formComponent/formUploadImg.vue'
 
 Vue.use(Vuetify)
-Vue.component('DateTimePicker', DateTimePicker)
-Vue.component('NumberTextField', NumberTextField)
+Vue.component('formTextField', formTextField)
+Vue.component('formPR', formPR)
+Vue.component('formDR', formDR)
+Vue.component('formTR', formTR)
+Vue.component('timePicker', timePicker)
+Vue.component('formComboBox', formComboBox)
+Vue.component('formNumberField', formNumberField)
+Vue.component('formNumberingSeats', formNumberingSeats)
+Vue.component('formUploadImg', formUploadImg)
+
+Vue.filter('getDay', function (value) {
+  if (!value) return ''
+  let day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  return day[value - 1]
+})
+Vue.filter('NormalTime', function (value) {
+  if (!value) return ''
+  return moment(value).format('HH:mm')
+})
 
 Vue.config.productionTip = false
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    checkAuth(to, from, next, true)
+  if (to.matched.some(record => record.meta.requireAR)) {
+    checkAuth(to, from, next, 'AR')
   }
-  if (to.matched.some(record => record.meta.requiresAdmin)) {
-    if (store.getters.getUser.role === 'admin') {
-      next()
-    } else {
-      next({
-        path: '/',
-        query: { redirect: to.fullPath }
-      })
-    }
+  if (to.matched.some(record => record.meta.requireSA)) {
+    checkAuth(to, from, next, 'SA')
+  }
+  if (to.matched.some(record => record.meta.requireM)) {
+    checkAuth(to, from, next, 'M')
   }
   if (to.matched.some(record => record.meta.checksAuth)) {
-    checkAuth(to, from, next, false)
+    checkAuth(to, from, next, '-')
   }
   next()
 })
@@ -40,23 +61,60 @@ function checkAuth (to, from, next, type) {
   axios.get(`${store.getters.ROOT_URL}/checkAuth`, {headers: {'Authorization': token}})
     .then(res => {
       store.dispatch('setUser', res.data.user)
-      if (type) {
-        next()
+      if (type === 'AR') {
+        if (res.data.user.Type === 'AdminResto') {
+          next()
+        } else {
+          store.dispatch('setErrorMsg', {codeS: 999, type: 'error'})
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+        }
+      } else if (type === 'SA') {
+        if (res.data.user.Type === 'SYSTEM') {
+          next()
+        } else {
+          store.dispatch('setErrorMsg', {codeS: 999, type: 'error'})
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+        }
+      } else if (type === 'M') {
+        if (res.data.user.Type === 'Member') {
+          next()
+        } else {
+          store.dispatch('setErrorMsg', {codeS: 999, type: 'error'})
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+        }
       } else {
-        next({
-          name: 'ListResto',
-          query: { redirect: to.fullPath }
-        })
+        if (res.data.user.Type === 'AdminResto') {
+          next({
+            name: 'AdminResto',
+            query: { redirect: to.fullPath }
+          })
+        } else if (res.data.user.Type === 'SYSTEM') {
+          next({
+            name: 'ReqAdmin',
+            query: { redirect: to.fullPath }
+          })
+        } else {
+          next()
+        }
       }
     }).catch(() => {
-      if (type) {
+      if (type === '-') {
+        next()
+      } else {
         store.dispatch('setErrorMsg', {codeS: 999, type: 'error'})
         next({
-          path: '/',
+          path: '/login',
           query: { redirect: to.fullPath }
         })
-      } else {
-        next()
       }
     })
 }

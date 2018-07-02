@@ -33,3 +33,6 @@
     - Environment(additional) :
         - NODE_ENV : 'development'
         - PORT : 8000
+
+- note : 
+    - create Table = "sequelize model:create --name Todo --attributes title:string"

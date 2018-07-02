@@ -56,7 +56,7 @@ export default {
         context.$store.dispatch('setDialogMsg', {
           txtmsg: 'Delete Success',
           status: true,
-          color: 'success'
+          color: 'green'
         })
         context.active = true
       }).catch((res) => {

@@ -1,8 +1,12 @@
-const UserC = require('./Controllers_User');
-const SaveC = require('./Save_Controllers');
-const GetC = require('./Get_Controllers');
+const Auth = require('./Auth');
+const Uploaders = require('./Uploader');
+const SystemAdmin = require('./SystemAdmin');
+const AdminResto = require('./AdminResto');
+const Member = require('./Member');
 module.exports = {
-    UserC,
-    SaveC,
-    GetC
+    Auth,
+    SystemAdmin,
+    AdminResto,
+    Uploaders,
+    Member
 };

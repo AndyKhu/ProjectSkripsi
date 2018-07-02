@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Tb_Gallery.associate = (models) => {
     Tb_Gallery.belongsTo(models.Tb_Resto, {
+      as: 'Gallery',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
     })

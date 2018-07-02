@@ -13,14 +13,6 @@
                   <v-form>
                     <v-text-field
                       @keyup="submitEnter"
-                      prepend-icon="person"
-                      name="fullName"
-                      label="Full Name"
-                      v-model="fullName"
-                      :rules="fullNameRules"
-                      required/>
-                    <v-text-field
-                      @keyup="submitEnter"
                       prepend-icon="email"
                       v-model="email"
                       :rules="emailRules"
@@ -31,6 +23,14 @@
                     </v-text-field>
                     <v-text-field
                       @keyup="submitEnter"
+                      prepend-icon="person"
+                      name="fullName"
+                      label="Full Name"
+                      v-model="fullName"
+                      :rules="fullNameRules"
+                      required/>
+                    <v-text-field
+                      @keyup="submitEnter"
                       prepend-icon="lock"
                       name="password"
                       label="Password"
@@ -38,8 +38,33 @@
                       v-model="password"
                       :rules="passwordRules"
                       required
-                      type="password">
-                    </v-text-field>
+                      type="password"/>
+                    <v-select
+                      prepend-icon="business_center"
+                      :items="type"
+                      v-model="usertype"
+                      single-line />
+                    <v-text-field v-if="usertype !== 'Member'"
+                      prepend-icon="restaurant_menu"
+                      name="Resto Name"
+                      label="Resto Name"
+                      v-model="restoname"/>
+                    <!-- <v-text-field
+                      prepend-icon="description"
+                      name="Business Permit"
+                      label="Business Permit"
+                      v-model="restoname"/> -->
+                    <v-layout row wrap class="pb-3" v-if="usertype !== 'Member'">
+                      <v-flex xs9 class="force-center-left txt-cst">
+                        Business Permit
+                      </v-flex>
+                      <v-flex xs3>
+                        <input @change="ImgChange" type="file" id="target" style="display: none" accept="image/*"/>
+                        <v-btn block dark color="green" @click="click">
+                          <v-icon dark>cloud_upload</v-icon>
+                        </v-btn>
+                      </v-flex>
+                    </v-layout>
                     <span style="color:#757575">Already Have Account ? <router-link to="/">Login Here</router-link></span>
                     <v-alert :type="getMessage().type || 'info'" :value="getMessage() !== null"
                          dismissible @input="closeMessage" v-if="getMessage() !== null ">{{getMessage().message}}</v-alert>
@@ -74,17 +99,28 @@ export default {
       fullName: '',
       fullNameRules: [
         (v) => !!v || 'Password required'
-      ]
+      ],
+      usertype: 'Member',
+      type: ['Member', 'Admin Resto'],
+      restoname: '',
+      Img: null
     }
   },
   methods: {
     submit () {
       var credentials = {
+        Id: '',
         email: this.email,
         password: this.password,
-        fullName: this.fullName
+        fullName: this.fullName,
+        restoName: this.restoname
       }
-      auth.signUp(this, credentials, '/')
+      if (this.usertype === 'Member') {
+        auth.signUp(this, credentials, '/')
+      } else {
+        credentials.Img = this.Img
+        auth.signupA(this, credentials, '/')
+      }
     },
     submitEnter (event) {
       if (event.keyCode === 13) {
@@ -96,7 +132,24 @@ export default {
     },
     closeMessage () {
       this.$store.dispatch('closeErrorMsg')
+    },
+    click () {
+      document.getElementById('target').click()
+    },
+    ImgChange (e) {
+      let tl = e.target.files.length
+      if (tl !== 0) {
+        this.Img = e.target.files[0]
+      }
     }
   }
 }
 </script>
+<style scoped>
+.txt-cst{
+  color: #424242;
+  font-size: 18px;
+  justify-content: flex-end;
+  padding: 0 20px;
+}
+</style>

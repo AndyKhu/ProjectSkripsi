@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Tb_Resto_Fac.associate = (models) => {
     Tb_Resto_Fac.belongsTo(models.Tb_Resto, {
+      as: 'Facility',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       targetKey: 'Id'

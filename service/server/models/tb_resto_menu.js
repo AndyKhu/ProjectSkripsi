@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Tb_Resto_Menu.associate = (models) => {
     Tb_Resto_Menu.belongsTo(models.Tb_Resto, {
+      as: 'FoodMenu',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
     })

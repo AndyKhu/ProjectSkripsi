@@ -24,6 +24,9 @@ module.exports = {
       Ptype: {
         type: Sequelize.STRING
       },
+      Type: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

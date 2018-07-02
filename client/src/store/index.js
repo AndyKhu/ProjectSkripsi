@@ -11,6 +11,10 @@ const store = new Vuex.Store({
     ROOT_URL: 'http://localhost:8001',
     errorMsg: null,
     User: null,
+    adminDialog: {
+      status: false,
+      src: 'http://via.placeholder.com/90x90'
+    },
     dialogMsg: {
       txtmsg: '',
       status: false,
@@ -25,7 +29,7 @@ const store = new Vuex.Store({
       if (value.codeS === 401 || value.codeS === 400) {
         value.message = 'Invalid Username or Password'
       } else if (value.codeS === 999) {
-        value.message = 'Login Session Expired'
+        value.message = 'You have no access to this link'
       } else {
         value.message = 'something error call administrator'
       }
@@ -36,13 +40,17 @@ const store = new Vuex.Store({
     },
     setdialogMsg: (state, value) => {
       state.dialogMsg = value
+    },
+    setadminDialog: (state, value) => {
+      state.adminDialog = value
     }
   },
   getters: {
     ROOT_URL: (state) => state.ROOT_URL,
     errorMsg: (state) => state.errorMsg,
     getUser: (state) => state.User,
-    getdialogMsg: (state) => state.dialogMsg
+    getdialogMsg: (state) => state.dialogMsg,
+    getadminDialog: (state) => state.adminDialog
   },
   actions: {
     closeErrorMsg: (context, payload) => {
@@ -56,6 +64,9 @@ const store = new Vuex.Store({
     },
     setDialogMsg: (context, payload) => {
       context.commit('setdialogMsg', payload)
+    },
+    setAdminDialog: (context, payload) => {
+      context.commit('setadminDialog', payload)
     }
   }
 })

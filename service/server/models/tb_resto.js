@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     Description: {
       type: DataTypes.STRING,
     },
+    ReservePrice: {
+      type: DataTypes.DOUBLE,
+    },
     PriceFrom: {
       type: DataTypes.DOUBLE,
     },
@@ -40,8 +43,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     Type: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.STRING
+    },
+    Rate: {
+      type: DataTypes.DOUBLE
     }
   })
   Tb_Resto.associate = (models) => {
@@ -50,16 +55,31 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
     }),
     Tb_Resto.hasMany(models.Tb_Resto_Fac, {
+      as: 'Facility',
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
+    }),
+    Tb_Resto.hasMany(models.Tb_Resto_Seat, {
+      as: 'Seats',
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
+    }),
+    Tb_Resto.hasMany(models.Tb_Resto_Account, {
+      as: 'Account',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       sourceKey: 'Id'
     }),
     Tb_Resto.hasMany(models.Tb_Gallery, {
+      as: 'Gallery',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       sourceKey: 'Id'
     }),
     Tb_Resto.hasMany(models.Tb_Resto_Menu, {
+      as: 'FoodMenu',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       sourceKey: 'Id'
