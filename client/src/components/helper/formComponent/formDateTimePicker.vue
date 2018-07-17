@@ -23,7 +23,7 @@
       <v-layout wrap>
         <v-card style="max-width: 290px">
           <v-flex xs12 v-if="!timeOnly">
-              <v-date-picker @input="changev"
+              <v-date-picker @input="changev" :min="minDate"
                             :disabled="disabled" :readonly="readonly"
                             v-if="active" v-model="date" no-title scrollable></v-date-picker>
           </v-flex>
@@ -144,6 +144,13 @@ export default {
     }
   },
   computed: {
+    minDate: {
+      get () {
+        let currentdate = new Date()
+        currentdate.setDate(currentdate.getDate() + 1)
+        return moment(currentdate).format('YYYY-MM-DD')
+      }
+    },
     formattedDateTime: {
       get () {
         return this.datetime === null ? '' : moment(this.datetime).format(this.format || this.defaultFormat)

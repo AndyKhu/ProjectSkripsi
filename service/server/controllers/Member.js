@@ -1,5 +1,7 @@
 const Models = require('../models')
 const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+const del = require('del')
 const env = process.env.NODE_ENV || 'development'
 const config = require(`${__dirname}/../config/config.json`)[env]
 let sequelize
@@ -64,6 +66,21 @@ module.exports = {
       res.status(400).send({ error: err })
     })
   },
+  getReservationHistory (req, res, next) {
+    sequelize.query(`select a.*,a."reserveDate"+ (a."Duration" * interval '1 minute')  as "DurationC",b."Name" as "RestoName",c."PID" from public."Tb_User_Reservations" a join public."Tb_Restos" b on a."RestoId" = b."Id" join public."Tb_Galleries" c on c."Id_Resto" = b."Id" and (c."Type" = 'both' or c."Type" = 'default')`, { type: Sequelize.QueryTypes.SELECT})
+    .then(listH => {
+      listH.forEach((val,index) => {
+        if (val.PID) {
+          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${val.PID}`))
+          val.file = bitmap
+        }
+      })
+      res.status(200).send(listH)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
   getRestoDetail(req, res, next) {
     Models.Tb_Resto.findOne({ where: {Id: req.params.id},
       include: [
@@ -81,6 +98,13 @@ module.exports = {
           model: Models.Tb_Resto_Account,
           as: 'Account',
           attributes: ['Id','BankName','AccountNumber','Id_Resto']
+        },
+        {
+          model: Models.Tb_Resto_Review,
+          where: {Status: {[Op.ne]: 2}},   
+          required: false,       
+          as: 'Reviews',
+          attributes: ['Id','comment','rate','userId','userName','userPID','Id_Resto']
         },
         {
           model: Models.Tb_Resto_Menu,
@@ -110,6 +134,54 @@ module.exports = {
     }).catch(err => {
       console.log(err)
       res.status(400).send({ error: err })
+    })
+  },
+  saveRestoReview (req, res, next) {
+    let data = req.body
+    data.Id = guid()
+    Models.Tb_Resto_Review.create(data).then(pro3 => {
+      res.status(200).send(pro3)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({errmsg: 'Failed to Comment'})
+    })
+  },
+  saveRestoReserve (req, res, next) {
+    let data = req.body
+    data.Id = guid()
+    let foodList = []
+    data.FoodMenu.forEach((val,index) => {
+      foodList.push({Id: guid(), Amount: val.Amount, MenuId: val.Id, Id_Reserve: data.Id})
+    })
+    Models.Tb_User_Reservation.create(data).then(pro3 => {
+      Models.Tb_User_Reservation_Menu.bulkCreate(foodList).then(pro => {
+        data.FoodMenu = foodList
+        res.status(200).send(data)
+      })
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({errmsg: 'Failed to Comment'})
+    })
+  },
+  updateProfile (req, res, next) {
+    let data = req.body
+    if(data.upload)
+      del.sync([`uploads/${data.Id}/${data.delete}`])
+    Models.Tb_User.update({
+      fullName: data.fullName,
+      Phone: data.Phone,
+      Age: data.Age,
+      Weight: data.Weight,
+      Height: data.Height,
+      DpName: data.DpName,
+      DpId: data.DpId,
+      DpType: data.DpType
+    },
+    {where: {Id: data.Id}}).then(hsl => {
+      res.status(200).send(hsl)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({errmsg: 'Failed to Update'})
     })
   }
 }

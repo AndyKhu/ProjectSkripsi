@@ -8,6 +8,7 @@ const store = new Vuex.Store({
     Helper
   },
   state: {
+    // ROOT_URL: 'http://172.16.11.60:8001',
     ROOT_URL: 'http://localhost:8001',
     errorMsg: null,
     User: null,

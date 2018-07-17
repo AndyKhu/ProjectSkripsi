@@ -14,7 +14,7 @@
           <v-icon>arrow_drop_down</v-icon>
         </div>
         <v-card tile width="300px">
-          <MenuLink :Type="'AR'"/>
+          <MenuLink :Type="'AR'" :userId="getuser().Id"/>
         </v-card>
       </v-menu>
     </v-toolbar>

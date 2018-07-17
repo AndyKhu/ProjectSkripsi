@@ -1,11 +1,10 @@
 <template>
-  <div class="component-cont mb-3">
-    <label class="mb-2">{{label}}</label>
-    <v-text-field class="pa-0 px-3"
+  <div class="component-cont" :class="noPadding?'':labelC?'inputCenter mb-3':'mb-3'">
+    <label v-if="!noPadding" :class="brbtm?labelC?'text-xs-center':'':'mb-2'">{{label}}</label>
+    <v-text-field class="pa-0" :class="noPadding?'no-border-bottom':brbtm?'brbtm px-3':'px-3'"
       v-bind="$attrs"
       v-model="comData"
-      hide-details
-      placeholder=" ">
+      hide-details>
     </v-text-field>
   </div>
 </template>
@@ -13,7 +12,7 @@
 export default {
   props: {
     value: {
-      type: String,
+      type: String / Number,
       require: false,
       default: ''
     },
@@ -21,6 +20,21 @@ export default {
       type: String,
       require: false,
       default: ''
+    },
+    brbtm: {
+      type: Boolean,
+      require: false,
+      default: false
+    },
+    labelC: {
+      type: Boolean,
+      require: false,
+      default: false
+    },
+    noPadding: {
+      type: Boolean,
+      require: false,
+      default: false
     }
   },
   computed: {
@@ -46,6 +60,17 @@ export default {
   padding: 10px;
   color: #616161 !important;
   border: 1px solid #dedede;
+}
+.inputCenter >>> input {
+  text-align: center;
+}
+.brbtm >>> input {
+  border: none;
+  border-bottom: 1px solid #dedede;
+}
+.no-border-bottom >>> input {
+  border: none;
+  border-top: 1px solid #dedede;
 }
 .component-cont >>> .input-group__selections{
   justify-content: center;

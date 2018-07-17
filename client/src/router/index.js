@@ -5,20 +5,23 @@ import signUp from '@/components/signup'
 import NotFoundPage from '@/components/NotFoundPage'
 import profilePage from '@/components/profilePage'
 import historyPage from '@/components/historyPage'
+import ChangePassword from '@/components/changePassword'
 // Member
 import Member from '@/components/Member/index'
 import ListResto from '@/components/Member/listresto'
 import RestoDetail from '@/components/Member/restoDetail'
 import RestoReserve from '@/components/Member/restoReserve'
+import MyFavorite from '@/components/Member/myFavorite'
 // Admin Resto
 import AdminResto from '@/components/AdminResto/index'
 import MenuAR from '@/components/AdminResto/menu'
 import restoSetup from '@/components/AdminResto/restoSetup'
+import confirmList from '@/components/AdminResto/confirmList'
 // System Admin
 import SystemAdmin from '@/components/SystemAdmin/index'
 import reqAdminSA from '@/components/SystemAdmin/reqAdmin'
 import AccountSA from '@/components/SystemAdmin/account'
-import RestoSA from '@/components/SystemAdmin/resto'
+import ReviewSA from '@/components/SystemAdmin/review'
 
 Vue.use(Router)
 
@@ -51,6 +54,16 @@ export default new Router({
           component: RestoDetail
         },
         {
+          path: '/changepass',
+          name: 'ChangePassword',
+          component: ChangePassword
+        },
+        {
+          path: '/myFavorite',
+          name: 'MyFavorite',
+          component: MyFavorite
+        },
+        {
           path: '/reserve/:id',
           name: 'Reserve',
           component: RestoReserve
@@ -80,9 +93,19 @@ export default new Router({
           component: MenuAR
         },
         {
-          path: '/profile/:id',
+          path: '/profileAR/:id',
           name: 'ARProfile',
           component: profilePage
+        },
+        {
+          path: '/changepassAR',
+          name: 'ChangePasswordAR',
+          component: ChangePassword
+        },
+        {
+          path: '/confirmList',
+          name: 'confirmList',
+          component: confirmList
         },
         {
           path: '/restoSetup',
@@ -108,8 +131,8 @@ export default new Router({
         },
         {
           path: '/Resto',
-          name: 'ViewResto',
-          component: RestoSA
+          name: 'Reviews',
+          component: ReviewSA
         }
       ]
     },

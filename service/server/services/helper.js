@@ -1,4 +1,5 @@
 const Tb_User = require('../models').Tb_User
+const Tb_User_Favorite = require('../models').Tb_User_Favorite
 const bcrypt = require('bcrypt-nodejs')
 module.exports = {
   create(data,done) {
@@ -21,7 +22,13 @@ module.exports = {
     }).catch(error => {return done(null,false,{ message: 'Something Error Tell Administrator'})})
   },
   getUser (payload,done) {
-    Tb_User.findById(payload.sub)
+    Tb_User.findById(payload.sub,{
+      include: [
+      {
+        model: Tb_User_Favorite,
+        as: 'UserFavorite'
+      }]
+    })
     .then(user => {
         if(!user){return done(null,false)}
         else{return done(null,user)}
@@ -31,7 +38,12 @@ module.exports = {
   login (data,done) {
     Tb_User.findOne(
       { 
-        where: {Email: data.email, Status: true}
+        where: {Email: data.email, Status: true},
+        include: [
+          {
+            model: Tb_User_Favorite,
+            as: 'UserFavorite'
+          }]
       })
     .then(user => {
         if(!user){return done(null,false)}

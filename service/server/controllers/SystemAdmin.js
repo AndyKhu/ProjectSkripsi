@@ -2,7 +2,19 @@ const Models = require('../models')
 //for read Image
 const fs = require('fs')
 const path = require('path')
-
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op
+const del = require('del')
+const env = process.env.NODE_ENV || 'development'
+const config = require(`${__dirname}/../config/config.json`)[env]
+let sequelize
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable])
+} else {
+  sequelize = new Sequelize(
+    config.database, config.username, config.password, config
+  )
+}
 //default
 function guid () {
   function s4 () {
@@ -29,6 +41,24 @@ module.exports = {
       res.status(400).send({ error: err })
     )
   },
+  getTbReview (req,res,next){
+    sequelize.query(`select a.*,b."Name" as "RestoName",c."Email" from public."Tb_Resto_Reviews" a join public."Tb_Restos" b on a."Id_Resto" = b."Id" join public."Tb_Users" c on a."userId" = c."Id" where a."Status" = 1`, { type: Sequelize.QueryTypes.SELECT})
+    .then(resto => {
+      res.status(200).send(resto)
+      // We don't need spread here, since only the results will be returned for select queries
+    }).catch(err => {
+      console.log(err)
+    })
+  },
+  getTbReviewAll (req,res,next){
+    sequelize.query(`select a.*,b."Name" as "RestoName",c."Email" from public."Tb_Resto_Reviews" a join public."Tb_Restos" b on a."Id_Resto" = b."Id" join public."Tb_Users" c on a."userId" = c."Id" where a."Status" != 0`, { type: Sequelize.QueryTypes.SELECT})
+    .then(resto => {
+      res.status(200).send(resto)
+      // We don't need spread here, since only the results will be returned for select queries
+    }).catch(err => {
+      console.log(err)
+    })
+  },
   getTbUserAll(req, res, next) {
     Models.Tb_User.findAll({
       attributes: ['Id','fullName','Email','Type','Status'],
@@ -40,6 +70,14 @@ module.exports = {
     )
   },
   //put
+  updateRestoReview(req, res, next) {
+    Models.Tb_Resto_Review.update({Status: req.params.status}, {where: {Id: req.params.id}}).then(cb => {
+      res.status(200).send({good: 'lul'})
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
   updateTbUser(req, res, next) {
     let data = req.body
     Models.Tb_User.update({Email:data.Email, fullName: data.fullName, Type: data.Type, Status: data.Status},{where: {Id: data.Id }}).then(pro => {

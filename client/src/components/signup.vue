@@ -65,7 +65,7 @@
                         </v-btn>
                       </v-flex>
                     </v-layout>
-                    <span style="color:#757575">Already Have Account ? <router-link to="/">Login Here</router-link></span>
+                    <span style="color:#757575">Already Have Account ? <router-link :to="{name: 'Login'}">Login Here</router-link></span>
                     <v-alert :type="getMessage().type || 'info'" :value="getMessage() !== null"
                          dismissible @input="closeMessage" v-if="getMessage() !== null ">{{getMessage().message}}</v-alert>
                   </v-form>

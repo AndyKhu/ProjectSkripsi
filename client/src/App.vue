@@ -121,9 +121,9 @@ a {
     color: #ffffff
   }
 
-  html::-webkit-scrollbar {
+  /* html::-webkit-scrollbar {
     display: none;
-  }
+  } */
   .force-center{
     display: flex;
     justify-content: center;
@@ -138,5 +138,8 @@ a {
   }
   .menu__content .menu__content--select   .menu__content--autocomplete .menuable__content__active{
     overflow: hidden;
+  }
+  .flex-column{
+    flex-direction: column;
   }
 </style>

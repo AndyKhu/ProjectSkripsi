@@ -42,8 +42,10 @@ module.exports = {
         val.dataValues.file = bitmap
       })
       resto.FoodMenu.forEach((val,index) => {
-        let bitmap = fs.readFileSync(path.join(`uploads/${resto.Id}/${val.PID}`))
-        val.dataValues.file = bitmap
+        if(val.PID){
+          let bitmap = fs.readFileSync(path.join(`uploads/${resto.Id}/${val.PID}`))
+          val.dataValues.file = bitmap
+        }
       })
       res.status(200).send(resto)
     }).catch(err => {
@@ -51,7 +53,40 @@ module.exports = {
       res.status(400).send({ error: err })
     })
   },
+  getTbRestoByuserIDmin(req, res, next) {
+    Models.Tb_Resto.findOne({ where: {Id_User: req.params.id},
+      include: [
+        {
+          model: Models.Tb_Resto_Review,
+          where: {Status: 0},          
+          as: 'Reviews',
+          attributes: ['Id','comment','rate','userId','userName','userPID','Id_Resto']
+        }
+        ]
+    }).then(resto =>{
+      res.status(200).send(resto)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
   //put
+  saveRestoRate (req, res, next) {
+    Models.Tb_Resto.update({Rate: req.params.rate}, { where: { Id: req.params.id } }).then(callback => {
+      res.status(200).send({good: 'lul'})
+    }).catch(err=> {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
+  updateRestoReview(req, res, next) {
+    Models.Tb_Resto_Review.update({Status: 1}, {where: {Id: req.params.id}}).then(cb => {
+      res.status(200).send({good: 'lul'})
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
   updateTbResto(req, res, next) {
     let data = req.body
     Models.Tb_Resto.update(data, { where: { Id: data.Id } }).then(callback => {
@@ -78,8 +113,10 @@ module.exports = {
   },
   updateTbRestoMenu(req, res, next) {
     Models.Tb_Resto_Menu.create(req.body).then(pro3 => {
-      let bitmap = fs.readFileSync(path.join(`uploads/${pro3.Id_Resto}/${pro3.PID}`))
-      pro3.dataValues.file = bitmap
+      if(pro3.PID){
+        let bitmap = fs.readFileSync(path.join(`uploads/${pro3.Id_Resto}/${pro3.PID}`))
+        pro3.dataValues.file = bitmap
+      }
       res.status(200).send(pro3)
     })
   },
@@ -103,6 +140,8 @@ module.exports = {
     })
   },
   deleteTbRestoMenu(req, res, next) {
+    if(req.params.pid)
+      del.sync([`uploads/${req.params.restoid}/${req.params.pid}`]);
     Models.Tb_Resto_Menu.destroy({ where: { Id: req.params.id } }).then(callback => {
       res.status(200).send({good: 'lul'})
     }).catch(err => {

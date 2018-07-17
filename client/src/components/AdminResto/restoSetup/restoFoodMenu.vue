@@ -6,7 +6,7 @@
     <v-layout row wrap v-else>
       <v-flex xs4 v-for="(item,i) in value" :key="i">
         <div class="card-food-menu-cont">
-          <v-card-media :src="item.src" height="170px" cover>
+          <v-card-media :src="item.src?item.src:'http://via.placeholder.com/280x170'" height="170px" cover>
           </v-card-media>
           <div class="price-cst-cont">
             <div class="price-cst">
@@ -83,8 +83,27 @@ export default {
     save () {
       this.formData.Id = helper.getGuid()
       AdminResto.updateTbRestoMenu(this, this.formData, helper.getGuid(), this.restoId).then(cb => {
+        if (cb.data.file) {
+          let x = new Blob([new Uint8Array(cb.data.file.data)])
+          let showImg = URL.createObjectURL(x)
+          cb.data.src = showImg
+          delete cb.data.file
+        }
         this.ListMenu.push(cb.data)
         this.$emit('input', this.ListMenu)
+        this.$emit('formC', true)
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Save Success',
+          status: true,
+          color: 'success'
+        })
+        this.formData = {
+          Name: null,
+          Price: null,
+          Img: null,
+          Type: 'Food',
+          Description: null
+        }
       })
     },
     priceFormated (value) {
@@ -96,7 +115,7 @@ export default {
       return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1)
     },
     delMenu (item, index) {
-      AdminResto.deleteTbRestoMenu(this, item.Id)
+      AdminResto.deleteTbRestoMenu(this, item.Id, item.PID, this.restoId)
       this.ListMenu.splice(index, 1)
       this.$emit('input', this.ListMenu)
     }

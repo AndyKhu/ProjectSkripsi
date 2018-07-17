@@ -26,8 +26,7 @@
           class="table-cst"
           :headers="headers"
           :search="searchF"
-          :items="items"
-          hide-actions>
+          :items="items">
           <template slot="items" slot-scope="props">
               <td>{{ props.item.Email }}</td>
               <td>{{ props.item.fullName }}</td>

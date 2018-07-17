@@ -37,7 +37,7 @@
                   <restoFac v-model="resto.Facility" :restoId="resto.Id" v-else-if="inactive.Id == 1"/>
                   <restoSeats v-model="resto.Seats" :restoId="resto.Id" v-else-if="inactive.Id == 2"/>
                   <restoAccount v-model="resto.Account" :restoId="resto.Id" v-else-if="inactive.Id == 3"/>
-                  <restoFoodMenu v-model="resto.FoodMenu" :form="form" :restoId="resto.Id" v-else-if="inactive.Id == 4"/>
+                  <restoFoodMenu v-model="resto.FoodMenu" @formC="formC" :form="form" :restoId="resto.Id" v-else-if="inactive.Id == 4"/>
                   <restoGallery v-model="resto.Gallery" :restoId="resto.Id" v-else-if="inactive.Id == 5"/>
                 </v-flex>
               </v-card>
@@ -92,6 +92,9 @@ export default {
     ]
   }),
   methods: {
+    formC (value) {
+      this.form = value
+    },
     changeclass (item) {
       this.items.filter((e) => { return e.active })[0].active = false
       this.items.filter((e) => { return e.Id === item.Id })[0].active = true
@@ -126,12 +129,15 @@ export default {
         let x = new Blob([new Uint8Array(val.file.data)])
         let showImg = URL.createObjectURL(x)
         val.src = showImg
+        delete val.file
       })
       this.resto.FoodMenu.forEach((val, index) => {
-        let x = new Blob([new Uint8Array(val.file.data)])
-        let showImg = URL.createObjectURL(x)
-        val.src = showImg
-        delete val.file
+        if (val.file) {
+          let x = new Blob([new Uint8Array(val.file.data)])
+          let showImg = URL.createObjectURL(x)
+          val.src = showImg
+          delete val.file
+        }
       })
     })
   }

@@ -6,7 +6,16 @@ export default {
   getTbUserAll (context) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbUserAll`)
   },
+  getTbReview (context) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReview`)
+  },
+  getTbReviewAll (context) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReviewAll`)
+  },
   // update
+  updateRestoReview (context, Id, status) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateRestoReviewSA/${Id}/${status}`)
+  },
   updateTbUser (context, data) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbUser`, data)
   },

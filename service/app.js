@@ -2,6 +2,14 @@ const express = require('express')
 const logger = require('morgan')
 const bodyParser = require('body-parser')
 const cors = require('cors');
+const schedule = require('node-schedule')
+const algorithm = require('./algorithm.js')
+const test = require('./test.js')
+
+// var j = schedule.scheduleJob('*/50 * * * *', function(){
+//   algorithm.execute()
+// })
+// test.execute()
 
 const app = express()
 app.use(cors());

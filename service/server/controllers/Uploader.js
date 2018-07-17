@@ -50,7 +50,16 @@ module.exports = {
         res.status(400).send({ error: err })
       })
     })
+  },
+  getSingleImg (req, res, next) {
+    if (!fs.existsSync(`uploads/${req.params.direct}`) && !fs.existsSync(`uploads/${req.params.direct}/${req.params.id}`)) {
+      res.status(400).send({error: 'not found'})
+    } else {
+      let bitmap = fs.readFileSync(path.join(`uploads/${req.params.direct}/${req.params.id}`))
+      res.status(200).send({file: bitmap})
+    }
   }
+  
 }
 
 function guid () {

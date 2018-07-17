@@ -57,6 +57,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      Status: {
+        type: Sequelize.BOOLEAN
+      },
       Id_User: {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',

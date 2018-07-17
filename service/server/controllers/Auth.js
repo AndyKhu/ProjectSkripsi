@@ -27,6 +27,39 @@ module.exports = {
   signincb(req,res,next){
     res.send({token:tokenForUser(req.user),user:req.user})
   },
+  changePass(req,res,next){
+    let data = req.body
+    Models.Tb_User.findOne(
+      { 
+        where: {Id: data.Id}
+      })
+    .then(user => {
+        if(!user){
+          res.status(400).send({ message: 'User Not Found'})
+        }
+        else{
+          let newPass = bcrypt.hashSync(data.newpass, bcrypt.genSaltSync(8), null)
+          let status = bcrypt.compareSync(data.pass, user.Password)
+          let status2 = bcrypt.compareSync(data.newpass, user.Password)
+          if (status2){
+            res.status(200).send({ status: false , message: 'New Password & Current Password can`t be same'})
+          }
+          else if(status) {
+            Models.Tb_User.update({
+              Password: newPass
+            },{where: {Id: data.Id}}).then(data => {
+              res.status(200).send({status: true})
+            }).catch(err => {
+              console.log(err)
+              res.status(400).send({ message: 'error'})
+            })
+          }
+          else {
+            res.status(200).send({ status: false , message: 'Password Not Match'})
+          }
+        }
+    })
+  },
   createReqAdmin (req,res,next) {
     let raw = req.body
     const passwordG = bcrypt.hashSync(raw.Password, bcrypt.genSaltSync(8), null)

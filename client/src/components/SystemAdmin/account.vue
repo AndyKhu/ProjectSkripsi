@@ -27,7 +27,7 @@
           :headers="headers"
           :search="searchF"
           :items="items"
-          hide-actions>
+          :pagination.sync="pagination">
           <template slot="items" slot-scope="props">
               <td>{{ props.item.Email }}</td>
               <td>{{ props.item.fullName }}</td>
@@ -102,8 +102,11 @@
 </template>
 <script>
 import Service from '@/api/systemadmin.js'
-export default{
+export default {
   data: () => ({
+    pagination: {
+      sortBy: 'Status'
+    },
     items: [],
     searchF: '',
     selected: {},

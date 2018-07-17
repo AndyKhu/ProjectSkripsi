@@ -4,22 +4,33 @@ export default {
   getTbRestoByID (context, userID) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbRestoByuserID/${userID}`)
   },
+  getTbRestoByIDmin (context, userID) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbRestoByuserIDmin/${userID}`)
+  },
   updateTbResto (context, ListData) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbResto`, ListData)
   },
+  updateRestoReview (context, Id) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateRestoReview/${Id}`)
+  },
   updateTbRestoMenu (context, ListData, fileId, RestoId) {
-    let formdata = new FormData()
-    formdata.append('img', ListData.Img)
-    return axios.post(`${context.$store.getters.ROOT_URL}/api/upload/${RestoId}/${fileId}`, formdata)
-      .then(cb => {
-        ListData.src = URL.createObjectURL(ListData.Img)
-        delete ListData.Img
-        ListData.PID = cb.data.PID
-        ListData.Ptype = cb.data.Ptype
-        ListData.Pname = cb.data.Pname
-        ListData.Id_Resto = RestoId
-        return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbRestoMenu`, ListData)
-      })
+    if (ListData.Img) {
+      let formdata = new FormData()
+      formdata.append('img', ListData.Img)
+      return axios.post(`${context.$store.getters.ROOT_URL}/api/upload/${RestoId}/${fileId}`, formdata)
+        .then(cb => {
+          ListData.src = URL.createObjectURL(ListData.Img)
+          delete ListData.Img
+          ListData.PID = cb.data.PID
+          ListData.Ptype = cb.data.Ptype
+          ListData.Pname = cb.data.Pname
+          ListData.Id_Resto = RestoId
+          return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbRestoMenu`, ListData)
+        })
+    } else {
+      ListData.Id_Resto = RestoId
+      return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbRestoMenu`, ListData)
+    }
   },
   updateTbRestoGallery (context, ListData, RestoId) {
     let formdata = new FormData()
@@ -39,7 +50,7 @@ export default {
     delete item.file
     return axios.put(`${context.$store.getters.ROOT_URL}/api/deleteTbRestoGallery`, item)
   },
-  deleteTbRestoMenu (context, Id) {
-    return axios.put(`${context.$store.getters.ROOT_URL}/api/deleteTbRestoMenu/${Id}`)
+  deleteTbRestoMenu (context, Id, PID, RestoId) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/deleteTbRestoMenu/${Id}/${PID}/${RestoId}`)
   }
 }

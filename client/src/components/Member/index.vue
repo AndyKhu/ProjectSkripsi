@@ -2,15 +2,15 @@
   <v-app style="background: #FFF">
     <v-container fluid class="pa-0">
       <v-layout row wrap>
-        <v-flex class="nav-top-cst">
-          <v-layout>
-            <v-flex xs2 class="test">
+        <v-flex xs12 class="nav-top-cst">
+          <v-layout row wrap>
+            <v-flex xs4 md2 lg2 class="test">
               <v-icon>restaurant_menu</v-icon>
               <router-link class="default" :to="{name: 'Home'}">
               <v-toolbar-title>Rabbito</v-toolbar-title>
               </router-link>
             </v-flex>
-            <v-flex xs6 offset-xs1 class="filter">
+            <v-flex xs7 md6 offset-md1 lg6 offset-lg1 class="filter">
               <v-text-field class="pa-0"
                 hide-details
                 v-model="search"
@@ -18,9 +18,9 @@
                 placeholder="Search..."
               ></v-text-field>
             </v-flex>
-            <v-spacer></v-spacer>
-            <v-flex xs2 class="cst-flex">
-              <v-menu offset-y class="hidden-sm-and-down" v-if="getuser()!=null">
+            <v-spacer class="hidden-sm-and-down"></v-spacer>
+            <v-flex xs2 class="cst-flex hidden-sm-and-down">
+              <v-menu offset-y v-if="getuser()!=null">
                 <div slot="activator" class="pr-2">
                   <h3 class="d-inline-block">{{getuser().fullName}}</h3>
                   <v-icon>arrow_drop_down</v-icon>
@@ -33,9 +33,12 @@
                 <h3 class="d-inline-block pr-2">Login</h3>
               </router-link>
             </v-flex>
-            <!-- <v-flex xs2 class="hidden-md-and-up">
-              <v-icon @click="nav = !nav">menu</v-icon>
-            </v-flex> -->
+            <v-flex xs1 md2 lg2 class="hidden-md-and-up force-center">
+              <v-icon v-if="getuser()!=null">menu</v-icon>
+              <router-link class="default" :to="{name: 'Login'}" v-else>
+                <v-icon>input</v-icon>
+              </router-link>
+            </v-flex>
           </v-layout>
         </v-flex>
         <v-snackbar

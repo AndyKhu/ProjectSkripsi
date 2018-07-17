@@ -47,6 +47,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     Rate: {
       type: DataTypes.DOUBLE
+    },
+    Status: {
+      type: DataTypes.BOOLEAN
     }
   })
   Tb_Resto.associate = (models) => {
@@ -62,6 +65,12 @@ module.exports = (sequelize, DataTypes) => {
     }),
     Tb_Resto.hasMany(models.Tb_Resto_Seat, {
       as: 'Seats',
+      foreignKey: 'Id_Resto',
+      onDelete: 'CASCADE',
+      sourceKey: 'Id'
+    }),
+    Tb_Resto.hasMany(models.Tb_Resto_Review, {
+      as: 'Reviews',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
       sourceKey: 'Id'

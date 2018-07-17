@@ -1,6 +1,6 @@
 <template>
   <v-layout row wrap>
-        <v-flex lg7 xl8 class="my-3 px-3" style="border-right:1px solid #dedede">
+        <v-flex md7 lg7 xsl2 class="my-3 px-3" style="border-right:1px solid #dedede">
           <v-layout row wrap class="mb-4">
             <v-flex xs1>
               <v-icon large>access_time</v-icon>
@@ -73,7 +73,7 @@
             </v-flex>
         </v-layout>
     </v-flex>
-    <v-flex lg5 xl4 class="my-3 px-2">
+    <v-flex md5 lg5 xsl2 class="my-3 px-2">
       <v-flex xs12 class="line-bottom pb-3" text-xs-center>
         <h2 class="mb-2">Payment List</h2>
         <v-flex xs12 text-xs-center v-if="resto.Account.length == 0">
@@ -93,7 +93,7 @@
         </v-flex>
         <v-flex xs12 class="rd-item-center px-2 my-3" v-for="(item,i) in resto.Facility" :key="i">
           <v-icon large>{{item.Icon}}</v-icon>
-          <span class="rd-item-title mx-5">
+          <span class="rd-item-title ml-3">
             {{item.Name}}
           </span>
         </v-flex>

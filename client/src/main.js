@@ -18,6 +18,7 @@ import formPR from '@/components/helper/formComponent/priceRangeTextField.vue'
 import formDR from '@/components/helper/formComponent/dayRangeTextField.vue'
 import formTR from '@/components/helper/formComponent/timeRangeTextField.vue'
 import formUploadImg from '@/components/helper/formComponent/formUploadImg.vue'
+import StarRating from 'vue-star-rating'
 
 Vue.use(Vuetify)
 Vue.component('formTextField', formTextField)
@@ -29,6 +30,7 @@ Vue.component('formComboBox', formComboBox)
 Vue.component('formNumberField', formNumberField)
 Vue.component('formNumberingSeats', formNumberingSeats)
 Vue.component('formUploadImg', formUploadImg)
+Vue.component('star-rating', StarRating)
 
 Vue.filter('getDay', function (value) {
   if (!value) return ''
@@ -38,6 +40,10 @@ Vue.filter('getDay', function (value) {
 Vue.filter('NormalTime', function (value) {
   if (!value) return ''
   return moment(value).format('HH:mm')
+})
+Vue.filter('formatDate', function (value) {
+  if (!value) return ''
+  return moment(value).format('DD MMM YYYY')
 })
 
 Vue.config.productionTip = false

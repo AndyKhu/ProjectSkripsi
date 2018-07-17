@@ -1,7 +1,7 @@
 <template>
   <v-container fluid grid-list-lg class="pa-0">
     <v-layout row wrap>
-      <v-flex xs3 v-for="(item,i) in resto.Gallery" :key="i">
+      <v-flex xs6 md3 lg3 v-for="(item,i) in resto.Gallery" :key="i">
         <div class="item-img">
           <img :src="item.src" style="width:100%;height:100%;">
         </div>

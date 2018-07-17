@@ -1,7 +1,7 @@
 <template>
   <v-container fluid v-if="resto !== null">
     <v-layout row wrap justify-center>
-      <v-flex lg7 xl6>
+      <v-flex lg7 xl2 md7>
         <v-card-media
           class="white--text mb-1"
           height="300px"
@@ -13,9 +13,9 @@
             <v-flex xs8>
               <v-icon class="mx-1" color="red darken-1">star</v-icon>
               <span class="rd-subtitle mr-2">
-                {{resto.Rate === null?'--':resto.Rate}} | 0 reviews
+                {{resto.Rate === null?'--':resto.Rate.toFixed(1)}} | {{resto.Reviews.length}} reviews
               </span>
-              <v-icon>favorite_border</v-icon>
+              <v-icon :color="favorite?'primary':''" class="pointer" @click="cFavorite">{{favorite?'favorite':'favorite_border'}}</v-icon>
             </v-flex>
             <v-flex xs4 text-xs-right class="pr-2 pb-2">
               <v-btn depressed color="success" @click="reserve">RESERVE</v-btn>
@@ -34,33 +34,38 @@
           <v-tab-item key="gal" class="pa-2">
             <restoGallery :resto="resto" />
           </v-tab-item>
+          <v-tab-item key="rev">
+            <restoReview :resto="resto" />
+          </v-tab-item>
         </v-tabs>
       </v-flex>
-      <v-flex lg3 offset-lg1 xl2 offset-xl1 class="rd-menu-cont px-4 py-2">
-        <v-flex xs12 class="rd-menu-title">
+      <v-flex md3 offset-md1 lg3 offset-lg1 xl2 offset-xl1 class="rd-menu-cont ">
+        <v-flex xs12 class="rd-menu-title px-4 py-2">
           <h2>Menu</h2>
         </v-flex>
-        <v-flex xs12 v-for="(item,i) in resto.FoodMenu" :key="i" class="my-3">
-          <div class="card-food-menu-cont">
-            <v-card-media :src="item.src" height="170px" cover>
-            </v-card-media>
-            <div class="price-cst-cont">
-              <div class="price-cst">
-                <p class="price-text">{{priceFormated(item.Price)}}</p>
+        <v-flex xs12 class="menu-cont-scroll px-4 py-2">
+          <v-flex xs12 v-for="(item,i) in resto.FoodMenu" :key="i" class="my-3">
+            <div class="card-food-menu-cont">
+              <v-card-media :src="item.src" height="170px" contain>
+              </v-card-media>
+              <div class="price-cst-cont">
+                <div class="price-cst">
+                  <p class="price-text">{{priceFormated(item.Price)}}</p>
+                </div>
               </div>
+              <v-layout row wrap class="mx-2 mb-0">
+              <v-flex xs10 class="py-1">
+                {{formatTitle(item.Name)}} <br>
+                <span class="foodmenu-subtittle">{{item.Description?item.Description:'-'}}</span>
+              </v-flex>
+              <!-- <v-flex xs2 class="pa-0 card-food-action">
+                <v-btn icon class="ma-0" @click="delMenu(item,i)">
+                  <v-icon color="error">delete</v-icon>
+                </v-btn>
+              </v-flex> -->
+              </v-layout>
             </div>
-            <v-layout row wrap class="mx-2 mb-0">
-            <v-flex xs10>
-              {{formatTitle(item.Name)}} <br>
-              <span class="foodmenu-subtittle">{{item.Description}}</span>
-            </v-flex>
-            <!-- <v-flex xs2 class="pa-0 card-food-action">
-              <v-btn icon class="ma-0" @click="delMenu(item,i)">
-                <v-icon color="error">delete</v-icon>
-              </v-btn>
-            </v-flex> -->
-            </v-layout>
-          </div>
+          </v-flex>
         </v-flex>
       </v-flex>
     </v-layout>
@@ -81,10 +86,12 @@
 import Member from '@/api/member.js'
 import restoInfo from '@/components/Member/restoInfo.vue'
 import restoGallery from '@/components/Member/restoGallery.vue'
+import restoReview from '@/components/Member/restoReview.vue'
 export default {
   components: {
     restoInfo,
-    restoGallery
+    restoGallery,
+    restoReview
   },
   data () {
     return {
@@ -96,7 +103,9 @@ export default {
         {header: 'Information', key: 'inf'},
         {header: 'Gallery', key: 'gal'},
         {header: 'Reviews', key: 'rev'}
-      ]
+      ],
+      favorite: false,
+      userFavorite: null
     }
   },
   methods: {
@@ -118,6 +127,26 @@ export default {
       } else {
         this.$router.push({name: 'Reserve', params: {id: this.restoId}})
       }
+    },
+    cFavorite () {
+      this.favorite = !this.favorite
+    }
+  },
+  computed: {
+    getUser () {
+      return this.$store.getters.getUser
+    }
+  },
+  watch: {
+    getUser (newValue, oldValue) {
+      if (newValue !== null) {
+        if (newValue.UserFavorite.filter((e) => { return e.Id_Resto === this.$route.params.id }).length !== 0) {
+          this.userFavorite = newValue.UserFavorite.filter((e) => { return e.Id_Resto === this.$route.params.id })[0]
+          this.favorite = true
+        } else {
+          this.favorite = false
+        }
+      }
     }
   },
   mounted () {
@@ -136,6 +165,9 @@ export default {
         val.src = URL.createObjectURL(x)
         delete val.file
       })
+      if (this.resto.Reviews.length !== 0) {
+        this.resto.totalRate = this.resto.Reviews.map(item => item.rate).reduce((prev, next) => prev + next) / this.resto.Reviews.length
+      }
     }).catch(err => {
       console.log(err)
       this.$router.push({name: 'notFound'})
@@ -152,8 +184,15 @@ export default {
   font-size: 14px;
   color: #9E9E9E;
 } */
+.pointer{
+  cursor: pointer;
+}
 .rd-menu-title{
   border-bottom: 1px solid #dedede;
+}
+.menu-cont-scroll{
+  max-height: 900px;
+  overflow-y: scroll;
 }
 .rd-menu-cont{
   border: 1px solid #dedede;
@@ -166,8 +205,10 @@ export default {
   border-bottom: 1px solid #dedede;
 }
 .card-food-menu-cont{
+  max-height: 280px;
   border: 1px solid #dedede;
   position: relative;
+  overflow: hidden;
 }
 .foodmenu-tittle{
   background: #f5f5f5;

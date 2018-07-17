@@ -29,7 +29,7 @@ export default{
     }
   },
   data: () => ({
-    dinningItems: ['Casual Dinning', 'Family Style', 'Fine Dinning']
+    dinningItems: ['Casual Dinning', 'Family Style', 'Fine Dinning', 'Fast Food', 'Fast Casual Dinning']
   }),
   methods: {
     PEC (value) {
