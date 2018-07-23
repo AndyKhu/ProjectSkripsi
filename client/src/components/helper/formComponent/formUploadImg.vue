@@ -1,12 +1,16 @@
 <template>
   <div class="component-cont">
     <label class="mb-2">{{label}}</label>
-    <div class="img-upload-cont mx-3">
-      <div class="img-add" @click="triggerInput" :class="tmpData != null ?'hide':'show'">
+    <div class="mx-3" :class="{'img-upload-cont':icon==null}">
+      <v-btn @click="triggerInput" icon v-if="icon" class="ma-0" color="success">
+        <v-icon>{{icon}}</v-icon>
+        <input @change="changeValue" type="file" id="target" style="display: none" accept="image/*"/>
+      </v-btn>
+      <div class="img-add" @click="triggerInput" :class="tmpData != null ?'hide':'show'" v-else>
         <v-icon dark size="40px">add</v-icon>
         <input @change="changeValue" type="file" id="target" style="display: none" accept="image/*"/>
       </div>
-      <img class="cst-upload-img" :src="previewImg" alt="" v-if="tmpData != null">
+      <img class="cst-upload-img" :src="previewImg" alt="" v-if="tmpData != null && !icon">
     </div>
   </div>
 </template>
@@ -22,6 +26,11 @@ export default {
       type: String,
       require: false,
       default: ''
+    },
+    icon: {
+      type: String,
+      require: false,
+      default: null
     }
   },
   data () {

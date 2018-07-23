@@ -26,7 +26,7 @@
             <v-flex xs1></v-flex>
             <v-flex xs11 align-center class="px-3">
               <span class="rd-subtitle">
-                {{resto.PriceFrom}} s/d {{resto.PriceEnd}}
+                {{resto.PriceFrom | formatPrice}} s/d {{resto.PriceEnd | formatPrice}}
               </span>
             </v-flex>
           </v-layout>

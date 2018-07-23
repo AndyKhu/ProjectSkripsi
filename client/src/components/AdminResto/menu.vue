@@ -2,7 +2,7 @@
   <v-container fluid grid-list-lg v-if="getuser()!=null && resto != null">
     <v-layout row wrap>
       <v-flex xs12 lg4 v-for="(item,i) in listMenu" :key="i" >
-        <router-link :to="{name: item.link}">
+        <router-link :to="{name: item.link, params: {id: resto.Id}}">
           <v-card class='segment' :class="item.color">
             <div class='segment-item h-150px'>
               <div class='item'>
@@ -15,6 +15,9 @@
       </v-flex>
       <v-flex xs12>
         <v-layout row wrap>
+          <v-flex xs12 sm6 md6 lg6>
+            <chartLine v-if="data" :height="350" :data="data" :options="{responsive: true, maintainAspectRatio: false}"/>
+          </v-flex>
           <v-flex xs12 sm6 md6 lg6>
             <div class="cardAR-review-cont">
               <div class="cardAR-review-tittle">
@@ -30,7 +33,7 @@
                         :key="item.title"
                         avatar>
                         <v-list-tile-avatar>
-                          <img :src="'http://via.placeholder.com/200x200'">
+                          <img :src="item.src">
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                           <v-list-tile-title>{{item.userName}}</v-list-tile-title>
@@ -63,13 +66,18 @@
 </template>
 <script>
 import AdminResto from '@/api/adminresto.js'
+import chartLine from '@/components/helper/chart.js'
 export default{
+  components: {
+    chartLine
+  },
   data: () => ({
+    data: null,
     resto: null,
     listMenu: [
       { link: 'restoSetup', color: 'segment-red', icon: 'info_outline', label: 'Resto Info' },
       { link: 'confirmList', color: 'segment-green', icon: 'assignment', label: 'Confirmation List' },
-      { link: 'restoSetup', color: 'segment-purple', icon: 'donut_small', label: 'Reservation List' }
+      { link: 'ReservationList', color: 'segment-purple', icon: 'donut_small', label: 'Reservation List' }
     ]
   }),
   methods: {
@@ -93,9 +101,39 @@ export default{
         })
       })
     },
+    async getChartData (restoId) {
+      var curr = new Date() // get current date
+      var first = curr.getDate() - curr.getDay() // First day is the day of the month - the day of the week
+      let tmpD = []
+      // var firstday = new Date(curr.setDate(first))
+      for (let i = 0; i < 7; i++) {
+        let tmp = new Date(curr.setDate(first + i))
+        let data = {RestoId: restoId, Date: tmp}
+        await AdminResto.getCountReservasi(this, data).then(cb => {
+          tmpD.push(cb.data[0].count)
+        })
+      }
+      this.data = {
+        labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        datasets: [
+          {
+            label: 'Reservation',
+            backgroundColor: '#f87979',
+            data: tmpD
+          }
+        ]
+      }
+    },
     refresh () {
       AdminResto.getTbRestoByIDmin(this, this.getuser().Id).then(res => {
+        console.log(res.data)
         this.resto = res.data
+        this.resto.Reviews.forEach((val, index) => {
+          let x = new Blob([new Uint8Array(val.file.data)])
+          val.src = URL.createObjectURL(x)
+          delete val.file
+        })
+        this.getChartData(res.data.Id)
       })
     }
   },

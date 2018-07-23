@@ -67,6 +67,18 @@
           </v-card>
         </v-flex>
       </v-layout>
+      <!-- <v-dialog v-model="dialog" persistent max-width="290">
+        <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn>
+        <v-card>
+          <v-card-title class="headline">Use Google's location service?</v-card-title>
+          <v-card-text>Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" flat @click.native="dialog = false">Disagree</v-btn>
+            <v-btn color="green darken-1" flat @click.native="dialog = false">Agree</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog> -->
     </v-flex>
   </v-app>
   <v-app v-else>
@@ -80,6 +92,7 @@ import Member from '@/api/member.js'
 export default {
   data () {
     return {
+      dialog: false,
       data: {
         fullName: null,
         Email: null,
@@ -115,17 +128,49 @@ export default {
     getuser () {
       return this.$store.getters['getUser']
     },
-    update () {
-      Member.updateProfile(this, this.data, this.dp).then(res => {
+    validate () {
+      if (this.data.fullName === null || this.data.fullName === '') {
         this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Update Success',
+          txtmsg: `Name Can't be Empty`,
           status: true,
-          color: 'success'
+          color: 'error'
         })
-      })
+        return false
+      } else if (this.data.Phone === null || this.data.Phone === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Phone Can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      }
+      return true
+    },
+    update () {
+      if (this.validate()) {
+        Member.updateProfile(this, this.data, this.dp).then(res => {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Update Success',
+            status: true,
+            color: 'success'
+          })
+        })
+      }
     },
     close () {
-      console.log(this.data)
+      this.dialog = true
+      // Member.closeAccount(this, this.getuser().Id).then(cb => {
+      //   this.$store.dispatch('setUser', null)
+      //   localStorage.removeItem('authToken')
+      //   this.$router.push('/')
+      // }).catch(err => {
+      //   this.$store.dispatch('setDialogMsg', {
+      //     txtmsg: 'Failed To Close Account',
+      //     status: true,
+      //     color: 'error'
+      //   })
+      // })
+      // console.log(this.data)
     }
   },
   mounted () {

@@ -16,8 +16,8 @@ if (config.use_env_variable) {
 const fs = require('fs')
 const path = require('path')
 //default
-function guid () {
-  function s4 () {
+function guid() {
+  function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
       .substring(1)
@@ -25,37 +25,130 @@ function guid () {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 }
 module.exports = {
-  getListRestourant(req, res, next){
-    sequelize.query(`select a.*,c."PID" from public."Tb_Restos" a join public."Tb_Users" b on a."Id_User" = b."Id" left join public."Tb_Galleries" c on a."Id" = c."Id_Resto" where b."Status" and (c."Type" = 'both' or c."Type" = 'default')`, { type: Sequelize.QueryTypes.SELECT})
-    .then(resto => {
-      resto.forEach((val,index) => {
-        let bitmap = fs.readFileSync(path.join(`uploads/${val.Id}/${val.PID}`))
-        val.file = bitmap
+  getListRestaurantTrending(req, res, next) {
+    Models.Tb_Resto.findAll({
+      where: { Status: true },
+      include: [
+        {
+          where: { [Op.or]: [{ Type: 'both' }, { Type: 'default' }] },
+          model: Models.Tb_Gallery,
+          as: 'Gallery',
+          attributes: ['Id', 'Type', 'PID', 'Pname', 'Ptype', 'Id_Resto'],
+          limit: 1
+        }
+      ],
+      attributes: ['Id', 'Name', 'Description', 'Rate'],
+      limit: 3,
+      order: [['Rate', 'DESC', 'NULLS Last']]
+    }).then((resto) => {
+      resto.forEach((rest, ind) => {
+        rest.Gallery.forEach((val, index) => {
+          let bitmap = fs.readFileSync(path.join(`uploads/${rest.Id}/${val.PID}`))
+          val.dataValues.file = bitmap
+        })
       })
-      res.status(200).send(resto)
-      // We don't need spread here, since only the results will be returned for select queries
-    }).catch(err => {
-      console.log(err)
+      res.status(200).json({ 'result': resto });
     })
   },
+  getCountReservasi(req, res, next) {
+    let data = req.body
+    sequelize.query(`select count("Id") from public."Tb_User_Reservations" where "RestoId" = '${data.RestoId}' and Date("reserveDate") = Date('${data.Date}')`, { type: Sequelize.QueryTypes.SELECT })
+      .then(listH => {
+        res.status(200).send(listH)
+      }).catch(err => {
+        console.log(err)
+        res.status(400).send({ error: err })
+      })
+  },
+  getMaxValue(req, res, next) {
+    Models.Tb_Resto.findAll({
+      attributes: [
+        [sequelize.fn('max', sequelize.col('PriceEnd')), 'PriceEnd']
+        // etc
+      ]
+    }).then(cb => {
+      // console.log(cb)
+      res.status(200).send(cb)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
+  closeAccount(req, res, next) {
+    Models.Tb_User.update({ Status: false }, { where: { Id: req.params.id } }).then(cb => {
+      res.status(200).send(cb)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err })
+    })
+  },
+  getListRestourant(req, res, next) {
+    let search = req.params.search === '-' ? '' : req.params.search
+    let price = req.params.price
+    let ds = req.params.ds === '-' ? '' : req.params.ds
+    let limit = 8;   // number of records per page
+    let offset = 0;
+    let searchP
+    if (req.params.price === 0 || req.params.price === '0') {
+      searchP = { Status: true, Name: { $iLike: `%${search}%` }, Type: { $iLike: `%${ds}%` } }
+    } else {
+      searchP = { Status: true, Name: { $iLike: `%${search}%` }, Type: { $iLike: `%${ds}%` }, PriceFrom: { $lte: price }, PriceEnd: { $gte: price } }
+    }
+    Models.Tb_Resto.findAndCountAll({ where: searchP }).then(data => {
+      let page = req.params.page;      // page number
+      let pages = Math.ceil(data.count / limit);
+      offset = limit * (page - 1);
+      Models.Tb_Resto.findAll({
+        where: searchP,
+        include: [
+          {
+            where: { [Op.or]: [{ Type: 'both' }, { Type: 'default' }] },
+            model: Models.Tb_Gallery,
+            as: 'Gallery',
+            attributes: ['Id', 'Type', 'PID', 'Pname', 'Ptype', 'Id_Resto'],
+            limit: 1
+          }
+        ],
+        attributes: ['Id', 'Name', 'Description', 'Rate'],
+        limit: limit,
+        offset: offset,
+        order: [['createdAt']]
+      }).then((resto) => {
+        resto.forEach((rest, ind) => {
+          rest.Gallery.forEach((val, index) => {
+            let bitmap = fs.readFileSync(path.join(`uploads/${rest.Id}/${val.PID}`))
+            val.dataValues.file = bitmap
+          })
+        })
+        res.status(200).json({ 'result': resto, 'count': data.count, 'pages': pages });
+      });
+    }).catch(function (error) {
+      res.status(500).send('Internal Server Error');
+    });
+  },
   getRestoDetailmin(req, res, next) {
-    Models.Tb_Resto.findOne({ where: {Id: req.params.id},
+    Models.Tb_Resto.findOne({
+      where: { Id: req.params.id },
       include: [
         {
           model: Models.Tb_Resto_Account,
           as: 'Account',
-          attributes: ['Id','BankName','AccountNumber','Id_Resto']
+          attributes: ['Id', 'BankName', 'AccountNumber', 'Id_Resto']
+        },
+        {
+          model: Models.Tb_Resto_Seat,
+          as: 'Seats'
         },
         {
           model: Models.Tb_Resto_Menu,
           as: 'FoodMenu',
-          attributes: ['Id','Name','Price','Description','PID','Pname','Ptype']
+          attributes: ['Id', 'Name', 'Price', 'Description', 'PID', 'Pname', 'Ptype']
         }]
-    }).then(resto =>{
-      if(resto === null) {
-        res.status(401).send({ err : 'not found'})
+    }).then(resto => {
+      if (resto === null) {
+        res.status(401).send({ err: 'not found' })
       } else {
-        resto.FoodMenu.forEach((val,index) => {
+        resto.FoodMenu.forEach((val, index) => {
           let bitmap = fs.readFileSync(path.join(`uploads/${resto.Id}/${val.PID}`))
           val.dataValues.file = bitmap
         })
@@ -66,92 +159,264 @@ module.exports = {
       res.status(400).send({ error: err })
     })
   },
-  getReservationHistory (req, res, next) {
-    sequelize.query(`select a.*,a."reserveDate"+ (a."Duration" * interval '1 minute')  as "DurationC",b."Name" as "RestoName",c."PID" from public."Tb_User_Reservations" a join public."Tb_Restos" b on a."RestoId" = b."Id" join public."Tb_Galleries" c on c."Id_Resto" = b."Id" and (c."Type" = 'both' or c."Type" = 'default')`, { type: Sequelize.QueryTypes.SELECT})
-    .then(listH => {
-      listH.forEach((val,index) => {
-        if (val.PID) {
-          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${val.PID}`))
-          val.file = bitmap
-        }
+  getUserFavorite(req, res, next) {
+    sequelize.query(`select a."Id",a."Id_Resto",b."Name",b."Description",c."PID" from public."Tb_User_Favorites" a join public."Tb_Restos" b on b."Id"= a."Id_Resto" left join public."Tb_Galleries" c on b."Id" = c."Id_Resto" where a."Id_User" = '${req.params.id}' and b."Status" and (c."Type" = 'both' or c."Type" = 'default')`, { type: Sequelize.QueryTypes.SELECT })
+      .then(listH => {
+        listH.forEach((val, index) => {
+          if (val.PID) {
+            let bitmap = fs.readFileSync(path.join(`uploads/${val.Id_Resto}/${val.PID}`))
+            val.file = bitmap
+          }
+        })
+        res.status(200).send(listH)
+      }).catch(err => {
+        console.log(err)
+        res.status(400).send({ error: err })
       })
-      res.status(200).send(listH)
+  },
+  HistoryReservationUpload(req, res, next) {
+    let data = req.body
+    console.log(data)
+    if (!data.Id) {
+      data.Id = guid()
+      Models.Tb_User_Reservation_Upload.create(data).then(pro3 => {
+        Models.Tb_User_Reservation.update({ Status: 1 }, { where: { Id: data.Id_Reserve } }).then(cb => {
+          res.status(200).send(data)
+        })
+      }).catch(err => {
+        console.log(err)
+        res.status(400).send({ errmsg: 'Failed to Comment' })
+      })
+    } else {
+      if(data.oldPID){
+        del.sync([`uploads/${data.Id_Reserve}/${data.oldPID}`]);
+      }
+      Models.Tb_User_Reservation_Upload.update({
+        BankId: data.BankId,
+        TransferDt: data.TransferDt,
+        SenderName: data.SenderName,
+        Nominal: data.Nominal,
+        PID: data.PID
+      }, {where: {Id: data.Id}}).then(pro3 => {
+        res.status(200).send(data)
+      }).catch(err => {
+        res.status(400).send({ errmsg: 'Failed to Comment' })
+      })
+    }
+  },
+  getReservationHistory(req, res, next) {
+    Models.Tb_User_Reservation.findAll({
+      where: { Id_User: req.params.id, Status: {$notIn: [4,5]}},
+      include: [
+        {
+          model: Models.Tb_User_Reservation_Menu,
+          as: 'FoodMenu',
+          include: [
+            {
+              model: Models.Tb_Resto_Menu,
+              as: 'Menu'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_Resto,
+          as: 'Resto',
+          include: [
+            {
+              model: Models.Tb_Gallery,
+              as: 'Gallery',
+              where: { Type: { $or: ['both', 'type'] } },
+              limit: 1
+            },
+            {
+              model: Models.Tb_Resto_Account,
+              as: 'Account'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_User_Reservation_Upload,
+          as: 'Upload'
+        }
+      ]
+    }).then(cb => {
+      cb.forEach((val, index) => {
+        if (val.Resto.Gallery.length !== 0) {
+          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${val.Resto.Gallery[0].PID}`))
+          val.dataValues.file = bitmap
+        }
+        val.dataValues.DurationC = new Date(new Date(val.reserveDate).getTime() + val.Duration*60000);
+        val.FoodMenu.forEach((fm, index) => {
+          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${fm.Menu.PID}`))
+          fm.dataValues.file = bitmap
+        })
+      })
+      res.status(200).send(cb)
+    })
+  },
+  getReservationHistory2(req, res, next) {
+    Models.Tb_User_Reservation.findAll({
+      where: { Id_User: req.params.id, Status: {$in: [4,5]}},
+      include: [
+        {
+          model: Models.Tb_User_Reservation_Menu,
+          as: 'FoodMenu',
+          include: [
+            {
+              model: Models.Tb_Resto_Menu,
+              as: 'Menu'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_Resto,
+          as: 'Resto',
+          include: [
+            {
+              model: Models.Tb_Gallery,
+              as: 'Gallery',
+              where: { Type: { $or: ['both', 'type'] } },
+              limit: 1
+            },
+            {
+              model: Models.Tb_Resto_Account,
+              as: 'Account'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_User_Reservation_Upload,
+          as: 'Upload'
+        }
+      ]
+    }).then(cb => {
+      cb.forEach((val, index) => {
+        if (val.Resto.Gallery.length !== 0) {
+          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${val.Resto.Gallery[0].PID}`))
+          val.dataValues.file = bitmap
+        }
+        val.dataValues.DurationC = new Date(new Date(val.reserveDate).getTime() + val.Duration*60000);
+        val.FoodMenu.forEach((fm, index) => {
+          let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${fm.Menu.PID}`))
+          fm.dataValues.file = bitmap
+        })
+      })
+      res.status(200).send(cb)
+    })
+  },
+  getListBank(req, res, next) {
+    Models.Tb_Resto_Account.findAll({ where: { Id_Resto: req.params.id } }).then(cb => {
+      res.status(200).send(cb)
     }).catch(err => {
       console.log(err)
       res.status(400).send({ error: err })
     })
   },
   getRestoDetail(req, res, next) {
-    Models.Tb_Resto.findOne({ where: {Id: req.params.id},
+    Models.Tb_Resto.findOne({
+      where: { Id: req.params.id },
       include: [
         {
           model: Models.Tb_Resto_Fac,
           as: 'Facility',
-          attributes: ['Id','Icon','Id_Resto','Name']
+          attributes: ['Id', 'Icon', 'Id_Resto', 'Name']
         },
         {
           model: Models.Tb_Resto_Seat,
           as: 'Seats',
-          attributes: ['Id','seatFrom','seatEnd','noSeat','Id_Resto']
+          attributes: ['Id', 'seatFrom', 'seatEnd', 'noSeat', 'Id_Resto']
         },
         {
           model: Models.Tb_Resto_Account,
           as: 'Account',
-          attributes: ['Id','BankName','AccountNumber','Id_Resto']
+          attributes: ['Id', 'BankName', 'AccountNumber', 'Id_Resto']
         },
         {
           model: Models.Tb_Resto_Review,
-          where: {Status: {[Op.ne]: 2}},   
-          required: false,       
+          where: { Status: { [Op.ne]: 2 } },
+          required: false,
           as: 'Reviews',
-          attributes: ['Id','comment','rate','userId','userName','userPID','Id_Resto']
+          attributes: ['Id', 'comment', 'rate', 'userId', 'userName', 'userPID', 'Id_Resto']
         },
         {
           model: Models.Tb_Resto_Menu,
           as: 'FoodMenu',
-          attributes: ['Id','Name','Price','Description','PID','Pname','Ptype']
+          attributes: ['Id', 'Name', 'Price', 'Description', 'PID', 'Pname', 'Ptype']
         },
         {
           model: Models.Tb_Gallery,
           as: 'Gallery',
-          attributes: ['Id','Type','PID','Pname','Ptype','Id_Resto']
+          attributes: ['Id', 'Type', 'PID', 'Pname', 'Ptype', 'Id_Resto']
         }],
-        order: [[{ model: Models.Tb_Gallery, as: 'Gallery' }, 'Type', 'ASC']]
-    }).then(resto =>{
-      if(resto === null) {
-        res.status(401).send({ err : 'not found'})
+      order: [[{ model: Models.Tb_Gallery, as: 'Gallery' }, 'Type', 'ASC']]
+    }).then(resto => {
+      if (resto === null) {
+        res.status(401).send({ err: 'not found' })
       } else {
-        resto.Gallery.forEach((val,index) => {
+        resto.Gallery.forEach((val, index) => {
           let bitmap = fs.readFileSync(path.join(`uploads/${resto.Id}/${val.PID}`))
           val.dataValues.file = bitmap
         })
-        resto.FoodMenu.forEach((val,index) => {
+        resto.FoodMenu.forEach((val, index) => {
           let bitmap = fs.readFileSync(path.join(`uploads/${resto.Id}/${val.PID}`))
           val.dataValues.file = bitmap
         })
-        res.status(200).send(resto)
+        if (resto.Reviews.length !== 0) {
+          let tmp = 0
+          resto.Reviews.forEach((val, index) => {
+            Models.Tb_User.findOne({
+              where: { Id: val.userId },
+              attributes: ['Id', 'DpId', 'DpName', 'DpType']
+            }).then(cb => {
+              let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
+              val.dataValues.file = bitmap
+              tmp += 1
+              if (tmp === resto.Reviews.length) {
+                res.status(200).send(resto)
+              }
+            })
+          })
+        } else {
+          res.status(200).send(resto)
+        }
       }
     }).catch(err => {
       console.log(err)
       res.status(400).send({ error: err })
     })
   },
-  saveRestoReview (req, res, next) {
+  saveRestoReview(req, res, next) {
     let data = req.body
-    data.Id = guid()
-    Models.Tb_Resto_Review.create(data).then(pro3 => {
-      res.status(200).send(pro3)
+    Models.Tb_Resto_Review.findOne({ where: { userId: data.userId, Id_Resto: data.Id_Resto, Status: { $ne: 2 } } }).then(cb => {
+      if (cb === null) {
+        data.Id = guid()
+        Models.Tb_Resto_Review.create(data).then(pro3 => {
+          Models.Tb_User.findOne({
+            where: { Id: data.userId },
+            attributes: ['Id', 'DpId', 'DpName', 'DpType']
+          }).then(cb => {
+            let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
+            pro3.dataValues.file = bitmap
+            res.status(200).send(pro3)
+          })
+        })
+      } else {
+        Models.Tb_Resto_Review.update({ comment: data.comment, rate: data.rate }, { where: { Id: cb.Id } }).then(pro3 => {
+          res.status(200).send({ good: 'lul' })
+        })
+      }
     }).catch(err => {
       console.log(err)
-      res.status(400).send({errmsg: 'Failed to Comment'})
+      res.status(400).send({ errmsg: 'Failed to Comment' })
     })
+
   },
-  saveRestoReserve (req, res, next) {
+  saveRestoReserve(req, res, next) {
     let data = req.body
     data.Id = guid()
     let foodList = []
-    data.FoodMenu.forEach((val,index) => {
-      foodList.push({Id: guid(), Amount: val.Amount, MenuId: val.Id, Id_Reserve: data.Id})
+    data.FoodMenu.forEach((val, index) => {
+      foodList.push({ Id: guid(), Amount: val.Amount, MenuId: val.Id, Id_Reserve: data.Id })
     })
     Models.Tb_User_Reservation.create(data).then(pro3 => {
       Models.Tb_User_Reservation_Menu.bulkCreate(foodList).then(pro => {
@@ -160,12 +425,32 @@ module.exports = {
       })
     }).catch(err => {
       console.log(err)
-      res.status(400).send({errmsg: 'Failed to Comment'})
+      res.status(400).send({ errmsg: 'Failed to Comment' })
     })
   },
-  updateProfile (req, res, next) {
+  updateFavorite(req, res, next) {
     let data = req.body
-    if(data.upload)
+    Models.Tb_User_Favorite.findOne({ where: { Id_User: data.userId, Id_Resto: data.restoId } }).then(fav => {
+      console.log(data.status)
+      if (fav && !data.status) {
+        Models.Tb_User_Favorite.destroy({ where: { Id: fav.Id } }).then(pro3 => {
+          res.status(200).send({ good: 'lul' })
+        })
+      } else if (fav === null && data.status) {
+        Models.Tb_User_Favorite.create({ Id: guid(), Id_User: data.userId, Id_Resto: data.restoId }).then(pro3 => {
+          res.status(200).send(pro3)
+        })
+      } else {
+        res.status(400).send({ errmsg: 'something error please contact admin' })
+      }
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ errmsg: 'Error' })
+    })
+  },
+  updateProfile(req, res, next) {
+    let data = req.body
+    if (data.upload)
       del.sync([`uploads/${data.Id}/${data.delete}`])
     Models.Tb_User.update({
       fullName: data.fullName,
@@ -177,11 +462,11 @@ module.exports = {
       DpId: data.DpId,
       DpType: data.DpType
     },
-    {where: {Id: data.Id}}).then(hsl => {
-      res.status(200).send(hsl)
-    }).catch(err => {
-      console.log(err)
-      res.status(400).send({errmsg: 'Failed to Update'})
-    })
+      { where: { Id: data.Id } }).then(hsl => {
+        res.status(200).send(hsl)
+      }).catch(err => {
+        console.log(err)
+        res.status(400).send({ errmsg: 'Failed to Update' })
+      })
   }
 }

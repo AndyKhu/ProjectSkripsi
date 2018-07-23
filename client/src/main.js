@@ -19,6 +19,7 @@ import formDR from '@/components/helper/formComponent/dayRangeTextField.vue'
 import formTR from '@/components/helper/formComponent/timeRangeTextField.vue'
 import formUploadImg from '@/components/helper/formComponent/formUploadImg.vue'
 import StarRating from 'vue-star-rating'
+import numformat from '@/assets/js/accounting.min.js'
 
 Vue.use(Vuetify)
 Vue.component('formTextField', formTextField)
@@ -44,6 +45,19 @@ Vue.filter('NormalTime', function (value) {
 Vue.filter('formatDate', function (value) {
   if (!value) return ''
   return moment(value).format('DD MMM YYYY')
+})
+Vue.filter('menitToHours', function (value) {
+  if (!value) return ''
+  if (value % 60 === 0) return parseInt(value / 60) + ' Hours '
+  return parseInt(value / 60) + ' Hours ' + (value % 60) + ' Minute'
+})
+Vue.filter('formatDateTime', function (value) {
+  if (!value) return ''
+  return moment(value).format('DD MMM YYYY HH:mm')
+})
+Vue.filter('formatPrice', function (value) {
+  if (!value) return '0'
+  return numformat.formatNumber(parseInt(value), 0, '.', ',')
 })
 
 Vue.config.productionTip = false

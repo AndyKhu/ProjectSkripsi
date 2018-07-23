@@ -3,9 +3,10 @@
     <v-layout row wrap justify-center>
       <v-flex lg7 xl2 md7>
         <v-card-media
-          class="white--text mb-1"
+          class="white--text grey lighten-2 mb-1"
           height="300px"
           :src="defsrc"
+          contain
         />
         <h2>{{resto.Name}}</h2>
         <v-flex xs12>
@@ -110,9 +111,10 @@ export default {
   },
   methods: {
     priceFormated (value) {
-      let tmp = value.toString()
+      let tmp = value
       if (value < 1000) return tmp
-      else return tmp.slice(0, tmp.length - 3)
+      // else return tmp.slice(0, tmp.length - 3)
+      else return (tmp / 1000).toFixed(1)
     },
     formatTitle (string) {
       return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1)
@@ -129,7 +131,23 @@ export default {
       }
     },
     cFavorite () {
-      this.favorite = !this.favorite
+      if (this.$store.getters['getUser'] === null) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Please login first',
+          status: true,
+          color: 'error'
+        })
+      } else {
+        let data = {userId: this.$store.getters['getUser'].Id, restoId: this.restoId, status: !this.favorite}
+        Member.updateFavorite(this, data).then(res => {
+          this.favorite = !this.favorite
+          if (this.favorite) {
+            this.userFavorite = res.data
+          } else {
+            this.userFavorite = null
+          }
+        })
+      }
     }
   },
   computed: {
@@ -161,6 +179,11 @@ export default {
         delete val.file
       })
       this.resto.FoodMenu.forEach((val, index) => {
+        let x = new Blob([new Uint8Array(val.file.data)])
+        val.src = URL.createObjectURL(x)
+        delete val.file
+      })
+      this.resto.Reviews.forEach((val, index) => {
         let x = new Blob([new Uint8Array(val.file.data)])
         val.src = URL.createObjectURL(x)
         delete val.file

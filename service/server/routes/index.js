@@ -14,17 +14,30 @@ module.exports = (app) => {
   app.post('/api/changePass',Auth.changePass)
   
   // member
-  app.get('/api/getListRestourant',Member.getListRestourant)
+  // app.get('/api/getListRestourant',Member.getListRestourant)
+  app.get('/api/getListRestourant/:page/:search/:price/:ds',Member.getListRestourant)
+  app.get('/api/getListRestourantTrending',Member.getListRestaurantTrending)
   app.get('/api/getRestoDetail/:id',Member.getRestoDetail)
+  app.get('/api/maxValueResto',Member.getMaxValue)
   app.get('/api/getReservationHistory/:id',Member.getReservationHistory)
+  app.get('/api/getReservationHistory2/:id',Member.getReservationHistory2)
   app.get('/api/getRestoDetailmin/:id',Member.getRestoDetailmin)
+  app.get('/api/getUserFavorite/:id',Member.getUserFavorite)
   app.post('/api/saveRestoReview',Member.saveRestoReview)
   app.post('/api/saveRestoReserve',Member.saveRestoReserve)
   app.post('/api/updateProfile',Member.updateProfile)
+  app.post('/api/updateFavorite',Member.updateFavorite)
+  app.post('/api/getCountReservasi',Member.getCountReservasi)
+  app.post('/api/closeAccount/:id',Member.closeAccount)
+  app.post('/api/getListBank/:id',Member.getListBank)
+  app.post('/api/HistoryReservationUpload',Member.HistoryReservationUpload)
   app.get('/api/fortesting',Algo.execute)
 
   //Admin Resto
   app.get('/api/getTbRestoByuserID/:id',AdminResto.getTbRestoByuserID)
+  app.get('/api/getTbReservationConfirm/:id',AdminResto.getTbReservationConfirm)
+  app.post('/api/getTbReservationSchedule',AdminResto.getTbReservationSchedule)
+  app.post('/api/getTbReservationSchedule2',AdminResto.getTbReservationSchedule2)
   app.get('/api/getTbRestoByuserIDmin/:id',AdminResto.getTbRestoByuserIDmin)
   app.put('/api/updateTbResto',AdminResto.updateTbResto)
   app.put('/api/updateTbRestoMenu',AdminResto.updateTbRestoMenu)
@@ -34,6 +47,9 @@ module.exports = (app) => {
   app.put('/api/deleteTbRestoMenu/:id/:pid/:restoid',AdminResto.deleteTbRestoMenu)
   app.put('/api/updateRestoReview/:id',AdminResto.updateRestoReview)
   app.put('/api/saveRestoRate/:id/:rate',AdminResto.saveRestoRate)
+  app.put('/api/updateTbReservationConfirm/:id/:status',AdminResto.updateTbReservationConfirm)
+  app.put('/api/updateTbReservationSchedule/:reserveId/:scheduleId',AdminResto.updateTbReservationSchedule)
+  
   
   //System Admin
   app.get('/api/getReqAdminResto',SystemAdmin.getTbRequestAdminInProgress)

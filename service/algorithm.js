@@ -4,7 +4,6 @@ const env = process.env.NODE_ENV || 'development'
 const config = require(`${__dirname}/server/config/config.json`)[env]
 const moment = require('moment')
 const _ = require('lodash')
-const data = require('./data.js')
 
 let sequelize
 if (config.use_env_variable) {
@@ -16,18 +15,27 @@ if (config.use_env_variable) {
 }
 module.exports = {
   async execute(req, res, next) {
+    let stoplist = [10,20,30,40,50,60,70,80,90,100]
+    let hasilA = []
     let listResto = await getListResto() //listResto
     let iterasi = 100 // jumlah iterasi
     // untuk testing
-    let kromosomA,kromosomB,kromosomC,kromosomD,kromosomE,kromosomF,kromosomG,kromosomH,kromosomI
+    let count = 0
+    Models.Tb_User_Reservation_Schedule.destroy({where: {Status: 0}, force: true })
     listResto.forEach(async (val, index) => {
+      let listres = []
+      let listlength = 0
+      let kromosomA,kromosomB,kromosomC,kromosomD,kromosomE,kromosomF,kromosomG,kromosomH,kromosomI   
       for(let it = 0 ;it<iterasi;it++){
         let n = 6 // Jumlah Kromosom
         let Resto = val
         let SeatsTotal = await getTotalSeat(Resto.Id)
         let listReservation = await getListReservation(Resto.Id)
+        listlength = listReservation.length
+        if ( listReservation.length === 0 ){
+          break;
+        }
         let kromosom = await getKrimsonR(listReservation, SeatsTotal, n, Resto)
-        // let kromosom = _.cloneDeep(data.data)
         kromosomA = _.cloneDeep(kromosom)
         let totalgen = kromosomA[0].length      
         // pasangkan kromsom (ex: [k1,k2,k3,k4,k5,k6] -> [k1,k2], [k3,k4], [k5,k6])
@@ -91,24 +99,81 @@ module.exports = {
             // console.log('a : '+random)
             let probKromosom = tmpkromosomSelection.filter((e)=>{ return e.maxprob >= random && e.minprob <= random })
             if(probKromosom.length !== 0){
-              console.log('a : '+random)
               kromosomSelection.push(probKromosom[0])
               tmpkromosomSelection.splice(tmpkromosomSelection.indexOf(probKromosom[0]),1)
             }
           }
           kromosomI = _.cloneDeep(kromosomSelection)
         }
-        // kromosomI.map(i => {
-        //   console.log("fitness: "+i.fitness)
-        //   if(i.fitness )
-        // })
+        // let restouser = {a: kromosomA, b: kromosomB, c: kromosomC, d: kromosomD, e: kromosomE, f: kromosomF, g: kromosomG, h:kromosomH, I:kromosomI}
+        if(stoplist.indexOf(it+1) !== -1){
+          let rmse1 = kromosomI.map(item => item.fitness).reduce((prev, next) => prev + next)
+          let rmse2 = Math.sqrt((n-rmse1)/n)
+          let restouser = {I:kromosomI}
+          listres.push({iterasi: it+1, data: restouser, total: rmse1.toFixed(2), RMSE: rmse2.toFixed(2)})
+        }
         if(kromosomI.filter((e)=>{return e.fitness === 1}).length !== 0){
-          console.log(it)
           break;
         }
       }
-      let restouser = {a: kromosomA, b: kromosomB, c: kromosomC, d: kromosomD, e: kromosomE, f: kromosomF, g: kromosomG, h:kromosomH, I:kromosomI}
-      res.status(200).send(restouser)
+      hasilA.push({ID: val.Id, data: listres, lastrecord: kromosomI})
+      count+=1     
+      if(kromosomI){
+        if(kromosomI[0].fitness === 1){
+          let saveData = []
+          kromosomI[0].kromosom.forEach((krs,index)=> {
+            saveData.push({
+              Id: guid(),
+              Id_Reserve: krs.reserveId,
+              Id_Seat: krs.seatId,
+              Id_Resto: val.Id,
+              Status: 0
+            })
+            Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+          })
+          Models.Tb_User_Reservation_Schedule.bulkCreate(saveData)
+        }else {
+          let bentrokList = ReservasiBentrok2(kromosomI[0].kromosom)
+          let bentrokBest = ReservasiBentrokgetBest(kromosomI[0].kromosom)
+          let saveData = []
+          kromosomI[0].kromosom.forEach((krs,index)=> {
+            if(bentrokList.filter((e)=> {return e.reserveId === krs.reserveId && e.seatId === krs.seatId}).length === 0){
+              saveData.push({
+                Id: guid(),
+                Id_Reserve: krs.reserveId,
+                Id_Seat: krs.seatId,
+                Id_Resto: val.Id,
+                Status: 0
+              })
+              Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+            }else {
+              if(bentrokBest.filter((e)=> {return e.reserveId === krs.reserveId && e.seatId === krs.seatId}).length === 0) {
+                saveData.push({
+                  Id: guid(),
+                  Id_Reserve: krs.reserveId,
+                  Id_Seat: krs.seatId,
+                  Id_Resto: val.Id,
+                  Status: 3
+                })
+                Models.Tb_User_Reservation.update({Status: 4},{where: {Id: krs.reserveId}})
+              } else {
+                saveData.push({
+                  Id: guid(),
+                  Id_Reserve: krs.reserveId,
+                  Id_Seat: krs.seatId,
+                  Id_Resto: val.Id,
+                  Status: 0
+                })
+                Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+              }
+            }
+          })
+          Models.Tb_User_Reservation_Schedule.bulkCreate(saveData)
+        }
+      }
+      if(count === listResto.length){
+        res.status(200).send(hasilA)
+      }
     })
   }
 }
@@ -154,9 +219,11 @@ function mutasi(kromosomMutasi,SeatsTotal,Resto){
         // variable seat yang cocok dengan kromosom yang akan di mutasi
         let tmp = Resto.Seats.filter((e) => { return e.seatFrom <= kromosomMutasi[tmpM].totalSeats && e.seatEnd >= kromosomMutasi[tmpM].totalSeats })
         // nilai random dari 0 s/d jumlah seat (st)
-        let x = Math.floor((Math.random() * st[0].count) + 0);
+        if (st.length !== 0) {
+          let x = Math.floor((Math.random() * st[0].count) + 0);
+          kromosomMutasi[tmpM].seatId = tmp[x].Id      
+        }
         // tukar seat kromosom yang akan di mutasi dengan hasil random
-        kromosomMutasi[tmpM].seatId = tmp[x].Id
       }
     }
   }
@@ -326,6 +393,52 @@ function ReservasiBentrok(x){
   return unique_array
 }
 
+function ReservasiBentrokgetBest(x){
+  let xtmp = []
+  x.forEach((a, pindex) => {
+    let otmp = null
+    x.forEach((b, nindex) => {
+      if(a.reserveId != b.reserveId && dateCheckComplete(b.timeS,b.timeE,a.timeS,a.timeE) && a.seatId == b.seatId){
+        if(otmp == null) otmp = a
+        if(otmp.Duration < b.Duration)
+          otmp = b
+        else if (otmp.Duration === b.Duration && otmp.totalSeats < b.totalSeats)
+          otmp = b
+        else if (otmp.Duration === b.Duration && otmp.totalSeats === b.totalSeats){
+          if(xtmp.filter(e => {return e.reserveId === b.reserveId}).length !== 0)
+            otmp = b
+          else 
+            otmp = a
+        }
+      }
+    })
+    if(otmp)
+      xtmp.push(otmp)
+  })
+  let unique_array = _.uniqWith(xtmp,_.isEqual) 
+  // unique_array.forEach((a,ai) =>) 
+  return unique_array
+}
+
+function ReservasiBentrok2(x){
+  let xtmp = []
+  x.forEach((a, pindex) => {
+    x.forEach((b, nindex) => {
+      if(a.reserveId != b.reserveId){
+        if(dateCheckComplete(b.timeS,b.timeE,a.timeS,a.timeE)){
+          if(a.seatId == b.seatId){
+            xtmp.push({reserveId: a.reserveId, seatId: a.seatId, timeS: a.timeS, timeE: a.timeE})
+            xtmp.push({reserveId: b.reserveId, seatId: b.seatId, timeS: b.timeS, timeE: b.timeE})
+          }
+        }
+      }
+    })
+  })
+  let unique_array = _.uniqWith(xtmp,_.isEqual) 
+  // unique_array.forEach((a,ai) =>) 
+  return unique_array
+}
+
 function getkromosominduk(x) {
   let xtmp = []
   for(let i = 0 ; i < x.length ; i+=2){
@@ -420,9 +533,11 @@ async function getKrimsonR(listReservation, SeatsTotal, n, Resto) {
       let st = SeatsTotal.filter((e) => { return e.seatFrom <= val.totalSeats && e.seatEnd >= val.totalSeats })
       let tmp = Resto.Seats.filter((e) => { return e.seatFrom <= val.totalSeats && e.seatEnd >= val.totalSeats })
       // console.log(tmp.length)
-      let x = Math.floor((Math.random() * st[0].count) + 0);
-      let constTimeE = new Date(val.reserveDate.getTime() + val.Duration * 60000)
-      krimsontmp.push({ reserveId: val.Id, seatId: tmp[x].Id, totalSeats: val.totalSeats, timeS: val.reserveDate, timeE: constTimeE, restoO: Resto.OpenTime, restoC: Resto.CloseTime })
+      if (st.length !== 0) {
+        let x = Math.floor((Math.random() * st[0].count) + 0);
+        let constTimeE = new Date(val.reserveDate.getTime() + val.Duration * 60000)
+        krimsontmp.push({ reserveId: val.Id, seatId: tmp[x].Id, totalSeats: val.totalSeats, timeS: val.reserveDate, timeE: constTimeE, restoO: Resto.OpenTime, restoC: Resto.CloseTime, Duration: val.Duration })
+      }
     })
     krimsonR.push(krimsontmp)
   }
@@ -469,7 +584,9 @@ function compare2(a, b) {
 async function getListReservation(Id) {
   let reservationList
   await Models.Tb_User_Reservation.findAll({
-    where: { Status: 0, RestoId: Id }
+    where: { $and: [ {Status: {$in: [2,3]}},{RestoId: Id},
+      sequelize.where(sequelize.fn('date', sequelize.col('reserveDate')),'=',sequelize.fn('date', new Date()))]
+    }
   }).then(list => {
     reservationList = list
   }).catch(err => {
@@ -477,4 +594,13 @@ async function getListReservation(Id) {
     reservationList = []
   })
   return reservationList
+}
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1)
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 }

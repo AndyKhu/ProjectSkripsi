@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'Id_User',
       onDelete: 'CASCADE',
     }),
+    Tb_Resto.belongsTo(models.Tb_User_Reservation, {
+      as: 'Resto',
+      foreignKey: 'Id'
+    }),
     Tb_Resto.hasMany(models.Tb_Resto_Fac, {
       as: 'Facility',
       foreignKey: 'Id_Resto',

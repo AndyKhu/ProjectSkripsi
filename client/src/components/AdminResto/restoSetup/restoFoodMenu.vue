@@ -6,7 +6,7 @@
     <v-layout row wrap v-else>
       <v-flex xs4 v-for="(item,i) in value" :key="i">
         <div class="card-food-menu-cont">
-          <v-card-media :src="item.src?item.src:'http://via.placeholder.com/280x170'" height="170px" cover>
+          <v-card-media class="cursorP" :src="item.src?item.src:'http://via.placeholder.com/280x170'" height="170px" cover @click="edit(item)">
           </v-card-media>
           <div class="price-cst-cont">
             <div class="price-cst">
@@ -71,6 +71,7 @@ export default {
       ListMenu: this.value,
       foodCategory: ['Food', 'Drink'],
       formData: {
+        Id: null,
         Name: null,
         Price: null,
         Img: null,
@@ -80,36 +81,75 @@ export default {
     }
   },
   methods: {
-    save () {
-      this.formData.Id = helper.getGuid()
-      AdminResto.updateTbRestoMenu(this, this.formData, helper.getGuid(), this.restoId).then(cb => {
-        if (cb.data.file) {
-          let x = new Blob([new Uint8Array(cb.data.file.data)])
-          let showImg = URL.createObjectURL(x)
-          cb.data.src = showImg
-          delete cb.data.file
-        }
-        this.ListMenu.push(cb.data)
-        this.$emit('input', this.ListMenu)
-        this.$emit('formC', true)
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Save Success',
-          status: true,
-          color: 'success'
-        })
+    async edit (item) {
+      await AdminResto.getFoodImage(this, this.restoId, item.PID).then(cb => {
+        let tmp = new File([new Uint8Array(cb.data.file.data)], 'tmp')
         this.formData = {
-          Name: null,
-          Price: null,
-          Img: null,
-          Type: 'Food',
-          Description: null
+          Id: item.Id,
+          Name: item.Name,
+          Price: item.Price,
+          Img: tmp,
+          PID: item.PID,
+          Type: item.Type,
+          Description: item.Description
+        }
+      })
+      this.$emit('formC', false)
+    },
+    save () {
+      AdminResto.updateTbRestoMenu(this, this.formData, helper.getGuid(), this.restoId).then(cb => {
+        if (this.formData.Id) {
+          if (this.formData.Img) {
+            // let x = new Blob([this.formData.Img])
+            let showImg = URL.createObjectURL(this.formData.Img)
+            this.formData.src = showImg
+            delete this.formData.Img
+            this.ListMenu.splice(this.ListMenu.indexOf(this.ListMenu.filter((e) => { return e.Id === this.formData.Id })[0]), 1)
+            this.ListMenu.push(this.formData)
+            this.$emit('input', this.ListMenu)
+            this.$emit('formC', true)
+            this.$store.dispatch('setDialogMsg', {
+              txtmsg: 'Save Success',
+              status: true,
+              color: 'success'
+            })
+            this.formData = {
+              Name: null,
+              Price: null,
+              Img: null,
+              Type: 'Food',
+              Description: null
+            }
+          }
+        } else {
+          if (cb.data.file) {
+            let x = new Blob([new Uint8Array(cb.data.file.data)])
+            let showImg = URL.createObjectURL(x)
+            cb.data.src = showImg
+            delete cb.data.file
+          }
+          this.ListMenu.push(cb.data)
+          this.$emit('input', this.ListMenu)
+          this.$emit('formC', true)
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Save Success',
+            status: true,
+            color: 'success'
+          })
+          this.formData = {
+            Name: null,
+            Price: null,
+            Img: null,
+            Type: 'Food',
+            Description: null
+          }
         }
       })
     },
     priceFormated (value) {
-      let tmp = value.toString()
+      let tmp = value / 1000
       if (value < 1000) return tmp
-      else return tmp.slice(0, tmp.length - 3)
+      else return tmp.toFixed(1)
     },
     formatTitle (string) {
       return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1)
@@ -141,6 +181,9 @@ export default {
   font-weight: bold;
   color: #757575  ;
   border-bottom: 1px solid #dedede;
+}
+.cursorP{
+  cursor: pointer;
 }
 .card-food-action{
   display: flex;

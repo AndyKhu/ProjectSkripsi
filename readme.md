@@ -7,6 +7,8 @@
     - axios                     | v. ^0.18.0
     - vuelidate                 | v. ^0.6.2
     - Moment                    | v. ^2.22.1
+    - vue-chartjs               | v. ^3.3.2
+    - chart.js                  | v. ^2.7.2
 - Server 
     - reference : 
         - https://github.com/waiyaki/postgres-express-node-tutorial

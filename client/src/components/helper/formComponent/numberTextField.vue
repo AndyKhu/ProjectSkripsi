@@ -2,7 +2,7 @@
   <div class="component-cont mb-3">
     <label class="mb-2">{{label}}</label>
     <div class="component-item">
-      <v-text-field class="pa-0 px-3"
+      <v-text-field class="pa-0" :class="noMargin?'':'px-3'"
         v-bind="$attrs"
         hide-details
         :value="formatted"
@@ -28,6 +28,11 @@ export default {
       type: String,
       require: false,
       default: ''
+    },
+    noMargin: {
+      type: Boolean,
+      require: false,
+      default: false
     }
   },
   computed: {

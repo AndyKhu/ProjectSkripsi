@@ -1,6 +1,6 @@
 <template>
-  <div class="component-cont mb-3">
-    <label class="mb-2">{{label}}</label>
+  <div class="component-cont" :class="inLine?'rowFixed':'mb-3'">
+    <label :class="inLine?'':'mb-2'">{{label}}</label>
     <v-menu ref="picker"
             lazy
             :close-on-content-click="dateOnly ? true : false"
@@ -23,7 +23,7 @@
       <v-layout wrap>
         <v-card style="max-width: 290px">
           <v-flex xs12 v-if="!timeOnly">
-              <v-date-picker @input="changev" :min="minDate"
+              <v-date-picker @input="changev" :min="disabledMinDate?null:minDate"
                             :disabled="disabled" :readonly="readonly"
                             v-if="active" v-model="date" no-title scrollable></v-date-picker>
           </v-flex>
@@ -118,6 +118,21 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    inLine: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    disabledMinDate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    cstMinute: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -133,7 +148,7 @@ export default {
       hour: ['00','01','02','03','04','05','06','07','08','09',
              '10','11','12','13','14','15','16','17','18','19',
              '20','21','22','23'],
-      minute: ['00','01','02','03','04','05','06','07','08','09',
+      minute: this.cstMinute? ['00','30'] : ['00','01','02','03','04','05','06','07','08','09',
                '10','11','12','13','14','15','16','17','18','19',
                '20','21','22','23','24','25','26','27','28','29',
                '30','31','32','33','34','35','36','37','38','39',
@@ -164,6 +179,12 @@ export default {
     },
     timestamp () {
       return this.datetime === null ? null : new Date(moment(this.datetime).format(this.dateOnly ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm')).getTime()
+    }
+  },
+  watch: {
+    value (newValue, oldValue) {
+      this.value = newValue
+      this.datetime = this.value
     }
   },
   methods: {
@@ -201,6 +222,10 @@ export default {
 .component-cont{
   display: flex;
   flex-direction: column;
+}
+.rowFixed{
+  flex-direction: row;
+  align-items: center;
 }
 .component-cont label{
   color: #616161;

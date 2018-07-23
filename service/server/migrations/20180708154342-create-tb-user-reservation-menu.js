@@ -1,31 +1,3 @@
-'use strict';
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('tb_user_reservation_Menus', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      Id: {
-        type: Sequelize.STRING
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('tb_user_reservation_Menus');
-  }
-};
-
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.createTable('Tb_User_Reservation_Menus', {

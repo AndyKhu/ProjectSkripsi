@@ -115,12 +115,62 @@ export default {
         fullName: this.fullName,
         restoName: this.restoname
       }
-      if (this.usertype === 'Member') {
-        auth.signUp(this, credentials, '/')
-      } else {
-        credentials.Img = this.Img
-        auth.signupA(this, credentials, '/')
+      if (this.validate()) {
+        if (this.usertype === 'Member') {
+          auth.signUp(this, credentials, '/')
+        } else {
+          credentials.Img = this.Img
+          auth.signupA(this, credentials, '/')
+        }
       }
+    },
+    validate () {
+      if (!this.validateEmail(this.email)) {
+        console.log('ltea')
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Email is Invalid',
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.fullName === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Name Can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.password.length < 8) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'password must be at least 8',
+          status: true,
+          color: 'error'
+        })
+        return false
+      }
+      if (this.usertype === 'Admin Resto') {
+        if (this.restoname === '') {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: `Resto Name can't Be Empty`,
+            status: true,
+            color: 'error'
+          })
+          return false
+        } else if (!this.Img) {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: `Business Permit is Required`,
+            status: true,
+            color: 'error'
+          })
+          return false
+        }
+      }
+      return true
+    },
+    validateEmail (email) {
+      // eslint-disable-next-line
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      return re.test(String(email).toLowerCase())
     },
     submitEnter (event) {
       if (event.keyCode === 13) {

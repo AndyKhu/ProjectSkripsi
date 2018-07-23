@@ -6,30 +6,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING,
       },
-      Name: {
-        type: Sequelize.STRING
-      },
-      Phone: {
-        type: Sequelize.DOUBLE
-      },
-      reserveDate: {
-        type: Sequelize.DATE
-      },
-      Duration: {
-        type: Sequelize.INTEGER
-      },
-      totalSeats: {
-        type: Sequelize.INTEGER
-      },
-      Note: {
-        type: Sequelize.STRING
-      },
-      Status: {
-        type: Sequelize.INTEGER
-      },
-      RestoId: {
-        type: Sequelize.STRING
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -38,15 +14,36 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      Id_User: {
+      Status: {
+        type: Sequelize.INTEGER,
+      },
+      Id_Reserve: {
         type: Sequelize.STRING,
         onDelete: 'CASCADE',
         references: {
-          model: 'Tb_Users',
+          model: 'Tb_User_Reservation',
           key: 'Id',
-          as: 'Id_User',
-        },
+          as: 'Id_Reserve',
+        }
       },
+      Id_Seat: {
+        type: Sequelize.STRING,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Tb_Resto_Seat',
+          key: 'Id',
+          as: 'Id_Seat',
+        }
+      },
+      Id_Resto: {
+        type: Sequelize.STRING,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Tb_Resto',
+          key: 'Id',
+          as: 'Id_Resto',
+        }
+      }
     }),
   down: (queryInterface /* , Sequelize */) =>
     queryInterface.dropTable('Tb_User_Reservation_Schedules'),

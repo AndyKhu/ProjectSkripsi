@@ -2,7 +2,7 @@
   <div class="component-cont mb-3">
     <label class="mb-2">{{label}}</label>
     <div class="component-item">
-      <div class="cst-combobox px-3">
+      <div class="cst-combobox" :class="noMargin?'':'px-3'">
         <v-select class="pa-0"
           v-bind="$attrs"
           max-height="200px"
@@ -11,8 +11,8 @@
           :value="value"
           hide-details
           single-line
-          item-text="caption"
-          item-value="value"
+          :item-text="itemText"
+          :item-value="itemValue"
           autocomplete/>
         <div class="previewIcon ml-2" v-if="previewIcon !== ''">
           <v-icon>{{previewIcon}}</v-icon>
@@ -34,6 +34,11 @@ export default {
       required: true,
       default: []
     },
+    noMargin: {
+      type: Boolean,
+      require: false,
+      default: false
+    },
     label: {
       type: String,
       require: false,
@@ -43,6 +48,16 @@ export default {
       type: String,
       require: false,
       default: ''
+    },
+    itemText: {
+      type: String,
+      require: false,
+      default: 'caption'
+    },
+    itemValue: {
+      type: String,
+      require: false,
+      default: 'value'
     }
   },
   methods: {

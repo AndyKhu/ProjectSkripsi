@@ -16,13 +16,13 @@
                 <formTextField mask= "#### #### ####" v-model="data.Phone" :label="'Phone Number'"/>
               </v-flex>
               <v-flex xs12 md6 lg6 class="px-3">
-                <DateTimePicker v-model="data.reserveDate" />
+                <DateTimePicker v-model="data.reserveDate" cstMinute />
               </v-flex>
               <v-flex xs12 md6 lg6 class="px-3">
                 <formComboBox v-model="data.Duration" :Items="duratiItems" :label="'Duration'"/>
               </v-flex>
               <v-flex xs12 md6 lg6 class="px-3">
-                <formNumberSmall :max="20" v-model="data.totalSeats" :label="'Number of Seat'"/>
+                <formNumberSmall :max="maxS" v-model="data.totalSeats" :label="'Number of Seat'"/>
               </v-flex>
               <v-flex xs12 class="px-3">
                 <formTextField rows="4" multi-line v-model="data.Note" :label="'Note'"/>
@@ -37,7 +37,7 @@
               <v-layout row wrap>
                 <v-flex xs12 md4 lg4 v-for="(item,i) in resto.FoodMenu" :key="i">
                   <div class="card-food-menu-cont">
-                    <v-card-media :src="item.src" height="170px" contain>
+                    <v-card-media :src="item.src" class="grey lighten-3" height="170px" contain>
                     </v-card-media>
                     <div class="price-cst-cont">
                       <div class="price-cst">
@@ -50,7 +50,7 @@
                         <span class="foodmenu-subtittle">{{item.Description}}</span>
                       </v-flex>
                       <v-flex xs4 class="force-center">
-                        <formNumberSmall :min="0" :max="20" v-model="item.Amount"/>
+                        <formNumberSmall :min="0" :max="99" v-model="item.Amount"/>
                       </v-flex>
                     </v-layout>
                   </div>
@@ -78,10 +78,11 @@ export default {
   data () {
     return {
       active: true,
+      maxS: 0,
       data: {
         Name: null,
         Phone: null,
-        reserveDate: new Date().setDate(new Date().getDate() + 1),
+        reserveDate: this.newDate(),
         Duration: 60,
         totalSeats: 1,
         Note: null,
@@ -102,10 +103,17 @@ export default {
     }
   },
   methods: {
+    newDate () {
+      let a = new Date()
+      a.setDate(new Date().getDate() + 1)
+      a.setMinutes(0)
+      return a
+    },
     priceFormated (value) {
-      let tmp = value.toString()
+      let tmp = value
       if (value < 1000) return tmp
-      else return tmp.slice(0, tmp.length - 3)
+      // else return tmp.slice(0, tmp.length - 3)
+      else return (tmp / 1000).toFixed(1)
     },
     formatTitle (string) {
       return string.toLowerCase().charAt(0).toUpperCase() + string.slice(1)
@@ -114,21 +122,38 @@ export default {
       this.data.FoodMenu = this.resto.FoodMenu.filter(o => o.Amount)
       this.data.RestoId = this.resto.Id
       this.data.Id_User = this.getuser().Id
-      Member.saveRestoReserve(this, this.data).then(res => {
+      this.data.Cost = this.resto.ReservePrice * (this.data.Duration / 60)
+      console.log(this.data)
+      console.log(this.resto)
+      if (this.data.FoodMenu.length === 0) {
         this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Reserve Success',
-          status: true,
-          color: 'success'
-        })
-        this.$router.push({name: 'memberHistory', params: { id: this.getuser().Id }})
-      }).catch(err => {
-        console.log(err)
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Reserve Failed',
+          txtmsg: `Menu Can't be Empty`,
           status: true,
           color: 'error'
         })
-      })
+      } else if (this.data.Phone === null || this.data.Phone === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Phone Can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+      } else {
+        Member.saveRestoReserve(this, this.data).then(res => {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Reserve Success',
+            status: true,
+            color: 'success'
+          })
+          this.$router.push({name: 'memberHistory', params: { id: this.getuser().Id }})
+        }).catch(err => {
+          console.log(err)
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Reserve Failed',
+            status: true,
+            color: 'error'
+          })
+        })
+      }
     },
     getuser () {
       return this.$store.getters['getUser']
@@ -136,9 +161,13 @@ export default {
   },
   mounted () {
     Member.getRestoDetailmin(this, this.$route.params.id).then(res => {
+      console.log(res.data)
       this.resto = res.data
       this.data.Name = this.getuser().fullName
       this.data.Phone = this.getuser().Phone
+      if (this.resto.Seats.length !== 0) {
+        this.maxS = this.resto.Seats.map(item => item.seatEnd).reduce((prev, next) => prev > next ? prev : next)
+      }
       this.resto.FoodMenu.forEach((val, index) => {
         let x = new Blob([new Uint8Array(val.file.data)])
         val.src = URL.createObjectURL(x)
@@ -161,7 +190,7 @@ export default {
   background-size: auto;
 } */
 .list-menu-cont{
-  max-height: 450px;
+  height: 450px;
   overflow-y: scroll;
   border-bottom: 1px solid #dedede;
 }

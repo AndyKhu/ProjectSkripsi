@@ -5,26 +5,22 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       allowNull: false,
     },
-    Name: DataTypes.STRING,
-    Phone: DataTypes.STRING,
-    reserveDate: DataTypes.DATE,
-    Duration: DataTypes.INTEGER,
-    totalSeats: DataTypes.INTEGER,
-    Note: DataTypes.STRING,
-    Status: DataTypes.INTEGER,
-    RestoId: DataTypes.STRING
+    Status: {
+      type: DataTypes.INTEGER
+    }
   })
   Tb_User_Reservation_Schedule.associate = (models) => {
-    Tb_User_Reservation_Schedule.belongsTo(models.Tb_User, {
+    Tb_User_Reservation_Schedule.belongsTo(models.Tb_User_Reservation, {
       as: 'Reservation',
-      foreignKey: 'Id_User',
-      onDelete: 'CASCADE',
+      foreignKey: 'Id_Reserve'
     })
-    Tb_User_Reservation_Schedule.hasMany(models.Tb_User_Reservation_Menu, {
-      as: 'FoodMenu',
-      foreignKey: 'Id_Reserve',
-      onDelete: 'CASCADE',
-      sourceKey: 'Id'
+    Tb_User_Reservation_Schedule.belongsTo(models.Tb_Resto_Seat, {
+      as: 'Seats',
+      foreignKey: 'Id_Seat'
+    })
+    Tb_User_Reservation_Schedule.belongsTo(models.Tb_Resto, {
+      as: 'Resto',
+      foreignKey: 'Id_Resto'
     })
   }
   return Tb_User_Reservation_Schedule

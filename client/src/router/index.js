@@ -9,6 +9,7 @@ import ChangePassword from '@/components/changePassword'
 // Member
 import Member from '@/components/Member/index'
 import ListResto from '@/components/Member/listresto'
+import SearchResto from '@/components/Member/searchResto'
 import RestoDetail from '@/components/Member/restoDetail'
 import RestoReserve from '@/components/Member/restoReserve'
 import MyFavorite from '@/components/Member/myFavorite'
@@ -17,11 +18,13 @@ import AdminResto from '@/components/AdminResto/index'
 import MenuAR from '@/components/AdminResto/menu'
 import restoSetup from '@/components/AdminResto/restoSetup'
 import confirmList from '@/components/AdminResto/confirmList'
+import ReservationList from '@/components/AdminResto/reservationlist'
 // System Admin
 import SystemAdmin from '@/components/SystemAdmin/index'
 import reqAdminSA from '@/components/SystemAdmin/reqAdmin'
 import AccountSA from '@/components/SystemAdmin/account'
 import ReviewSA from '@/components/SystemAdmin/review'
+import Algo from '@/components/SystemAdmin/algo'
 
 Vue.use(Router)
 
@@ -37,6 +40,11 @@ export default new Router({
           path: '/',
           name: 'Home',
           component: ListResto
+        },
+        {
+          path: '/search/:type/:search',
+          name: 'SearchResto',
+          component: SearchResto
         },
         {
           path: '/profile/:id',
@@ -103,12 +111,17 @@ export default new Router({
           component: ChangePassword
         },
         {
-          path: '/confirmList',
+          path: '/confirmList/:id',
           name: 'confirmList',
           component: confirmList
         },
         {
-          path: '/restoSetup',
+          path: '/ReservationList/:id',
+          name: 'ReservationList',
+          component: ReservationList
+        },
+        {
+          path: '/restoSetup/:id',
           name: 'restoSetup',
           component: restoSetup
         }]
@@ -133,6 +146,11 @@ export default new Router({
           path: '/Resto',
           name: 'Reviews',
           component: ReviewSA
+        },
+        {
+          path: '/Algo',
+          name: 'Algo',
+          component: Algo
         }
       ]
     },

@@ -15,7 +15,7 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     let fileId = guid()
-    if (req.params.Id !== undefined && req.params.Id !== null){
+    if (req.params.Id !== undefined && req.params.Id !== null && req.params.Id !== 'null'){
       fileId = req.params.id
     }
     cb(null, fileId)

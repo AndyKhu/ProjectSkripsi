@@ -12,13 +12,14 @@
         <div class="cst-slider-img">
           <v-btn icon color="white" class="cst-slider-btnR hidden-md-and-up" @click="sliderR"><v-icon>keyboard_arrow_right</v-icon></v-btn>
           <v-btn icon color="white" class="cst-slider-btnL hidden-md-and-up" @click="sliderL"><v-icon>keyboard_arrow_left</v-icon></v-btn>
-          <div class="cst-slider-img-item" :class="item.length === 3?'sl3':item.length === 2?'sl2':'sl1'">
+          <div class="cst-slider-img-item" :class="itemTrending.length === 3?'sl3':itemTrending.length === 2?'sl2':'sl1'">
             <v-layout row wrap justify-center>
-              <!-- <v-flex md4 lg4 v-for="n in item" style="cursor: pointer" :class="item.length === 3?'xs4':item.length === 2?'xs6':'xs12'"
-                :key="n.Id">
+              <v-flex xs4 md3 lg3 v-for="n in itemTrending" style="cursor: pointer" :class="itemTrending.length === 3?'xs4':itemTrending.length === 2?'xs6':'xs12'"
+                :key="n.Id" @click="goDetail(n)">
                 <v-card class="card-cont">
                   <div class="card-img-cont">
-                    <img :src="n.src" alt="">
+                    <img :src="n.src" alt="" v-if="n.src">
+                    <img :src="'http://via.placeholder.com/310x200'" alt="" v-else>
                   </div>
                   <v-card-title>
                     <div>
@@ -29,7 +30,7 @@
                   <v-card-actions>
                   </v-card-actions>
                 </v-card>
-              </v-flex> -->
+              </v-flex>
             </v-layout>
           </div>
         </div>
@@ -48,7 +49,8 @@
         :key="n.Id" @click="goDetail(n)">
         <v-card class="card-cont">
           <div class="card-img-cont">
-            <img :src="n.src" alt="">
+            <img :src="n.src" alt="" v-if="n.src">
+            <img :src="'http://via.placeholder.com/310x200'" alt="" v-else>
           </div>
           <v-card-title>
             <div>
@@ -57,6 +59,13 @@
             </div>
           </v-card-title>
         </v-card>
+      </v-flex>
+      <v-flex xs12 class="text-xs-center">
+        <v-pagination
+          v-model="page"
+          @input="reloadData"
+          :length="totalPage"
+        ></v-pagination>
       </v-flex>
     </v-layout>
   </v-container>
@@ -68,9 +77,24 @@
 import Member from '@/api/member.js'
 export default {
   data: () => ({
-    item: null
+    item: [],
+    itemTrending: [],
+    page: 1,
+    totalPage: 1
   }),
   methods: {
+    reloadData (value) {
+      Member.loadListResto(this, this.page, '-', 0, '-').then(res => {
+        this.item = res.data.result
+        this.totalPage = res.data.pages
+        this.item.forEach((val, index) => {
+          val.Gallery.forEach((gal, index) => {
+            let x = new Blob([new Uint8Array(gal.file.data)])
+            val.src = URL.createObjectURL(x)
+          })
+        })
+      })
+    },
     goDetail (value) {
       this.$router.push({name: 'restoDetail', params: { id: value.Id }})
     },
@@ -94,13 +118,15 @@ export default {
     }
   },
   mounted () {
-    Member.loadListResto(this).then(res => {
-      this.item = res.data
-      this.item.forEach((val, index) => {
-        let x = new Blob([new Uint8Array(val.file.data)])
-        val.src = URL.createObjectURL(x)
+    this.reloadData(this.page)
+    Member.loadListRestoTrending(this).then(res => {
+      this.itemTrending = res.data.result
+      this.itemTrending.forEach((val, index) => {
+        val.Gallery.forEach((gal, index) => {
+          let x = new Blob([new Uint8Array(gal.file.data)])
+          val.src = URL.createObjectURL(x)
+        })
       })
-      console.log(this.item)
     })
   }
 }

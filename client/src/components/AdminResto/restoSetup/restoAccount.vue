@@ -54,17 +54,23 @@ export default{
   },
   methods: {
     add () {
-      if (this.Name !== null && this.Name !== '') {
-        this.Items.push({Id: helper.getGuid(), BankName: this.Name, AccountNumber: this.Account, Id_Resto: this.restoId})
-        this.Name = null
-        this.Account = null
-        this.input()
-      } else {
+      if (this.Name === null || this.Name === '') {
         this.$store.dispatch('setDialogMsg', {
           txtmsg: 'Bank Name Can`t be empty',
           status: true,
           color: 'error'
         })
+      } else if (this.Account === null || this.Account === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Account Can`t be empty',
+          status: true,
+          color: 'error'
+        })
+      } else {
+        this.Items.push({Id: helper.getGuid(), BankName: this.Name, AccountNumber: this.Account, Id_Resto: this.restoId})
+        this.Name = null
+        this.Account = null
+        this.input()
       }
     },
     deleteItem (item) {

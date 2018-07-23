@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'FoodMenu',
       foreignKey: 'Id_Resto',
       onDelete: 'CASCADE',
+    }),
+    Tb_Resto_Menu.belongsTo(models.Tb_User_Reservation_Menu, {
+      as: 'Menu',
+      foreignKey: 'Id'
     })
   }
   return Tb_Resto_Menu

@@ -55,11 +55,37 @@ export default{
   },
   methods: {
     add () {
-      this.Items.push({Id: helper.getGuid(), seatFrom: this.minSeat, seatEnd: this.maxSeat, noSeat: this.noSeat, Id_Resto: this.restoId})
-      this.minSeat = 0
-      this.maxSeat = 0
-      this.noSeat = 0
-      this.input()
+      if (this.minSeat === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Seat from Can`t be 0',
+          status: true,
+          color: 'error'
+        })
+      } else if (this.maxSeat === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Seat End Can`t be 0',
+          status: true,
+          color: 'error'
+        })
+      } else if (this.maxSeat < this.minSeat) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Seat End Can`t be Smaller than Seat From',
+          status: true,
+          color: 'error'
+        })
+      } else if (this.Items.filter((e) => { return e.noSeat === this.noSeat || e.noSeat === this.noSeat.toString() }).length !== 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'No Seat Already Added Please Input another No Seat',
+          status: true,
+          color: 'error'
+        })
+      } else {
+        this.Items.push({Id: helper.getGuid(), seatFrom: this.minSeat, seatEnd: this.maxSeat, noSeat: this.noSeat, Id_Resto: this.restoId})
+        this.minSeat = 0
+        this.maxSeat = 0
+        this.noSeat = 0
+        this.input()
+      }
     },
     SEC (value) {
       this.maxSeat = value

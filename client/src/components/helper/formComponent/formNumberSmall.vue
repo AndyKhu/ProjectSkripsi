@@ -6,7 +6,9 @@
         v-bind="$attrs"
         mask="##"
         v-model="comData"
+        :disabled="disabled"
         hide-details
+        @input="updateV"
         placeholder=" ">
       </v-text-field>
       <div class="icon-cst-cont noselect">
@@ -17,6 +19,7 @@
   </div>
 </template>
 <script>
+import _ from 'lodash'
 export default {
   props: {
     value: {
@@ -38,35 +41,53 @@ export default {
       type: Number,
       require: false,
       default: 1
+    },
+    disabled: {
+      type: Boolean,
+      require: false,
+      default: false
+    }
+  },
+  data () {
+    return {
+      comData: this.value
     }
   },
   methods: {
     up () {
-      if (this.comData === null || this.comData === '') this.comData = this.min
-      else {
-        if (this.comData === this.max) this.comData = this.min
-        else this.comData++
+      if (!this.disabled) {
+        if (this.comData === null || this.comData === '') this.comData = this.min
+        else {
+          if (this.comData === this.max) this.comData = this.min
+          else this.comData++
+        }
+        this.$emit('input', parseInt(this.comData))
       }
     },
     down () {
-      if (this.comData === null || this.comData === '') this.comData = this.min
-      else {
-        if (this.comData === this.min) this.comData = this.max
-        else this.comData--
+      if (!this.disabled) {
+        if (this.comData === null || this.comData === '') this.comData = this.min
+        else {
+          if (this.comData === this.min) this.comData = this.max
+          else this.comData--
+        }
+        this.$emit('input', parseInt(this.comData))
       }
-    }
-  },
-  computed: {
-    comData: {
-      get () {
-        return this.value
-      },
-      set (val) {
-        if (parseInt(val) > this.max) this.comData = this.min
-        else this.$emit('input', parseInt(val))
+    },
+    updateV: _.debounce(function (event) {
+      if (parseInt(event) > this.max) {
+        this.comData = this.min
       }
-    }
+      this.$emit('input', parseInt(event))
+    }, 500)
   }
+  // computed: {
+  //   comData: {
+  //     get () {
+  //       return this.value
+  //     }
+  //   }
+  // }
 }
 </script>
 <style scoped>

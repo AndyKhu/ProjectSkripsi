@@ -55,7 +55,8 @@ export default {
     menu: [
       { Id: 0, icon: 'notifications', title: 'Request AdminResto', active: true, linkname: 'ReqAdmin' },
       { Id: 1, icon: 'account_circle', title: 'Account', active: false, linkname: 'AccountM' },
-      { Id: 2, icon: 'forum', title: 'Reviews', active: false, linkname: 'Reviews' }],
+      { Id: 2, icon: 'forum', title: 'Reviews', active: false, linkname: 'Reviews' },
+      { Id: 1, icon: 'code', title: 'Algo', active: false, linkname: 'Algo' }],
     items: []
   }),
   methods: {

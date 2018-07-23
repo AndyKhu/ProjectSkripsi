@@ -33,7 +33,7 @@
               :key="item.title"
               avatar>
               <v-list-tile-avatar>
-                <img :src="'http://via.placeholder.com/200x200'">
+                <img :src="item.src">
               </v-list-tile-avatar>
               <v-list-tile-content>
                 <v-list-tile-title>{{item.userName}}</v-list-tile-title>
@@ -102,13 +102,24 @@ export default {
       // console.log(Math.max.apply(Math, this.rvChart.map(function (o) { return o.rate })))
     },
     sendReview () {
-      if (this.getuser() !== null) {
+      if (this.getuser() !== null && this.data.comment !== null && this.data.rate !== null) {
+        console.log(this.data)
         this.data.userId = this.getuser().Id
         this.data.userName = this.getuser().fullName
         this.data.PID = this.getuser().DpId
         this.data.Status = 0
         Member.saveRestoReview(this, this.data).then(res => {
-          this.resto.Reviews.push(this.data)
+          let tmp = this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })
+          if (tmp.length === 0) {
+            let x = new Blob([new Uint8Array(res.data.file.data)])
+            res.data.src = URL.createObjectURL(x)
+            delete res.data.file
+            this.resto.Reviews.push(res.data)
+          } else {
+            this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })[0].comment = this.data.comment
+            this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })[0].rate = this.data.rate
+          }
+          console.log(this.resto.Reviews)
           this.resto.Rate = this.resto.Reviews.map(item => item.rate).reduce((prev, next) => prev + next) / this.resto.Reviews.length
           Member.updateTbRestoRate(this, this.resto.Id, this.resto.Rate)
           this.$emit('input', this.resto)
@@ -133,7 +144,7 @@ export default {
         })
       } else {
         this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Login First',
+          txtmsg: this.data.comment ? this.data.rate ? 'Login First' : `Rate Can't be empty` : `Comment Can't be empty`,
           status: true,
           color: 'error'
         })

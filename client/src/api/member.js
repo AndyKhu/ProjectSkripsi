@@ -1,7 +1,10 @@
 import axios from 'axios'
 export default {
-  loadListResto (context) {
-    return axios.get(`${context.$store.getters.ROOT_URL}/api/getListRestourant`)
+  loadListResto (context, page, search, price, ds) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getListRestourant/${page}/${search}/${price}/${ds}`)
+  },
+  loadListRestoTrending (context) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getListRestourantTrending`)
   },
   getRestoDetail (context, restoId) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getRestoDetail/${restoId}`)
@@ -12,8 +15,34 @@ export default {
   getReservationHistory (context, userId) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getReservationHistory/${userId}`)
   },
+  getReservationHistory2 (context, userId) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getReservationHistory2/${userId}`)
+  },
   getProfilePicture (context, user) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getSingleImg/${user.Id}/${user.DpId}`)
+  },
+  getUserFavorite (context, user) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getUserFavorite/${user.Id}`)
+  },
+  getMaxValueResto (context) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/maxValueResto`)
+  },
+  getListBank (context, restoId) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getListBank/${restoId}`)
+  },
+  HistoryReservationUpload (context, data) {
+    if (data.Attachment) {
+      let formdata = new FormData()
+      formdata.append('img', data.Attachment)
+      return axios.post(`${context.$store.getters.ROOT_URL}/api/upload/${data.Id_Reserve}/null`, formdata).then(cb => {
+        data.oldPID = data.PID
+        data.PID = cb.data.PID
+        delete data.Attachment
+        return axios.post(`${context.$store.getters.ROOT_URL}/api/HistoryReservationUpload`, data)
+      })
+    } else {
+      return axios.post(`${context.$store.getters.ROOT_URL}/api/HistoryReservationUpload`, data)
+    }
   },
   updateTbRestoRate (context, restoId, rate) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/saveRestoRate/${restoId}/${rate}`)
@@ -26,6 +55,9 @@ export default {
   },
   updateFavorite (context, data) {
     return axios.post(`${context.$store.getters.ROOT_URL}/api/updateFavorite`, data)
+  },
+  closeAccount (context, userId) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/closeAccount/${userId}`)
   },
   updateProfile (context, data, dp) {
     if (dp !== null) {

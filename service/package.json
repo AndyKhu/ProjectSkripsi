@@ -28,7 +28,8 @@
     "pg": "^6.4.1",
     "pg-hstore": "^2.3.2",
     "querystring": "^0.2.0",
-    "sequelize": "^4.13.5"
+    "sequelize": "^4.13.5",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "nodemon": "^1.17.3"

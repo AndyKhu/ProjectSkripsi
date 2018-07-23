@@ -7,8 +7,50 @@ export default {
   getTbRestoByIDmin (context, userID) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbRestoByuserIDmin/${userID}`)
   },
+  getCountReservasi (context, data) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/getCountReservasi`, data)
+  },
+  getTbReservationConfirm (context, restoId) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReservationConfirm/${restoId}`).then(cb => {
+      cb.data.forEach((val, index) => {
+        let x = new Blob([new Uint8Array(val.file.data)])
+        let showImg = URL.createObjectURL(x)
+        val.src = showImg
+        delete val.file
+      })
+      return cb
+    })
+  },
+  getTbReservationSchedule (context, date) {
+    let data = {
+      date: date
+    }
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/getTbReservationSchedule`, data).then(cb => {
+      return cb
+    })
+  },
+  getTbReservationSchedule2 (context, date) {
+    let data = {
+      date: date
+    }
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/getTbReservationSchedule2`, data).then(cb => {
+      return cb
+    })
+  },
+  updateTbReservationSchedule (context, data) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationSchedule/${data.Reservation.Id}/${data.Id}`)
+  },
+  updateTbReservationConfirm (context, ReserveId, status) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationConfirm/${ReserveId}/${status ? 2 : 4}`)
+  },
   updateTbResto (context, ListData) {
-    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbResto`, ListData)
+    let tmp = JSON.parse(JSON.stringify(ListData))
+    delete tmp.FoodMenu
+    delete tmp.Gallery
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbResto`, tmp)
+  },
+  getFoodImage (context, restoId, PID) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getSingleImg/${restoId}/${PID}`)
   },
   updateRestoReview (context, Id) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateRestoReview/${Id}`)
@@ -17,10 +59,12 @@ export default {
     if (ListData.Img) {
       let formdata = new FormData()
       formdata.append('img', ListData.Img)
+      if (ListData.Id) {
+        let oldPID = ListData.PID
+        ListData.oldPID = oldPID
+      }
       return axios.post(`${context.$store.getters.ROOT_URL}/api/upload/${RestoId}/${fileId}`, formdata)
         .then(cb => {
-          ListData.src = URL.createObjectURL(ListData.Img)
-          delete ListData.Img
           ListData.PID = cb.data.PID
           ListData.Ptype = cb.data.Ptype
           ListData.Pname = cb.data.Pname

@@ -103,22 +103,84 @@ export default {
     getuser () {
       return this.$store.getters['getUser']
     },
+    validate () {
+      if (this.resto.Phone === null || this.resto.Phone === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Phone can't Be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.PriceFrom === null || this.resto.PriceFrom === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Price From can't Be 0`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.PriceEnd === null || this.resto.PriceEnd === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Price End can't Be 0`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.PriceEnd < this.resto.PriceFrom) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Price From can't Be Smaller Than Price End`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.CloseDay < this.resto.OpenDay) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Day Open can't Be Smaller Than Day Close`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.ReservePrice === null || this.resto.reservePrice === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Reserve Price can't be 0`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.Seats.length === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Resto Seats can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (this.resto.Account.length === 0) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Resto Account can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      }
+      return true
+    },
     save () {
       console.log(this.resto)
-      AdminResto.updateTbResto(this, this.resto).then(cb => {
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Save Success',
-          status: true,
-          color: 'success'
+      if (this.validate()) {
+        AdminResto.updateTbResto(this, this.resto).then(cb => {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Save Success',
+            status: true,
+            color: 'success'
+          })
+        }).catch(err => {
+          console.log(err)
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: 'Save Failed ( Server Error )',
+            status: true,
+            color: 'success'
+          })
         })
-      }).catch(err => {
-        console.log(err)
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: 'Save Failed ( Server Error )',
-          status: true,
-          color: 'success'
-        })
-      })
+      }
     }
   },
   mounted () {
@@ -136,7 +198,6 @@ export default {
           let x = new Blob([new Uint8Array(val.file.data)])
           let showImg = URL.createObjectURL(x)
           val.src = showImg
-          delete val.file
         }
       })
     })
