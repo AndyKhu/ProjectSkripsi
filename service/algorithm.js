@@ -17,6 +17,7 @@ module.exports = {
   async execute(req, res, next) {
     let stoplist = [10,20,30,40,50,60,70,80,90,100]
     let hasilA = []
+    let ListResto = []
     let listResto = await getListResto() //listResto
     let iterasi = 100 // jumlah iterasi
     // untuk testing
@@ -117,6 +118,7 @@ module.exports = {
         }
       }
       hasilA.push({ID: val.Id, data: listres, lastrecord: kromosomI})
+      ListResto.push({caption: val.Name, value: val.Id})
       count+=1     
       if(kromosomI){
         if(kromosomI[0].fitness === 1){
@@ -129,7 +131,7 @@ module.exports = {
               Id_Resto: val.Id,
               Status: 0
             })
-            Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+            Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
           })
           Models.Tb_User_Reservation_Schedule.bulkCreate(saveData)
         }else {
@@ -145,7 +147,7 @@ module.exports = {
                 Id_Resto: val.Id,
                 Status: 0
               })
-              Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+              Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
             }else {
               if(bentrokBest.filter((e)=> {return e.reserveId === krs.reserveId && e.seatId === krs.seatId}).length === 0) {
                 saveData.push({
@@ -155,7 +157,7 @@ module.exports = {
                   Id_Resto: val.Id,
                   Status: 3
                 })
-                Models.Tb_User_Reservation.update({Status: 4},{where: {Id: krs.reserveId}})
+                Models.Tb_User_Reservation.update({Status: 4, PID: 'new', rejectNote: 'Algo Note'},{where: {Id: krs.reserveId}})
               } else {
                 saveData.push({
                   Id: guid(),
@@ -164,7 +166,7 @@ module.exports = {
                   Id_Resto: val.Id,
                   Status: 0
                 })
-                Models.Tb_User_Reservation.update({Status: 3},{where: {Id: krs.reserveId}})
+                Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
               }
             }
           })
@@ -172,7 +174,7 @@ module.exports = {
         }
       }
       if(count === listResto.length){
-        res.status(200).send(hasilA)
+        res.status(200).send({data: hasilA, ListResto: ListResto})
       }
     })
   }
@@ -584,8 +586,8 @@ function compare2(a, b) {
 async function getListReservation(Id) {
   let reservationList
   await Models.Tb_User_Reservation.findAll({
-    where: { $and: [ {Status: {$in: [2,3]}},{RestoId: Id},
-      sequelize.where(sequelize.fn('date', sequelize.col('reserveDate')),'=',sequelize.fn('date', new Date()))]
+    where: { $and: [ {Status: {$in: [2,3]}},{RestoId: Id}]
+      // sequelize.where(sequelize.fn('date', sequelize.col('reserveDate')),'=',sequelize.fn('date', new Date()))]
     }
   }).then(list => {
     reservationList = list

@@ -3,13 +3,18 @@
     <v-list subheader>
       <v-subheader>Restaurant</v-subheader>
       <router-link v-for="(item,i) in listMenuR" :key="i" :to="{name: item.link, params: {id: getuser().Id}}" v-if="Type === item.type">
-        <v-list-tile avatar @click="donothing">
+        <v-list-tile avatar @click="donothing(item)">
           <v-list-tile-avatar>
             <v-icon>{{item.icon}}</v-icon>
           </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>{{item.label}}</v-list-tile-title>
           </v-list-tile-content>
+          <v-list-tile-avatar v-if="item.label === 'Reservation History' && getuser().Reservation && getuser().Reservation.length !== 0">
+            <v-avatar :size="25" class="red darken-1 white--text mx-2 notif">
+              {{getuser().Reservation.length}}
+            </v-avatar>
+          </v-list-tile-avatar>
         </v-list-tile>
       </router-link>
     </v-list>
@@ -38,6 +43,7 @@
   </div>
 </template>
 <script>
+import Member from '@/api/member.js'
 export default {
   props: {
     Type: {
@@ -74,7 +80,12 @@ export default {
     ]
   }),
   methods: {
-    donothing () {
+    donothing (item) {
+      if (item.label === 'Reservation History') {
+        Member.updateNotif(this, this.getuser().Id).then(cb => {
+          this.getuser().Reservation = []
+        })
+      }
     },
     signOut () {
       this.$store.dispatch('setUser', null)

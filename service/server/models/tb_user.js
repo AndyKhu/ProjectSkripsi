@@ -58,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
     Tb_User.hasOne(models.Tb_Resto, {
       foreignKey: 'Id_User',
       as: 'userResto',
+    }),
+    Tb_User.hasMany(models.Tb_User_Reservation, {
+      foreignKey: 'Id_User',
+      as: 'Reservation',
     })
   }
   return Tb_User

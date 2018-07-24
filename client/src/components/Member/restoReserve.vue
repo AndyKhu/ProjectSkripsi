@@ -28,7 +28,7 @@
                 <formTextField rows="4" multi-line v-model="data.Note" :label="'Note'"/>
               </v-flex>
               <v-flex xs12 class="pt-0 px-3 text-xs-right">
-                <v-btn color="primary" @click="active = !active">Next</v-btn>
+                <v-btn color="primary" @click="nextControl">Next</v-btn>
               </v-flex>
             </v-layout>
           </v-flex>
@@ -70,6 +70,7 @@
 import Member from '@/api/member.js'
 import DateTimePicker from '@/components/helper/formComponent/formDateTimePicker'
 import formNumberSmall from '@/components/helper/formComponent/formNumberSmall'
+import moment from 'moment'
 export default {
   components: {
     DateTimePicker,
@@ -103,6 +104,47 @@ export default {
     }
   },
   methods: {
+    nextControl () {
+      if (this.validate()) {
+        this.active = false
+      }
+    },
+    validate () {
+      let reserveTime = moment(moment(new Date(this.data.reserveDate)).format('HH:mm'), 'HH:mm').toDate()
+      let reserveEnd = moment(reserveTime).add(this.data.Duration, 'minutes').toDate()
+      let OpenTime = moment(moment(new Date(this.resto.OpenTime)).format('HH:mm'), 'HH:mm').toDate()
+      let CloseTime = moment(moment(new Date(this.resto.CloseTime)).format('HH:mm'), 'HH:mm').toDate()
+      if (this.data.Phone === null || this.data.Phone === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Phone Can't be Empty`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (OpenTime > reserveTime) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Please Select Another Time ( Resto Not Open Yet )`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (CloseTime < reserveTime) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Please Select Another Time ( Resto Closed Already )`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      } else if (CloseTime < reserveEnd) {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Please Select Another Time ( Resto Closed Already )`,
+          status: true,
+          color: 'error'
+        })
+        return false
+      }
+      return true
+    },
     newDate () {
       let a = new Date()
       a.setDate(new Date().getDate() + 1)
@@ -123,17 +165,9 @@ export default {
       this.data.RestoId = this.resto.Id
       this.data.Id_User = this.getuser().Id
       this.data.Cost = this.resto.ReservePrice * (this.data.Duration / 60)
-      console.log(this.data)
-      console.log(this.resto)
       if (this.data.FoodMenu.length === 0) {
         this.$store.dispatch('setDialogMsg', {
           txtmsg: `Menu Can't be Empty`,
-          status: true,
-          color: 'error'
-        })
-      } else if (this.data.Phone === null || this.data.Phone === '') {
-        this.$store.dispatch('setDialogMsg', {
-          txtmsg: `Phone Can't be Empty`,
           status: true,
           color: 'error'
         })
@@ -144,7 +178,7 @@ export default {
             status: true,
             color: 'success'
           })
-          this.$router.push({name: 'memberHistory', params: { id: this.getuser().Id }})
+          this.$router.push({name: 'Bill', params: { id: res.data.Id }})
         }).catch(err => {
           console.log(err)
           this.$store.dispatch('setDialogMsg', {

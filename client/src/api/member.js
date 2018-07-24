@@ -30,6 +30,9 @@ export default {
   getListBank (context, restoId) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getListBank/${restoId}`)
   },
+  getHistoryReserverById (context, Id) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getHistoryReserverById/${Id}`)
+  },
   HistoryReservationUpload (context, data) {
     if (data.Attachment) {
       let formdata = new FormData()
@@ -44,6 +47,12 @@ export default {
       return axios.post(`${context.$store.getters.ROOT_URL}/api/HistoryReservationUpload`, data)
     }
   },
+  cancelReservation (context, Id) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/cancelReservation/${Id}`)
+  },
+  updateNotif (context, userId) {
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateNotif/${userId}`)
+  },
   updateTbRestoRate (context, restoId, rate) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/saveRestoRate/${restoId}/${rate}`)
   },
@@ -56,8 +65,8 @@ export default {
   updateFavorite (context, data) {
     return axios.post(`${context.$store.getters.ROOT_URL}/api/updateFavorite`, data)
   },
-  closeAccount (context, userId) {
-    return axios.post(`${context.$store.getters.ROOT_URL}/api/closeAccount/${userId}`)
+  closeAccount (context, user) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/closeAccount/${user.Id}`, user)
   },
   updateProfile (context, data, dp) {
     if (dp !== null) {

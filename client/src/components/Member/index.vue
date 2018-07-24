@@ -50,9 +50,12 @@
               </div>
             </v-flex>
             <v-spacer class="hidden-sm-and-down"></v-spacer>
-            <v-flex xs2 class="cst-flex hidden-sm-and-down">
+            <v-flex xs2 class="cst-flex hidden-sm-and-down force-center">
               <v-menu offset-y v-if="getuser()!=null">
                 <div slot="activator" class="pr-2">
+                  <v-avatar :size="20" class="red darken-1 white--text mx-2 notif" v-if="getuser()!=null && getuser().Reservation && getuser().Reservation.length!== 0">
+                    {{getuser().Reservation.length}}
+                  </v-avatar>
                   <h3 class="d-inline-block">{{getuser().fullName}}</h3>
                   <v-icon>arrow_drop_down</v-icon>
                 </div>
@@ -65,7 +68,7 @@
               </router-link>
             </v-flex>
             <v-flex xs1 md2 lg2 class="hidden-md-and-up force-center">
-              <v-icon v-if="getuser()!=null">menu</v-icon>
+              <v-icon v-if="getuser()!=null" @click="nav = true">menu</v-icon>
               <router-link class="default" :to="{name: 'Login'}" v-else>
                 <v-icon>input</v-icon>
               </router-link>
@@ -82,14 +85,14 @@
           <v-btn small flat color="white" @click.native="getdialogMsg().status = false">Close</v-btn>
         </v-snackbar>
         <router-view class="container-cst"/>
-        <!-- <v-navigation-drawer
+        <v-navigation-drawer v-if="getuser() !== null"
           temporary
           fixed
           v-model="nav"
           class="nav-cst"
           >
-          <MenuLink/>
-        </v-navigation-drawer> -->
+          <MenuLink :userId="getuser().Id"/>
+        </v-navigation-drawer>
         <div class="cst-dialog-cont front" v-if="getdialogMsg2().status">
           <div class="button-cont front">
             <v-btn icon small color="white" @click="close"><v-icon>close</v-icon></v-btn>
@@ -227,12 +230,16 @@ export default {
 <style scoped>
 @media only screen and (max-width: 960px){
   .nav-cst{
-    margin-top: 120px !important;
+    /* margin-top: 120px !important; */
   }
 }
 @media only screen and (max-width: 564px){
   .nav-cst{
-    margin-top: 120px !important;
+    /* margin-top: 120px !important; */
+  }
+  .cst-dialog-item img, .body-container >>> .cst-dialog-item img{
+    max-width: 320px !important;
+    max-height: 540px !important;
   }
 }
 .filter,.test{
@@ -311,6 +318,7 @@ export default {
   all:unset;
 }
 .filter-item{
+  z-index: 999;
   position: absolute;
   top: 100%;
   left: 0;

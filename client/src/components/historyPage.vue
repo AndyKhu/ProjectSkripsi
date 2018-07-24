@@ -4,22 +4,25 @@
       <v-card>
         <v-layout row wrap>
           <v-flex xs12 class="item-tittle pa-2">
-            Payment Confirmation
+            {{dialogT ? 'Payment Confirmation' : 'Confirmation'}}
           </v-flex>
-          <v-flex xs6 class="pa-2 px-3">
+          <v-flex xs6 class="pa-2 px-3" v-if="dialogT">
             <formComboBox v-model="formConfirm.BankId" :label="'Bank'" :Items="formConfirm.BankItem"/>
             <formTextField v-model="formConfirm.SenderName" :label="'Sender Name'"/>
             <formUploadImg v-model="formConfirm.Attachment" :label="'Attachment'" :icon="'attachment'"/>
           </v-flex>
-          <v-flex xs6 class="pa-2 px-3">
+          <v-flex xs6 class="pa-2 px-3" v-if="dialogT">
             <DateTimePicker v-model="formConfirm.TransferDt" :label="'Transfer Date'" />
             <formNumberField disabled v-model="formConfirm.Nominal" :label="'Nominal'"/>
+          </v-flex>
+          <v-flex xs12 class="pa-2 label-sub" v-if="!dialogT">
+            Are You Sure want to Cancel This Reservation ?
           </v-flex>
           <v-flex xs12 class="text-xs-right px-3 pt-0 pb-3">
             <v-btn small color="error" @click="closeDialog">
               Cancel
             </v-btn>
-            <v-btn small color="primary" @click="confirmDialog">
+            <v-btn small color="primary" @click="clickControl">
               Confirm
             </v-btn>
           </v-flex>
@@ -48,9 +51,9 @@
             <v-flex xs12 v-if="items.length === 0" class="text-xs-center">
                No Data
             </v-flex>
-            <v-flex xs12 class="cst-card-history pa-2 pointer" v-for="(item,i) in itemPage[page-1]" :key="i" v-else @click="toDetail(item)">
+            <v-flex xs12 class="cst-card-history pa-2" v-for="(item,i) in itemPage[page-1]" :key="i" v-else>
               <v-layout row wrap>
-                <v-flex xs12 sm3 md3 lg3 class="img-cont">
+                <v-flex xs12 sm3 md3 lg3 class="img-cont pointer" @click="toDetail(item)">
                   <img :src="item.src" style="width:100%;height:100%;">
                 </v-flex>
                 <v-flex xs12 sm9 md9 lg9 :class="{'pl-4': $vuetify.breakpoint.smAndUp}">
@@ -75,6 +78,12 @@
                       <v-flex xs9 sm10 md10 lg10 class="cst-card-history-item-label">
                         {{getStatus(item.Status)}}
                       </v-flex>
+                      <v-flex xs3 sm2 md2 lg2 class="pt-2" v-if="item.Status === 4">
+                        <b>Reject Note</b>
+                      </v-flex>
+                      <v-flex xs9 sm10 md10 lg10 class="pt-2 cst-card-history-item-label" v-if="item.Status === 4">
+                        {{item.rejectNote?item.rejectNote:'-'}}
+                      </v-flex>
                       <v-flex xs3 sm2 md2 lg2 class="pt-2">
                         <b>Note</b>
                       </v-flex>
@@ -85,7 +94,7 @@
                         <v-btn @click="upload(item)" icon class="ma-0" :class="{'btn--small theme--dark primary': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
                           <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'primary--text': $vuetify.breakpoint.smAndUp}">cloud_download</v-icon>
                         </v-btn>
-                        <v-btn icon class="ma-0" :class="{'btn--small theme--dark error': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
+                        <v-btn @click="cancel(item)" icon class="ma-0" :class="{'btn--small theme--dark error': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
                           <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'error--text': $vuetify.breakpoint.smAndUp}">delete</v-icon>
                         </v-btn>
                       </v-flex>
@@ -118,6 +127,7 @@ export default {
   },
   data () {
     return {
+      dialogT: true,
       listS: true,
       detail: false,
       detailData: {},
@@ -139,6 +149,13 @@ export default {
     }
   },
   methods: {
+    clickControl () {
+      if (this.dialogT) {
+        this.confirmDialog()
+      } else {
+        this.executeCancel()
+      }
+    },
     toDetail (value) {
       this.detail = true
       this.detailData = value
@@ -227,12 +244,12 @@ export default {
           this.closeDialog()
           this.selectedItem.Upload = res.data
           this.selectedItem.Status = 1
-          this.selectedItem = null
         })
       }
     },
     upload (item) {
       this.dialog = true
+      this.dialogT = true
       this.selectedItem = item
       this.formConfirm.Id_Reserve = item.Id
       this.formConfirm.Nominal = item.Cost
@@ -252,7 +269,19 @@ export default {
       // 4 Rejected
       // 5 Done
       // 6 User Cancel
-      return val === 0 ? 'Unpaid' : val === 1 ? 'Pending' : val === 2 ? 'Paid (unschedule)' : val === 3 ? 'Scheduled' : val === 4 ? 'Rejected' : 'Done'
+      return val === 0 ? 'Unpaid' : val === 1 ? 'Pending' : val === 2 ? 'Paid (unschedule)' : val === 3 ? 'Scheduled' : val === 4 ? 'Rejected' : val === 5 ? 'Done' : 'Canceled'
+    },
+    cancel (val) {
+      this.dialog = true
+      this.dialogT = false
+      this.selectedItem = val
+    },
+    executeCancel () {
+      console.log(this.selectedItem)
+      Member.cancelReservation(this, this.selectedItem.Id).then(cb => {
+        this.items.splice(this.items.indexOf(this.selectedItem), 1)
+        this.dialog = false
+      })
     }
   },
   computed: {
@@ -300,6 +329,11 @@ export default {
     position: relative !important;
     padding: 0 !important;
   }
+}
+.label-sub {
+  color: #616161;
+  font-size: 14px;
+  word-wrap: break-word;
 }
 .item-tittle{
   background: #2196F3;

@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Tb_Resto.associate = (models) => {
     Tb_Resto.belongsTo(models.Tb_User, {
+      as: 'User',
       foreignKey: 'Id_User',
       onDelete: 'CASCADE',
     }),

@@ -5,7 +5,7 @@ const cors = require('cors');
 const schedule = require('node-schedule')
 const algorithm = require('./algorithm.js')
 
-// var j = schedule.scheduleJob('*/50 * * * *', function(){
+// var j = schedule.scheduleJob('* * */0 * *', function(){
 //   algorithm.execute()
 // })
 

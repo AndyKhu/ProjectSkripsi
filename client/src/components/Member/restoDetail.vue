@@ -184,9 +184,11 @@ export default {
         delete val.file
       })
       this.resto.Reviews.forEach((val, index) => {
-        let x = new Blob([new Uint8Array(val.file.data)])
-        val.src = URL.createObjectURL(x)
-        delete val.file
+        if (val.file) {
+          let x = new Blob([new Uint8Array(val.file.data)])
+          val.src = URL.createObjectURL(x)
+          delete val.file
+        }
       })
       if (this.resto.Reviews.length !== 0) {
         this.resto.totalRate = this.resto.Reviews.map(item => item.rate).reduce((prev, next) => prev + next) / this.resto.Reviews.length

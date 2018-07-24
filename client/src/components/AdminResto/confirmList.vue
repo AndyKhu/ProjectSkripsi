@@ -37,7 +37,7 @@
                     </v-btn>
                   </td>
                   <td class="text-xs-center">
-                    <v-btn icon class="mx-0" @click="confirm(props.item, false)">
+                    <v-btn icon class="mx-0" @click="reject(props.item)">
                       <v-icon color="pink">cancel</v-icon>
                     </v-btn>
                   </td>
@@ -81,33 +81,35 @@
               </v-alert>
             </template>
           </v-data-table>
-          <!-- <v-layout row wrap align-center class="dialogList" v-for="(item,i) in menuS" :key="i">
-            <v-flex xs8 class="pa-2">
-              <b>{{item.Menu.Name}} - {{item.Amount}}</b>
-            </v-flex>
-            <v-flex xs4 class="pa-2 text-xs-right">
-              <b>Rp. {{item.Menu.Price * item.Amount | formatPrice}}</b>
-            </v-flex>
-            <v-flex xs1 class="pa-2 text-xs-center">
-              <v-btn icon small class="ma-0">
-                <v-icon color="error">
-                  close
-                </v-icon>
-              </v-btn>
-            </v-flex>
-          </v-layout> -->
         </div>
         <div class="dialogFooter pa-2 text-xs-right">
           Total : {{getTotal() | formatPrice}}
-          <!-- <v-btn class="ma-0" depressed color="success" block>
-            <v-icon class="mr-2">
-              add_box
-            </v-icon>
-            Add Order
-          </v-btn> -->
         </div>
       </div>
     </div>
+    <v-dialog v-model="cdialog" persistent max-width="600">
+      <v-card>
+        <v-layout row wrap>
+          <v-flex xs12 class="item-tittle pa-2">
+            Reject Confirmation
+          </v-flex>
+          <!-- <v-flex xs12 class="pa-2 label-sub">
+            Are You Sure want to Reject This Reservation ?
+          </v-flex> -->
+          <v-flex xs12 class="pa-2">
+            <formTextField rows="4" multi-line v-model="Note" :label="'Note'"/>
+          </v-flex>
+          <v-flex xs12 class="text-xs-right px-3 pt-0 pb-3">
+            <v-btn small color="error" @click="cdialog = false;Note = ''">
+              Cancel
+            </v-btn>
+            <v-btn small color="primary" @click="rejectC">
+              Confirm
+            </v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-dialog>
   </v-flex>
 </template>
 <script>
@@ -115,8 +117,11 @@ import AdminResto from '@/api/adminresto.js'
 
 export default {
   data: () => ({
+    cdialog: false,
     dialog: false,
     dialogState: '',
+    Note: '',
+    tmp: null,
     menuS: [],
     headersD: [{text: 'Name', value: 'Name', sortable: false}, {text: 'qty', value: 'Amount', width: '50px', sortable: false, align: 'center'}, {text: 'Rate', value: 'Rate', width: '150px', sortable: false, align: 'center'}, {text: 'Amount', value: '-', width: '50px', sortable: false, align: 'center'}],
     items: [],
@@ -137,6 +142,20 @@ export default {
     })
   },
   methods: {
+    rejectC () {
+      if (this.Note === null || this.Note === '') {
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: `Note Required`,
+          status: true,
+          color: 'error'
+        })
+      } else {
+        this.tmp.Note = this.Note
+        this.confirm(this.tmp, false)
+        this.cdialog = false
+        this.Note = ''
+      }
+    },
     showPic (value) {
       this.dialog = true
       this.dialogState = 'Img'
@@ -145,7 +164,7 @@ export default {
       setTimeout(() => document.addEventListener('keyup', this.hide), 0)
     },
     confirm (value, status) {
-      AdminResto.updateTbReservationConfirm(this, value.Id, status).then(cb => {
+      AdminResto.updateTbReservationConfirm(this, value.Id, status, value.Note ? value.Note : '').then(cb => {
         this.items.splice(this.items.indexOf(value), 1)
         this.$store.dispatch('setDialogMsg', {
           txtmsg: `${status ? 'Confirm' : 'Reject'} Success`,
@@ -160,6 +179,10 @@ export default {
           color: 'error'
         })
       })
+    },
+    reject (value) {
+      this.tmp = value
+      this.cdialog = true
     },
     menuShow (value) {
       this.dialog = true

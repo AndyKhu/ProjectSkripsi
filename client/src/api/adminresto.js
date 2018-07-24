@@ -21,17 +21,19 @@ export default {
       return cb
     })
   },
-  getTbReservationSchedule (context, date) {
+  getTbReservationSchedule (context, date, RestoId) {
     let data = {
+      RestoId: RestoId,
       date: date
     }
     return axios.post(`${context.$store.getters.ROOT_URL}/api/getTbReservationSchedule`, data).then(cb => {
       return cb
     })
   },
-  getTbReservationSchedule2 (context, date) {
+  getTbReservationSchedule2 (context, date, RestoId) {
     let data = {
-      date: date
+      date: date,
+      RestoId: RestoId
     }
     return axios.post(`${context.$store.getters.ROOT_URL}/api/getTbReservationSchedule2`, data).then(cb => {
       return cb
@@ -40,8 +42,11 @@ export default {
   updateTbReservationSchedule (context, data) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationSchedule/${data.Reservation.Id}/${data.Id}`)
   },
-  updateTbReservationConfirm (context, ReserveId, status) {
-    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationConfirm/${ReserveId}/${status ? 2 : 4}`)
+  updateTbReservationConfirm (context, ReserveId, status, Note) {
+    let data = {
+      Note: Note
+    }
+    return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationConfirm/${ReserveId}/${status ? 2 : 4}`, data)
   },
   updateTbResto (context, ListData) {
     let tmp = JSON.parse(JSON.stringify(ListData))

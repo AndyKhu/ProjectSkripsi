@@ -9,7 +9,9 @@ const store = new Vuex.Store({
   },
   state: {
     // ROOT_URL: 'http://172.16.11.60:8001',
-    ROOT_URL: 'http://localhost:8001',
+    // ROOT_URL: 'http://192.168.1.240:8001',
+    ROOT_URL: 'http://192.168.43.191:8001',
+    // ROOT_URL: 'http://localhost:8001',
     errorMsg: null,
     User: null,
     adminDialog: {

@@ -75,8 +75,14 @@ module.exports = {
     })
   },
   closeAccount(req, res, next) {
-    Models.Tb_User.update({ Status: false }, { where: { Id: req.params.id } }).then(cb => {
-      res.status(200).send(cb)
+    Models.Tb_User.update({ Status: false }, { where: { Id: req.body.Id } }).then(cb => {
+      if (req.body && req.body.Type === 'AdminResto') {
+        Models.Tb_Resto.update({Status:false},{where: {Id_User: req.body.Id}}).then(cb2 => {
+          res.status(200).send(cb)  
+        })
+      } else {
+        res.status(200).send(cb)
+      }
     }).catch(err => {
       console.log(err)
       res.status(400).send({ error: err })
@@ -101,6 +107,12 @@ module.exports = {
       Models.Tb_Resto.findAll({
         where: searchP,
         include: [
+          {
+            where: { Status: true , Type: 'AdminResto'},
+            model: Models.Tb_User,
+            as: 'User',
+            required: true
+          },
           {
             where: { [Op.or]: [{ Type: 'both' }, { Type: 'default' }] },
             model: Models.Tb_Gallery,
@@ -204,9 +216,40 @@ module.exports = {
       })
     }
   },
+  getHistoryReserverById (req, res, next) {
+    Models.Tb_User_Reservation.findOne({where: {Id:req.params.id},
+      include: [
+        {
+          model: Models.Tb_User_Reservation_Menu,
+          as: 'FoodMenu',
+          include: [
+            {
+              model: Models.Tb_Resto_Menu,
+              as: 'Menu'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_Resto,
+          as: 'Resto'
+        }
+      ]
+    }).then(cb => {
+      res.status(200).send(cb)
+    }).catch(err => {
+      res.status(400).send({ errmsg: 'Failed to Comment' })
+    })
+  },
+  cancelReservation (req,res,next) {
+    Models.Tb_User_Reservation.update({Status: 6},{where: {Id: req.params.id}}).then(cb => {
+      res.status(200).send(cb)
+    }).catch(err => {
+      res.status(400).send({ errmsg: 'Failed to Comment' })
+    })
+  },
   getReservationHistory(req, res, next) {
     Models.Tb_User_Reservation.findAll({
-      where: { Id_User: req.params.id, Status: {$notIn: [4,5]}},
+      where: { Id_User: req.params.id, Status: {$notIn: [4,5,6]}},
       include: [
         {
           model: Models.Tb_User_Reservation_Menu,
@@ -256,7 +299,7 @@ module.exports = {
   },
   getReservationHistory2(req, res, next) {
     Models.Tb_User_Reservation.findAll({
-      where: { Id_User: req.params.id, Status: {$in: [4,5]}},
+      where: { Id_User: req.params.id, Status: {$in: [4,5,6]}},
       include: [
         {
           model: Models.Tb_User_Reservation_Menu,
@@ -368,13 +411,15 @@ module.exports = {
               where: { Id: val.userId },
               attributes: ['Id', 'DpId', 'DpName', 'DpType']
             }).then(cb => {
-              let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
-              val.dataValues.file = bitmap
+              if(cb.DpId && cb.DpId !== '') {
+                let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
+                val.dataValues.file = bitmap
+              }
               tmp += 1
               if (tmp === resto.Reviews.length) {
                 res.status(200).send(resto)
               }
-            })
+            }) 
           })
         } else {
           res.status(200).send(resto)
@@ -395,8 +440,10 @@ module.exports = {
             where: { Id: data.userId },
             attributes: ['Id', 'DpId', 'DpName', 'DpType']
           }).then(cb => {
-            let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
-            pro3.dataValues.file = bitmap
+            if(cb.DpId && cb.DpId !== '') {
+              let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
+              pro3.dataValues.file = bitmap
+            }
             res.status(200).send(pro3)
           })
         })
@@ -411,9 +458,18 @@ module.exports = {
     })
 
   },
+updateNotif (req,res,next) {
+    Models.Tb_User_Reservation.update({PID: 'old'},{where: {Id_User:req.params.id}}).then(cb => {
+      res.status(200).send({ good: 'lul' })
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ errmsg: 'Failed to Comment' })
+    })
+  },
   saveRestoReserve(req, res, next) {
     let data = req.body
     data.Id = guid()
+    data.PID = 'new'
     let foodList = []
     data.FoodMenu.forEach((val, index) => {
       foodList.push({ Id: guid(), Amount: val.Amount, MenuId: val.Id, Id_Reserve: data.Id })

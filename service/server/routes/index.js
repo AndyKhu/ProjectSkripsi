@@ -19,6 +19,7 @@ module.exports = (app) => {
   app.get('/api/getListRestourantTrending',Member.getListRestaurantTrending)
   app.get('/api/getRestoDetail/:id',Member.getRestoDetail)
   app.get('/api/maxValueResto',Member.getMaxValue)
+  app.get('/api/getHistoryReserverById/:id',Member.getHistoryReserverById)
   app.get('/api/getReservationHistory/:id',Member.getReservationHistory)
   app.get('/api/getReservationHistory2/:id',Member.getReservationHistory2)
   app.get('/api/getRestoDetailmin/:id',Member.getRestoDetailmin)
@@ -30,6 +31,8 @@ module.exports = (app) => {
   app.post('/api/getCountReservasi',Member.getCountReservasi)
   app.post('/api/closeAccount/:id',Member.closeAccount)
   app.post('/api/getListBank/:id',Member.getListBank)
+  app.put('/api/cancelReservation/:id',Member.cancelReservation)
+  app.put('/api/updateNotif/:id',Member.updateNotif)
   app.post('/api/HistoryReservationUpload',Member.HistoryReservationUpload)
   app.get('/api/fortesting',Algo.execute)
 

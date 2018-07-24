@@ -77,9 +77,9 @@ router.beforeEach((to, from, next) => {
   next()
 })
 function checkAuth (to, from, next, type) {
-  const token = 'bearer ' + localStorage.getItem('authToken')
-  axios.get(`${store.getters.ROOT_URL}/checkAuth`, {headers: {'Authorization': token}})
-    .then(res => {
+  if (localStorage.getItem('authToken')) {
+    const token = 'bearer ' + localStorage.getItem('authToken')
+    axios.get(`${store.getters.ROOT_URL}/checkAuth`, {headers: {'Authorization': token}}).then(res => {
       store.dispatch('setUser', res.data.user)
       if (type === 'AR') {
         if (res.data.user.Type === 'AdminResto') {
@@ -137,6 +137,17 @@ function checkAuth (to, from, next, type) {
         })
       }
     })
+  } else {
+    if (type === '-') {
+      next()
+    } else {
+      store.dispatch('setErrorMsg', {codeS: 999, type: 'error'})
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    }
+  }
 }
 /* eslint-disable no-new */
 new Vue({

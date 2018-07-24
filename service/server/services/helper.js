@@ -1,5 +1,6 @@
 const Tb_User = require('../models').Tb_User
 const Tb_User_Favorite = require('../models').Tb_User_Favorite
+const Tb_User_Reservation = require('../models').Tb_User_Reservation
 const bcrypt = require('bcrypt-nodejs')
 module.exports = {
   create(data,done) {
@@ -24,6 +25,13 @@ module.exports = {
   getUser (payload,done) {
     Tb_User.findById(payload.sub,{
       include: [
+      {
+        model: Tb_User_Reservation,
+        as: 'Reservation',
+        where: {PID: 'new'},
+        attributes: ['PID'],
+        required: false
+      },
       {
         model: Tb_User_Favorite,
         as: 'UserFavorite'

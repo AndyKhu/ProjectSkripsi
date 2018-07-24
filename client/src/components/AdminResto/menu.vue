@@ -129,9 +129,11 @@ export default{
         console.log(res.data)
         this.resto = res.data
         this.resto.Reviews.forEach((val, index) => {
-          let x = new Blob([new Uint8Array(val.file.data)])
-          val.src = URL.createObjectURL(x)
-          delete val.file
+          if (val.file) {
+            let x = new Blob([new Uint8Array(val.file.data)])
+            val.src = URL.createObjectURL(x)
+            delete val.file
+          }
         })
         this.getChartData(res.data.Id)
       })

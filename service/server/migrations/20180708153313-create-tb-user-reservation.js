@@ -36,6 +36,9 @@ module.exports = {
       PID: {
         type: Sequelize.STRING
       },
+      rejectNote: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

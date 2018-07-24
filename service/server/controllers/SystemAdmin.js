@@ -1,4 +1,12 @@
 const Models = require('../models')
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'vamkre01@gmail.com',
+    pass: 'Andy159753'
+  }
+})
 //for read Image
 const fs = require('fs')
 const path = require('path')
@@ -92,7 +100,7 @@ module.exports = {
     let User = {Id: data.Id, fullName: data.fullName, Email: data.Email, Password: data.Password,Type: 'AdminResto', Status: true}
     Models.Tb_Request_AdminResto.update({Status:2},{where: {Id: data.Id }}).then(pro => {
       Models.Tb_User.create(User).then(pro2 => {
-        Models.Tb_Resto.create({Id: guid(), Name: data.restoName, Id_User: data.Id}).then(pro3 => {
+        Models.Tb_Resto.create({Id: guid(), Name: data.restoName, Id_User: data.Id, Status: true}).then(pro3 => {
           res.sendStatus(200)
         })
       })
@@ -103,6 +111,19 @@ module.exports = {
   RejectReqAdmin(req, res, next) {
     let data = req.body
     Models.Tb_Request_AdminResto.update({Status:0},{where: {Id: data.Id }}).then(pro => {
+      let mailOptions = {
+        from: 'vamkre01@gmail.com',
+        to: data.Email,
+        subject: 'Admin Resto Request',
+        text: 'Your Request Has been Reject by Admin For Some Reason.'
+      }
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      })
       res.sendStatus(200)
     }).catch(err => {
       res.sendStatus(400)

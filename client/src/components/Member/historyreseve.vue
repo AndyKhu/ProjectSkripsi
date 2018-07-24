@@ -38,6 +38,9 @@
             <v-flex xs12 class="px-3">
               <formTextField disabled rows="4" multi-line v-model="data.Note" :label="'Note'"/>
             </v-flex>
+            <v-flex xs12 class="text-xs-right px-4">
+              <v-btn color="primary" @click="tobill()">Check Bill</v-btn>
+            </v-flex>
           </v-layout>
         </v-flex>
         <v-flex xs12 v-else>
@@ -106,6 +109,9 @@ export default {
     }
   },
   methods: {
+    tobill () {
+      this.$router.push({name: 'Bill', params: { id: this.data.Id }})
+    },
     back () {
       this.$emit('input', false)
     },

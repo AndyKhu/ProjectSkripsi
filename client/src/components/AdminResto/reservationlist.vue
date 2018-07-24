@@ -152,11 +152,11 @@ export default {
     },
     getTbReservationScheduleByDate (value) {
       if (this.form) {
-        AdminResto.getTbReservationSchedule(this, new Date(value)).then(cb => {
+        AdminResto.getTbReservationSchedule(this, new Date(value), this.$route.params.id).then(cb => {
           this.items = cb.data
         })
       } else {
-        AdminResto.getTbReservationSchedule2(this, new Date(value)).then(cb => {
+        AdminResto.getTbReservationSchedule2(this, new Date(value), this.$route.params.id).then(cb => {
           console.log(cb)
           this.items = cb.data
         })

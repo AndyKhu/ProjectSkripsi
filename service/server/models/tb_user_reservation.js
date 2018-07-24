@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     Status: DataTypes.INTEGER,
     RestoId: DataTypes.STRING,
     Cost: DataTypes.DOUBLE,
-    PID: DataTypes.STRING
+    PID: DataTypes.STRING,
+    rejectNote: DataTypes.STRING
   })
   Tb_User_Reservation.associate = (models) => {
     Tb_User_Reservation.belongsTo(models.Tb_User, {

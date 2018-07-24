@@ -13,6 +13,7 @@ import SearchResto from '@/components/Member/searchResto'
 import RestoDetail from '@/components/Member/restoDetail'
 import RestoReserve from '@/components/Member/restoReserve'
 import MyFavorite from '@/components/Member/myFavorite'
+import Bill from '@/components/Member/bill'
 // Admin Resto
 import AdminResto from '@/components/AdminResto/index'
 import MenuAR from '@/components/AdminResto/menu'
@@ -70,6 +71,11 @@ export default new Router({
           path: '/myFavorite',
           name: 'MyFavorite',
           component: MyFavorite
+        },
+        {
+          path: '/bill/:id',
+          name: 'Bill',
+          component: Bill
         },
         {
           path: '/reserve/:id',

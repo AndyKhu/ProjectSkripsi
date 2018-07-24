@@ -68,7 +68,8 @@ module.exports = {
       include: [
         {
           model: Models.Tb_Resto_Review,
-          where: {Status: 0},          
+          where: {Status: 0},     
+          required: false,     
           as: 'Reviews',
           attributes: ['Id','comment','rate','userId','userName','userPID','Id_Resto']
         }
@@ -80,8 +81,10 @@ module.exports = {
             Models.Tb_User.findOne({
             where: { Id: val.userId },
             attributes: ['Id', 'DpId', 'DpName', 'DpType']}).then(cb=>{
-              let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
-              val.dataValues.file = bitmap
+              if  (cb.DpId) {
+                let bitmap = fs.readFileSync(path.join(`uploads/${cb.Id}/${cb.DpId}`))
+                val.dataValues.file = bitmap
+              }
               tmp+=1
               if(tmp === resto.Reviews.length){
                 res.status(200).send(resto)        
@@ -185,7 +188,7 @@ module.exports = {
   getTbReservationSchedule(req,res,next) {
     let data = req.body
     console.log(data)
-    Models.Tb_User_Reservation_Schedule.findAll({where: {Status: 0},
+    Models.Tb_User_Reservation_Schedule.findAll({where: {Status: 0, Id_Resto: data.RestoId},
       include: [
         {
           model: Models.Tb_User_Reservation,
@@ -217,7 +220,7 @@ module.exports = {
   getTbReservationSchedule2(req,res,next) {
     let data = req.body
     console.log(data)
-    Models.Tb_User_Reservation_Schedule.findAll({where: {Status: {$ne: 0}},
+    Models.Tb_User_Reservation_Schedule.findAll({where: {Status: {$ne: 0}, Id_Resto: data.RestoId},
       include: [
         {
           model: Models.Tb_User_Reservation,
@@ -247,7 +250,8 @@ module.exports = {
     })
   },
   updateTbReservationConfirm(req,res,next) {
-    Models.Tb_User_Reservation.update({Status: req.params.status},{where: {Id: req.params.id}}).then(cb => {
+    let data = req.body
+    Models.Tb_User_Reservation.update({Status: req.params.status, rejectNote: data.Note, PID: 'new'},{where: {Id: req.params.id}}).then(cb => {
       res.status(200).send(cb)
     }).catch(err => {
       console.log(err)

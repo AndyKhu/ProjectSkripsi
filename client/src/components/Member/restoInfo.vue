@@ -60,6 +60,20 @@
           </v-layout>
           <v-layout row wrap class="mb-4">
             <v-flex xs1>
+              <v-icon large>room_service</v-icon>
+            </v-flex>
+            <v-flex xs11 class="px-3">
+              <h2 class="d-inline-block">Dinning Style</h2>
+            </v-flex>
+            <v-flex xs1></v-flex>
+            <v-flex xs11 align-center class="px-3">
+              <span class="rd-subtitle">
+                {{resto.Type}}
+              </span>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap class="mb-4">
+            <v-flex xs1>
               <v-icon large>home</v-icon>
             </v-flex>
             <v-flex xs11 class="px-3">

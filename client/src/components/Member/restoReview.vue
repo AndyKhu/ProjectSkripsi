@@ -33,7 +33,8 @@
               :key="item.title"
               avatar>
               <v-list-tile-avatar>
-                <img :src="item.src">
+                <v-avatar :size="40" class="grey darken-1" v-if="!item.src"/>
+                <img :src="item.src" v-else>
               </v-list-tile-avatar>
               <v-list-tile-content>
                 <v-list-tile-title>{{item.userName}}</v-list-tile-title>
@@ -55,13 +56,13 @@
     </v-flex>
     <v-flex xs12>
       <v-layout row wrap>
-        <v-flex xs8>
+        <v-flex xs12 sm8 md8 lg8>
           <formTextField placeholder="Type Coment Here......" class="rv-input" noPadding v-model="data.comment"/>
         </v-flex>
-        <v-flex xs2>
-          <star-rating :show-rating="false" :star-size="20" active-color="#e54436" v-model="data.rate"/>
+        <v-flex xs6 sm2 md2 lg2>
+          <star-rating :show-rating="false" :star-size="starsize" active-color="#e54436" v-model="data.rate"/>
         </v-flex>
-        <v-flex xs2>
+        <v-flex xs6 sm2 md2 lg2>
           <v-btn @click="sendReview" style="height:100%" block depressed class="ma-0" color="primary">send</v-btn>
         </v-flex>
       </v-layout>
@@ -80,16 +81,30 @@ export default {
   },
   data () {
     return {
+      // clientWidth: 0,
+      // clientHeight: 0,
       data: {
         comment: null,
         rate: null,
         Id_Resto: this.resto.Id
       },
       rvChart: [],
-      max: 0
+      max: 0,
+      starsize: 20
     }
   },
   methods: {
+    // _updateDimensions () {
+    //   // Cross-browser support as described in:
+    //   // https://stackoverflow.com/questions/1248081
+    //   this.clientWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+    //   this.clientHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    //   if (this.clientWidth < 600) {
+    //     this.starsize = 10
+    //   } else {
+    //     this.starsize = 20
+    //   }
+    // },
     getuser () {
       return this.$store.getters['getUser']
     },
@@ -111,9 +126,11 @@ export default {
         Member.saveRestoReview(this, this.data).then(res => {
           let tmp = this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })
           if (tmp.length === 0) {
-            let x = new Blob([new Uint8Array(res.data.file.data)])
-            res.data.src = URL.createObjectURL(x)
-            delete res.data.file
+            if (res.data.file) {
+              let x = new Blob([new Uint8Array(res.data.file.data)])
+              res.data.src = URL.createObjectURL(x)
+              delete res.data.file
+            }
             this.resto.Reviews.push(res.data)
           } else {
             this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })[0].comment = this.data.comment
@@ -153,7 +170,14 @@ export default {
   },
   mounted () {
     this.updateRv()
+    // this.$nextTick(() => {
+    //   this._updateDimensions()
+    //   window.addEventListener('resize', this._updateDimensions, {'passive': true})
+    // })
   }
+  // destroyed () {
+  //   window.removeEventListener('resize', this._updateDimensions)
+  // }
 }
 </script>
 <style scoped>

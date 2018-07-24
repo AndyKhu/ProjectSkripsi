@@ -11,7 +11,7 @@
               <span class="sub-tittle">Personal Details</span>
               <v-layout row wrap>
                 <v-flex xs5 class="pa-2 force-center">
-                  <v-avatar @click="click"
+                  <v-avatar @click="click" class="cst-avatar"
                     style="cursor:pointer"
                     :size="150"
                     color="red lighten-4">
@@ -54,7 +54,7 @@
                   <v-btn @click="update" color="success">Update Account</v-btn>
                 </v-flex>
                 <v-flex xs12 text-xs-center class="mb-4 mt-2">
-                  <v-btn @click="close" color="error">Close Account</v-btn>
+                  <v-btn @click="dialog = true" color="error">Close Account</v-btn>
                 </v-flex>
                 <v-flex xs12 style="border-top: 1px solid #dedede;">
                   <v-btn large depressed block color="white" @click="changepassword">
@@ -67,18 +67,26 @@
           </v-card>
         </v-flex>
       </v-layout>
-      <!-- <v-dialog v-model="dialog" persistent max-width="290">
-        <v-btn slot="activator" color="primary" dark>Open Dialog</v-btn>
-        <v-card>
-          <v-card-title class="headline">Use Google's location service?</v-card-title>
-          <v-card-text>Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="green darken-1" flat @click.native="dialog = false">Disagree</v-btn>
-            <v-btn color="green darken-1" flat @click.native="dialog = false">Agree</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog> -->
+      <v-dialog v-model="dialog" persistent max-width="600">
+      <v-card>
+        <v-layout row wrap>
+          <v-flex xs12 class="item-tittle pa-2">
+            Confirmation
+          </v-flex>
+          <v-flex xs12 class="pa-2 label-sub">
+            Are You Sure want to Close Your Account ?
+          </v-flex>
+          <v-flex xs12 class="text-xs-right px-3 pt-0 pb-3">
+            <v-btn small color="error" @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn small color="primary" @click="close">
+              Confirm
+            </v-btn>
+          </v-flex>
+        </v-layout>
+      </v-card>
+    </v-dialog>
     </v-flex>
   </v-app>
   <v-app v-else>
@@ -158,19 +166,19 @@ export default {
       }
     },
     close () {
-      this.dialog = true
-      // Member.closeAccount(this, this.getuser().Id).then(cb => {
-      //   this.$store.dispatch('setUser', null)
-      //   localStorage.removeItem('authToken')
-      //   this.$router.push('/')
-      // }).catch(err => {
-      //   this.$store.dispatch('setDialogMsg', {
-      //     txtmsg: 'Failed To Close Account',
-      //     status: true,
-      //     color: 'error'
-      //   })
-      // })
-      // console.log(this.data)
+      Member.closeAccount(this, this.getuser()).then(cb => {
+        this.$store.dispatch('setUser', null)
+        localStorage.removeItem('authToken')
+        this.$router.push('/')
+      }).catch(err => {
+        console.log(err)
+        this.$store.dispatch('setDialogMsg', {
+          txtmsg: 'Failed To Close Account',
+          status: true,
+          color: 'error'
+        })
+      })
+      console.log(this.data)
     }
   },
   mounted () {
@@ -205,9 +213,11 @@ export default {
     getUser (newValue, oldValue) {
       if (newValue !== null) {
         this.data = newValue
-        if (this.data.DpId !== null) {
+        if (this.data && this.data.DpId !== null) {
           Member.getProfilePicture(this, this.data).then(res => {
-            this.dppic = res.data.file
+            if (res.data.file) {
+              this.dppic = res.data.file
+            }
           })
         }
       }
@@ -216,6 +226,12 @@ export default {
 }
 </script>
 <style scoped>
+@media only screen and (max-width: 564px){
+  .cst-avatar{
+    height: 100px !important;
+    width: 100px !important;
+  }
+}
 .item-tittle{
   background: #2196F3;
   color: #ffffff;
