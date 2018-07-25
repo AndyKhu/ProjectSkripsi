@@ -53,8 +53,8 @@
             <v-flex xs2 class="cst-flex hidden-sm-and-down force-center">
               <v-menu offset-y v-if="getuser()!=null">
                 <div slot="activator" class="pr-2">
-                  <v-avatar :size="20" class="red darken-1 white--text mx-2 notif" v-if="getuser()!=null && getuser().Reservation && getuser().Reservation.length!== 0">
-                    {{getuser().Reservation.length}}
+                  <v-avatar :size="20" class="red darken-1 white--text mx-2 notif" v-if="getuser()!=null && getuser().Reservation && getuser().Reservation.length!== 0 && getuser().Reservation.filter(e => { return e.PID === 'new' }).length">
+                    {{getuser().Reservation.filter(e => { return e.PID === 'new' }).length}}
                   </v-avatar>
                   <h3 class="d-inline-block">{{getuser().fullName}}</h3>
                   <v-icon>arrow_drop_down</v-icon>

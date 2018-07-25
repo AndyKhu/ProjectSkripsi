@@ -10,9 +10,9 @@
           <v-list-tile-content>
             <v-list-tile-title>{{item.label}}</v-list-tile-title>
           </v-list-tile-content>
-          <v-list-tile-avatar v-if="item.label === 'Reservation History' && getuser().Reservation && getuser().Reservation.length !== 0">
+          <v-list-tile-avatar v-if="item.label === 'Reservation History' && getuser().Reservation && getuser().Reservation.length !== 0 && getuser().Reservation.filter(e => { return e.PID === 'new' }).length">
             <v-avatar :size="25" class="red darken-1 white--text mx-2 notif">
-              {{getuser().Reservation.length}}
+              {{getuser().Reservation.filter(e => { return e.PID === 'new' }).length}}
             </v-avatar>
           </v-list-tile-avatar>
         </v-list-tile>

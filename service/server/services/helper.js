@@ -28,8 +28,7 @@ module.exports = {
       {
         model: Tb_User_Reservation,
         as: 'Reservation',
-        where: {PID: 'new'},
-        attributes: ['PID'],
+        // where: {PID: 'new'},
         required: false
       },
       {
@@ -48,6 +47,12 @@ module.exports = {
       { 
         where: {Email: data.email, Status: true},
         include: [
+          {
+            model: Tb_User_Reservation,
+            as: 'Reservation',
+            where: {PID: 'new'},
+            required: false
+          },
           {
             model: Tb_User_Favorite,
             as: 'UserFavorite'
