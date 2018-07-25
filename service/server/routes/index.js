@@ -3,7 +3,8 @@ const SystemAdmin = require('../controllers').SystemAdmin
 const AdminResto = require('../controllers').AdminResto
 const Uploaders = require('../controllers').Uploaders
 const Member = require('../controllers').Member
-const Algo = require('../../algorithm.js')
+// const Algo = require('../../algorithm.js')
+const Algo = require('../controllers').Algo
 
 module.exports = (app) => {
   //AUTH
@@ -15,7 +16,7 @@ module.exports = (app) => {
   
   // member
   // app.get('/api/getListRestourant',Member.getListRestourant)
-  app.get('/api/getListRestourant/:page/:search/:price/:ds',Member.getListRestourant)
+  app.post('/api/getListRestourant',Member.getListRestourant)
   app.get('/api/getListRestourantTrending',Member.getListRestaurantTrending)
   app.get('/api/getRestoDetail/:id',Member.getRestoDetail)
   app.get('/api/maxValueResto',Member.getMaxValue)
@@ -34,7 +35,7 @@ module.exports = (app) => {
   app.put('/api/cancelReservation/:id',Member.cancelReservation)
   app.put('/api/updateNotif/:id',Member.updateNotif)
   app.post('/api/HistoryReservationUpload',Member.HistoryReservationUpload)
-  app.get('/api/fortesting',Algo.execute)
+  app.post('/api/fortesting',Algo.execute)
 
   //Admin Resto
   app.get('/api/getTbRestoByuserID/:id',AdminResto.getTbRestoByuserID)
@@ -63,6 +64,7 @@ module.exports = (app) => {
   app.put('/api/ApproveReqAdmin',SystemAdmin.ApproveReqAdmin)
   app.put('/api/RejectReqAdmin',SystemAdmin.RejectReqAdmin)
   app.put('/api/updateRestoReviewSA/:id/:status',SystemAdmin.updateRestoReview)
+  app.post('/api/getListRestoObject',SystemAdmin.getListRestoObject)
 
   //Utility
   app.get('/api/getSingleImg/:direct/:id',Uploaders.getSingleImg)

@@ -67,7 +67,6 @@ module.exports = {
         // etc
       ]
     }).then(cb => {
-      // console.log(cb)
       res.status(200).send(cb)
     }).catch(err => {
       console.log(err)
@@ -89,19 +88,19 @@ module.exports = {
     })
   },
   getListRestourant(req, res, next) {
-    let search = req.params.search === '-' ? '' : req.params.search
-    let price = req.params.price
-    let ds = req.params.ds === '-' ? '' : req.params.ds
+    let body = req.body
     let limit = 8;   // number of records per page
     let offset = 0;
     let searchP
-    if (req.params.price === 0 || req.params.price === '0') {
-      searchP = { Status: true, Name: { $iLike: `%${search}%` }, Type: { $iLike: `%${ds}%` } }
+    if (body.type === 0) {
+      searchP = { Status: true }
+    } else if (body.type === 1) {
+      searchP = { Status: true, Name: { $iLike: `%${body.search}%` }}
     } else {
-      searchP = { Status: true, Name: { $iLike: `%${search}%` }, Type: { $iLike: `%${ds}%` }, PriceFrom: { $lte: price }, PriceEnd: { $gte: price } }
+      searchP = { Status: true, Type: { $iLike: `%${body.ds === '-'?'':body.ds}%` }, PriceFrom: { $lte: body.price }, PriceEnd: { $gte: body.priceE } }
     }
     Models.Tb_Resto.findAndCountAll({ where: searchP }).then(data => {
-      let page = req.params.page;      // page number
+      let page = body.page;      // page number
       let pages = Math.ceil(data.count / limit);
       offset = limit * (page - 1);
       Models.Tb_Resto.findAll({
@@ -188,7 +187,6 @@ module.exports = {
   },
   HistoryReservationUpload(req, res, next) {
     let data = req.body
-    console.log(data)
     if (!data.Id) {
       data.Id = guid()
       Models.Tb_User_Reservation_Upload.create(data).then(pro3 => {
@@ -487,7 +485,6 @@ updateNotif (req,res,next) {
   updateFavorite(req, res, next) {
     let data = req.body
     Models.Tb_User_Favorite.findOne({ where: { Id_User: data.userId, Id_Resto: data.restoId } }).then(fav => {
-      console.log(data.status)
       if (fav && !data.status) {
         Models.Tb_User_Favorite.destroy({ where: { Id: fav.Id } }).then(pro3 => {
           res.status(200).send({ good: 'lul' })

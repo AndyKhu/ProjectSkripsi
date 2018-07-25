@@ -34,10 +34,26 @@ function guid () {
 }
 module.exports = {
   //get
+  getListRestoObject (req,res,next){
+    Models.Tb_Resto.findAll({
+      where: {Status: true},
+      include: [
+        {
+          where: { Status: true , Type: 'AdminResto'},
+          model: Models.Tb_User,
+          as: 'User',
+          required: true
+        }
+      ],
+      attributes: ['Id', 'Name']
+    }).then((resto) => {
+      res.status(200).json(resto);
+    });
+  },
   getTbRequestAdminInProgress(req, res, next) {
     Models.Tb_Request_AdminResto.findAll({
-      where: {  Status: 1 },
-      attributes: ['Id','Email','fullName','Password','restoName','PID','Pname','Ptype']
+      where: {},
+      attributes: ['Id','Email','fullName','Password','restoName','PID','Pname','Ptype','Status']
     }).then(list => {
       list.forEach(obj => { 
         res.set({'Content-Type': obj.Ptype})
@@ -95,7 +111,6 @@ module.exports = {
     })
   },
   ApproveReqAdmin(req, res, next) {
-    // console.log(req.body)
     let data = req.body
     let User = {Id: data.Id, fullName: data.fullName, Email: data.Email, Password: data.Password,Type: 'AdminResto', Status: true}
     Models.Tb_Request_AdminResto.update({Status:2},{where: {Id: data.Id }}).then(pro => {

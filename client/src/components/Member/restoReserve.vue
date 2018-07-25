@@ -195,7 +195,6 @@ export default {
   },
   mounted () {
     Member.getRestoDetailmin(this, this.$route.params.id).then(res => {
-      console.log(res.data)
       this.resto = res.data
       this.data.Name = this.getuser().fullName
       this.data.Phone = this.getuser().Phone

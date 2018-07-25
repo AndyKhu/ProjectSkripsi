@@ -164,7 +164,6 @@ export default {
       return true
     },
     save () {
-      console.log(this.resto)
       if (this.validate()) {
         AdminResto.updateTbResto(this, this.resto).then(cb => {
           this.$store.dispatch('setDialogMsg', {
@@ -186,7 +185,6 @@ export default {
   mounted () {
     AdminResto.getTbRestoByID(this, this.getuser().Id).then(res => {
       this.resto = res.data
-      console.log(this.resto)
       this.resto.Gallery.forEach((val, index) => {
         let x = new Blob([new Uint8Array(val.file.data)])
         let showImg = URL.createObjectURL(x)

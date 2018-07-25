@@ -28,23 +28,29 @@
                   <v-icon>search</v-icon>
                 </div>
                 <div class="filter-item" :class="filterS?'showF':''" id="filterBox">
-                  <div class="cst-slider pa-2 px-3">
+                  <div class="cst-slider py-4 mb-2 px-3" id="filterBox-child">
                     <label>Price Range</label>
-                    <v-slider class="pa-0"
+                    <!-- <v-slider class="pa-0"
                       v-model="price"
                       :max="Max"
                       :step="1000"
                       @input="filterC"
                       hide-details
-                    ></v-slider>
+                    ></v-slider> -->
+                    <vue-slider id="cst-slider-child" v-model="price" v-bind="options" :max="Max"></vue-slider>
                   </div>
-                  <div class="cst-slider pa-2 px-3">
+                  <!-- <div class="cst-slider pa-2 px-3">
                     <label>Max</label>
                     <formNumberField v-model="price" noMargin disabled/>
-                  </div>
-                  <div class="cst-slider pa-2 px-3">
+                  </div> -->
+                  <div class="cst-slider pt-2 pb-0 px-3">
                     <label>Dinning Style</label>
-                    <formComboBox v-model="ds" :Items="dinningItems" noMargin @input="filterC"/>
+                    <formComboBox v-model="ds" :Items="dinningItems" noMargin/>
+                  </div>
+                  <div class="px-3 text-xs-center">
+                    <v-btn small color="primary" @click="filterC">
+                      filter
+                    </v-btn>
                   </div>
                 </div>
               </div>
@@ -108,14 +114,16 @@
 <script>
 import MenuLink from '@/components/helper/menu.vue'
 import Member from '@/api/member.js'
+import vueSlider from 'vue-slider-component'
 import _ from 'lodash'
 export default {
   components: {
-    MenuLink
+    MenuLink,
+    vueSlider
   },
   data () {
     return {
-      price: 0,
+      price: [0, 1000],
       ds: '-',
       nav: false,
       navactive: false,
@@ -124,12 +132,28 @@ export default {
       search: '',
       filter1: 'All',
       filteritem: ['All', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
-      dinningItems: ['-', 'Casual Dinning', 'Family Style', 'Fine Dinning', 'Fast Food', 'Fast Casual Dinning']
+      dinningItems: ['-', 'Casual Dinning', 'Family Style', 'Fine Dinning', 'Fast Food', 'Fast Casual Dinning'],
+      options: {
+        width: '80%',
+        height: 8,
+        dotSize: 16,
+        min: 0,
+        max: 100000,
+        interval: 1000,
+        disabled: false,
+        show: true,
+        useKeyboard: true,
+        tooltip: 'always',
+        tooltipDir: [
+          'bottom',
+          'bottom'
+        ]
+      }
     }
   },
   mounted () {
     Member.getMaxValueResto(this).then(cb => {
-      this.max = cb.data[0].PriceEnd
+      this.Max = cb.data[0].PriceEnd
     })
   },
   methods: {
@@ -155,7 +179,8 @@ export default {
     hide (e) {
       let parent = document.getElementById('filterBox')
       let searchBox = document.getElementById('searchBox')
-      if (e && (e.target === parent || this.isChildOf(e.target, parent) || e.target === searchBox)) {
+      let xparent = document.getElementsByClassName('vue-slider')[0]
+      if (e && (e.target === parent || e.target === xparent || this.isChildOf(e.target, parent) || e.target === searchBox)) {
         // do nothing
       } else {
         this.filterS = false
@@ -172,18 +197,15 @@ export default {
       }
     },
     reinit () {
-      this.price = 0
+      this.price = [0, 1000]
       this.ds = '-'
     },
-    filterC: _.debounce(
-      function (value) {
-        this.search = ''
-        let tmp = this.price.toString() + '#?' + (this.ds === '' ? '-' : this.ds)
-        this.$router.push({name: 'SearchResto', params: {search: tmp, type: 1}})
-        // this.filterS = false
-        // document.removeEventListener('click', this.hide)
-      }, 500
-    ),
+    filterC () {
+      this.search = ''
+      let tmp = this.price[0].toString() + '@$' + this.price[1].toString() + '#?' + (this.ds === '' ? '-' : this.ds)
+      this.$router.push({name: 'SearchResto', params: {search: tmp, type: 1}})
+      document.removeEventListener('click', this.hide)
+    },
     searchC (event) {
       if (event.keyCode === 13) {
         if (this.search === '') {

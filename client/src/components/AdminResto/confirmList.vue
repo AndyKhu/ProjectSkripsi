@@ -5,9 +5,14 @@
         <v-card>
           <v-flex xs12 class="item-tittle pa-2">
             <v-layout row wrap>
-            <v-flex xs12>
-              Confirmation List
-            </v-flex>
+              <v-flex xs9 class="force-center-left">
+                Confirmation List
+              </v-flex>
+              <v-flex xs3 class="text-xs-right">
+                <v-btn dark icon @click="refresh" class="ma-0">
+                  <v-icon>refresh</v-icon>
+                </v-btn>
+              </v-flex>
             </v-layout>
           </v-flex>
           <v-flex xs12 class="pa-2">
@@ -54,7 +59,7 @@
     </v-layout>
     <div class="dialogBox" v-if="dialog">
       <div class="button-cont front" id="dialogB" v-if="dialogState === 'Img'">
-        <!-- <v-btn icon small color="white" @click="close"><v-icon>close</v-icon></v-btn> -->
+        <v-btn icon small color="white" @click="hide('-')"><v-icon>close</v-icon></v-btn>
         <div class="cst-dialog-item force-center">
           <img :src="dialogsrc" alt="">
         </div>
@@ -137,11 +142,14 @@ export default {
       {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}]
   }),
   mounted () {
-    AdminResto.getTbReservationConfirm(this, this.$route.params.id).then(cb => {
-      this.items = cb.data
-    })
+    this.refresh()
   },
   methods: {
+    refresh () {
+      AdminResto.getTbReservationConfirm(this, this.$route.params.id).then(cb => {
+        this.items = cb.data
+      })
+    },
     rejectC () {
       if (this.Note === null || this.Note === '') {
         this.$store.dispatch('setDialogMsg', {
@@ -205,7 +213,14 @@ export default {
     },
     hide (e) {
       let parent = document.getElementById('dialogB')
-      if (e) {
+      if (e === '-') {
+        this.dialog = false
+        this.menuS = []
+        this.dialogState = ''
+        this.dialogsrc = ''
+        document.removeEventListener('click', this.hide)
+        document.removeEventListener('keyup', this.hide)
+      } else if (e) {
         if (e.keyCode) {
           if (e.keyCode === 27) {
             this.dialog = false
@@ -229,7 +244,6 @@ export default {
         }
       }
     }
-
   }
 }
 </script>

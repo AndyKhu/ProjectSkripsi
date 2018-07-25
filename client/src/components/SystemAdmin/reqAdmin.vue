@@ -22,11 +22,17 @@
       </v-layout>
     </v-flex>
     <v-flex xs12 class="card-item">
+      <v-flex xs12>
+        <v-checkbox
+          :label="`Rejected Record`"
+          v-model="showAll"
+        ></v-checkbox>
+      </v-flex>
       <v-data-table
           class="table-cst"
-          :headers="headers"
+          :headers="showAll?headers2:headers"
           :search="searchF"
-          :items="items">
+          :items="showAll?itemsR:items">
           <template slot="items" slot-scope="props">
               <td>{{ props.item.Email }}</td>
               <td>{{ props.item.fullName }}</td>
@@ -41,7 +47,7 @@
                   <v-icon color="green">check_circle</v-icon>
                 </v-btn>
               </td>
-              <td class="text-xs-center">
+              <td class="text-xs-center" v-if="!showAll">
                 <v-btn icon class="mx-0" @click="Reject(props.item)">
                   <v-icon color="pink">cancel</v-icon>
                 </v-btn>
@@ -58,9 +64,11 @@
 </template>
 <script>
 import Service from '@/api/systemadmin.js'
-export default{
+export default {
   data: () => ({
     items: [],
+    itemsR: [],
+    showAll: false,
     showImg: 'http://via.placeholder.com/90x90',
     searchF: '',
     headers: [
@@ -69,7 +77,13 @@ export default{
       {text: 'Restaurant Name', value: 'restoName', sortable: false},
       {text: 'Business Permit', value: 'Img', sortable: false, align: 'center'},
       {text: 'Approve', value: ' ', width: '30px', sortable: false, align: 'center'},
-      {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}]
+      {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}],
+    headers2: [
+      {text: 'Email', value: 'Email', sortable: false},
+      {text: 'Name', value: 'fullName', sortable: false},
+      {text: 'Restaurant Name', value: 'restoName', sortable: false},
+      {text: 'Business Permit', value: 'Img', sortable: false, align: 'center'},
+      {text: 'Approve', value: ' ', width: '30px', sortable: false, align: 'center'}]
   }),
   methods: {
     deleteItem (item) {
@@ -78,7 +92,6 @@ export default{
       this.$emit('input', this.items)
     },
     Approve (item) {
-      // console.log(item)
       Service.ApproveRequestAdmin(this, item).then(res => {
         this.deleteItem(item)
         this.$store.dispatch('setDialogMsg', {
@@ -112,7 +125,8 @@ export default{
     },
     refresh () {
       Service.getTbRequestAdminInProgres(this).then(list => {
-        this.items = list.data
+        this.itemsR = list.data.filter(e => { return e.Status === 0 })
+        this.items = list.data.filter(e => { return e.Status === 1 })
       })
     }
   },

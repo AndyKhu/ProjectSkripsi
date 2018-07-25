@@ -114,11 +114,9 @@ export default {
         this.rvChart.push(this.resto.Reviews.filter(o => o.rate === i).length)
       }
       this.max = Math.max.apply(Math, this.rvChart)
-      // console.log(Math.max.apply(Math, this.rvChart.map(function (o) { return o.rate })))
     },
     sendReview () {
       if (this.getuser() !== null && this.data.comment !== null && this.data.rate !== null && this.getuser().Reservation.filter(e => { return e.restoId === this.resto.Id }).length !== 0) {
-        console.log(this.getuser().Reservation.filter(e => { return e.restoId === this.resto.Id }).length)
         this.data.userId = this.getuser().Id
         this.data.userName = this.getuser().fullName
         this.data.PID = this.getuser().DpId
@@ -136,7 +134,6 @@ export default {
             this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })[0].comment = this.data.comment
             this.resto.Reviews.filter((e) => { return e.userId === this.data.userId && e.Id_Resto === this.data.Id_Resto && e.Status !== 2 })[0].rate = this.data.rate
           }
-          console.log(this.resto.Reviews)
           this.resto.Rate = this.resto.Reviews.map(item => item.rate).reduce((prev, next) => prev + next) / this.resto.Reviews.length
           Member.updateTbRestoRate(this, this.resto.Id, this.resto.Rate)
           this.$emit('input', this.resto)

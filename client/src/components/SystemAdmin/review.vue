@@ -107,7 +107,6 @@ export default {
       this.$emit('input', this.items)
     },
     Approve (item) {
-      // console.log(item)
       Service.updateRestoReview(this, item.Id, 2).then(res => {
         this.refresh()
         this.$store.dispatch('setDialogMsg', {

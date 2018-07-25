@@ -9,13 +9,7 @@
         </div>
         <!-- <span class="font-bold font-title"> List Resto </span> -->
       </v-flex>
-      <v-flex v-if="item.length === 0">
-        Your Search : <br>
-        <b>
-        &emsp; Name : {{this.$route.params.name}} <br>
-        &emsp; Price Max : {{this.$route.params.max}} <br>
-        &emsp; Dinning Style : {{this.$route.params.ds}} <br>
-        </b>
+      <v-flex v-if="item && item.length === 0">
         didn't match any Resto
       </v-flex>
       <!-- {{'Name : '+this.$route.params.name +' | Price Max : '+ this.$route.params.max +' | Dinning Style : '+this.$route.params.ds}}</b>" didn't match any Resto</v-flex> -->
@@ -61,24 +55,35 @@ export default {
   },
   methods: {
     reloadData () {
+      let sendData
       if (this.type === 0 || this.type === '0') {
-        this.price = 0
-        this.ds = '-'
+        sendData = {
+          page: this.page,
+          type: 1,
+          search: this.searchtext
+        }
       } else {
         let tmp = this.searchtext.split('#?')
-        // this.searchtext = '-'
-        this.price = parseInt(tmp[0])
-        this.ds = tmp[1]
+        let tmps = tmp[0].split('@$')
+        sendData = {
+          page: this.page,
+          type: 2,
+          price: parseInt(tmps[0]),
+          priceE: parseInt(tmps[1]),
+          ds: tmp[1]
+        }
       }
-      Member.loadListResto(this, this.page, this.type === 1 ? '-' : this.searchtext, this.price, this.ds).then(res => {
+      Member.loadListResto(this, sendData).then(res => {
         this.item = res.data.result
         this.totalPage = res.data.pages
-        this.item.forEach((val, index) => {
-          val.Gallery.forEach((gal, index) => {
-            let x = new Blob([new Uint8Array(gal.file.data)])
-            val.src = URL.createObjectURL(x)
+        if (this.item) {
+          this.item.forEach((val, index) => {
+            val.Gallery.forEach((gal, index) => {
+              let x = new Blob([new Uint8Array(gal.file.data)])
+              val.src = URL.createObjectURL(x)
+            })
           })
-        })
+        }
       })
     },
     goDetail (value) {

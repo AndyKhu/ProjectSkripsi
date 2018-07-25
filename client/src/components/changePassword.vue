@@ -44,7 +44,6 @@ export default {
       this.data.Id = this.getUser.Id
       if (this.data.newpass === this.data.confirmpass) {
         Member.changePass(this, this.data).then(res => {
-          // console.log(res)
           if (res.data.status) {
             this.$store.dispatch('setDialogMsg', {
               txtmsg: 'Success Change Password',

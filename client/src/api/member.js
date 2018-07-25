@@ -1,7 +1,7 @@
 import axios from 'axios'
 export default {
-  loadListResto (context, page, search, price, ds) {
-    return axios.get(`${context.$store.getters.ROOT_URL}/api/getListRestourant/${page}/${search}/${price}/${ds}`)
+  loadListResto (context, data) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/getListRestourant`, data)
   },
   loadListRestoTrending (context) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getListRestourantTrending`)

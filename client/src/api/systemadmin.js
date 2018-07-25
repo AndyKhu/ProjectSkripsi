@@ -12,6 +12,9 @@ export default {
   getTbReviewAll (context) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReviewAll`)
   },
+  getListRestoObject (context) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/getListRestoObject`)
+  },
   // update
   updateRestoReview (context, Id, status) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateRestoReviewSA/${Id}/${status}`)

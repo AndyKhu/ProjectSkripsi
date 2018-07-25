@@ -84,7 +84,11 @@ export default {
   }),
   methods: {
     reloadData (value) {
-      Member.loadListResto(this, this.page, '-', 0, '-').then(res => {
+      let data = {
+        page: this.page,
+        type: 0
+      }
+      Member.loadListResto(this, data).then(res => {
         this.item = res.data.result
         this.totalPage = res.data.pages
         this.item.forEach((val, index) => {

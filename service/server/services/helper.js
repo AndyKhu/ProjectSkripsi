@@ -4,7 +4,6 @@ const Tb_User_Reservation = require('../models').Tb_User_Reservation
 const bcrypt = require('bcrypt-nodejs')
 module.exports = {
   create(data,done) {
-    console.log('lul')
     Tb_User.findOne({where: { Email: data.Email }})
     .then(user => {
       if(user){
@@ -62,7 +61,6 @@ module.exports = {
         if(!user){return done(null,false)}
         else{
           let status = bcrypt.compareSync(data.password, user.Password)
-          console.log(data.password)
           if(status) {return done(null, user)}
           else {return done(null,false)}
         }

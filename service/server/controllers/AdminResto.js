@@ -187,7 +187,6 @@ module.exports = {
   },
   getTbReservationSchedule(req,res,next) {
     let data = req.body
-    console.log(data)
     Models.Tb_User_Reservation_Schedule.findAll({where: {Status: 0, Id_Resto: data.RestoId},
       include: [
         {
@@ -219,7 +218,6 @@ module.exports = {
   },
   getTbReservationSchedule2(req,res,next) {
     let data = req.body
-    console.log(data)
     Models.Tb_User_Reservation_Schedule.findAll({where: {Status: {$ne: 0}, Id_Resto: data.RestoId},
       include: [
         {
@@ -270,7 +268,6 @@ module.exports = {
   },
   updateTbRestoGalleryNormal(req, res, next) {
     Models.Tb_Gallery.update({Type: 'normal'}, { where:{ Id: { [Op.in]: req.body } } }).then(resp => {
-      console.log('lul')
       res.status(200).send({good: 'lul'})
     }).catch(err => {
       console.log(err)
@@ -299,7 +296,6 @@ module.exports = {
   }
 }
 function updateTbRestoChild(entity, list, restoId) {
-  console.log(list)
   let listData = list
   let destroy = []
   return entity.findAll({ where: { Id_Resto: restoId }, attributes: ['Id'] })

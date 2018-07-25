@@ -57,7 +57,6 @@ export default {
         return a
       },
       set (value) {
-        console.log(value)
       }
     }
   },

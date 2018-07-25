@@ -113,7 +113,6 @@ export default {
   mounted () {
     Member.getHistoryReserverById(this, this.$route.params.id).then(cb => {
       this.data = cb.data
-      console.log(this.data)
     })
   }
 }

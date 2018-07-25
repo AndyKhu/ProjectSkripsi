@@ -126,7 +126,6 @@ export default {
     },
     validate () {
       if (!this.validateEmail(this.email)) {
-        console.log('ltea')
         this.$store.dispatch('setDialogMsg', {
           txtmsg: 'Email is Invalid',
           status: true,

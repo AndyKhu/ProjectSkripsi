@@ -178,12 +178,10 @@ export default {
           color: 'error'
         })
       })
-      console.log(this.data)
     }
   },
   mounted () {
     // this.data = this.getUser
-    // console.log(this.data)
     /* if (this.data.DpId !== null) {
       Member.getProfilePicture(this, this.data).then(res => {
         this.dppic = res.data.file

@@ -14,7 +14,6 @@ const localOptions = {
 
 const LocalSignup = new localStrategy(localOptions,function(req,email,password,done){
   const passwordG = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null)
-  console.log(req.body)
   const data = {
     Id : req.body.Id,
     fullName: req.body.fullName,    
@@ -31,7 +30,6 @@ const LocalSignup = new localStrategy(localOptions,function(req,email,password,d
     DpId: '',
     Status: true
   }
-  // console.log(Controllers)
   return helper.create(data,done)
 })
 const localLogin = new localStrategy(localOptions,function(req,email,password,done){

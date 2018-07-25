@@ -1,6 +1,6 @@
 <template>
   <div class="component-cont mb-3">
-    <label class="mb-2">{{label}}</label>
+    <label class="mb-2" v-if="!noLabel">{{label}}</label>
     <div class="component-item">
       <div class="cst-combobox" :class="noMargin?'':'px-3'">
         <v-select class="pa-0"
@@ -35,6 +35,11 @@ export default {
       default: []
     },
     noMargin: {
+      type: Boolean,
+      require: false,
+      default: false
+    },
+    noLabel: {
       type: Boolean,
       require: false,
       default: false

@@ -167,7 +167,6 @@ export default {
           this.items = res.data
           this.page = 1
           this.totalPage = Math.ceil(this.items.length / this.limit)
-          console.log(this.items)
           this.items.forEach((val, index) => {
             if (val.file) {
               let x = new Blob([new Uint8Array(val.file.data)])
@@ -188,7 +187,6 @@ export default {
           this.items = res.data
           this.page = 1
           this.totalPage = Math.ceil(this.items.length / this.limit)
-          console.log(this.items)
           this.items.forEach((val, index) => {
             if (val.file) {
               let x = new Blob([new Uint8Array(val.file.data)])
@@ -277,7 +275,6 @@ export default {
       this.selectedItem = val
     },
     executeCancel () {
-      console.log(this.selectedItem)
       Member.cancelReservation(this, this.selectedItem.Id).then(cb => {
         this.items.splice(this.items.indexOf(this.selectedItem), 1)
         this.dialog = false
@@ -297,7 +294,6 @@ export default {
     Member.getReservationHistory(this, this.$route.params.id).then(res => {
       this.items = res.data
       this.totalPage = Math.ceil(this.items.length / this.limit)
-      console.log(this.items)
       this.items.forEach((val, index) => {
         if (val.file) {
           let x = new Blob([new Uint8Array(val.file.data)])

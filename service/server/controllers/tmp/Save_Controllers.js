@@ -140,7 +140,6 @@ module.exports = {
   },
   saveRestoMenu(req, res, next) {
     let data = req.body
-    console.log(data)
     Tb_Resto_Menu.create(data)
       .then((data) => {
         res.status(200).send({ data: data })

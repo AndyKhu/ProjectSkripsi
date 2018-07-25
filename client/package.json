@@ -25,6 +25,7 @@
     "vue-chartjs": "^3.3.2",
     "vue-router": "^3.0.1",
     "vue-select": "^2.4.0",
+    "vue-slider-component": "^2.7.5",
     "vue-star-rating": "^1.6.0",
     "vuelidate": "^0.6.2",
     "vuetify": "^1.0.19",

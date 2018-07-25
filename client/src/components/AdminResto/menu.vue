@@ -126,7 +126,6 @@ export default{
     },
     refresh () {
       AdminResto.getTbRestoByIDmin(this, this.getuser().Id).then(res => {
-        console.log(res.data)
         this.resto = res.data
         this.resto.Reviews.forEach((val, index) => {
           if (val.file) {
