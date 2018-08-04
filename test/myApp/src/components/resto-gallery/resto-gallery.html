@@ -1,0 +1,10 @@
+<!-- Generated template for the RestoGalleryComponent component -->
+<div>
+  <ion-grid>
+    <ion-row>
+      <ion-col *ngFor="let item of resto.Gallery" col-4>
+        <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)" style="height:100px">
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>

@@ -97,6 +97,7 @@ export default {
             val.src = URL.createObjectURL(x)
           })
         })
+        console.log(this.item)
       })
     },
     goDetail (value) {

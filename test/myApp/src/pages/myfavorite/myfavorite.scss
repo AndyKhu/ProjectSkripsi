@@ -1,0 +1,20 @@
+page-myfavorite {
+  .cst-card {
+    height: 345px;
+    position: relative;
+    img {
+      height: 200px;
+    }
+  }
+  .card-cst-footer{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: absolute;
+    border-top: 1px solid #E0E0E0;
+    background: #F5F5F5;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

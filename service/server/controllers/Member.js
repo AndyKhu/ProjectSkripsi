@@ -245,6 +245,75 @@ module.exports = {
       res.status(400).send({ errmsg: 'Failed to Comment' })
     })
   },
+  getReservationHistoryPage(req, res, next) {
+    let body = req.body
+    console.log(body)
+    let limit = 4;   // number of records per page
+    let offset = 0;
+    let searchP
+    if (body.type === 0) {
+      searchP = {Id_User: body.Id, Status: {$notIn: [4,5,6]}}
+    } else if (body.type === 1) {
+      searchP = {Id_User:  body.Id, Status: {$in: [4,5,6]}}
+    }
+    Models.Tb_User_Reservation.findAndCountAll({ where: searchP }).then(data => {
+      let page = body.page;      // page number
+      let pages = Math.ceil(data.count / limit);
+      offset = limit * (page - 1);
+      Models.Tb_User_Reservation.findAll({
+        where: searchP,
+        include: [
+          {
+            model: Models.Tb_User_Reservation_Menu,
+            as: 'FoodMenu',
+            include: [
+              {
+                model: Models.Tb_Resto_Menu,
+                as: 'Menu'
+              }
+            ]
+          },
+          {
+            model: Models.Tb_Resto,
+            as: 'Resto',
+            include: [
+              {
+                model: Models.Tb_Gallery,
+                as: 'Gallery',
+                where: { Type: { $or: ['both', 'type'] } },
+                limit: 1
+              },
+              {
+                model: Models.Tb_Resto_Account,
+                as: 'Account'
+              }
+            ]
+          },
+          {
+            model: Models.Tb_User_Reservation_Upload,
+            as: 'Upload'
+          }
+        ],
+        limit: limit,
+        offset: offset
+      }).then((cb) => {
+        cb.forEach((val, index) => {
+          if (val.Resto.Gallery.length !== 0) {
+            let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${val.Resto.Gallery[0].PID}`))
+            val.dataValues.file = bitmap
+          }
+          val.dataValues.DurationC = new Date(new Date(val.reserveDate).getTime() + val.Duration*60000);
+          val.FoodMenu.forEach((fm, index) => {
+            let bitmap = fs.readFileSync(path.join(`uploads/${val.RestoId}/${fm.Menu.PID}`))
+            fm.dataValues.file = bitmap
+          })
+        })
+        res.status(200).json({ 'result': cb, 'count': data.count, 'pages': pages });
+      });
+    }).catch(function (error) {
+      res.status(500).send('Internal Server Error');
+    });
+  },
   getReservationHistory(req, res, next) {
     Models.Tb_User_Reservation.findAll({
       where: { Id_User: req.params.id, Status: {$notIn: [4,5,6]}},

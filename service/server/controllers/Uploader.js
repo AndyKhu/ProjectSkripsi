@@ -24,6 +24,21 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 module.exports = {
+  uploadImgBase64(req,res,next) {
+    let filename = guid()
+    let base64Data = req.body.src.replace(/^data:image\/jpeg;base64,/,"")
+    if (!fs.existsSync(`./uploads`)) {
+      fs.mkdirSync(`./uploads`)
+    }
+    if (!fs.existsSync(`./uploads/${req.params.direct}`)) {
+      fs.mkdirSync(`./uploads/${req.params.direct}`)
+    }
+    let url = `./uploads/${req.params.direct}/${filename}`
+    fs.writeFile(url,base64Data,'base64', function(err){
+      console.log(err)
+    })
+    res.status(200).send({PID: filename})
+  },
   async uploadImg(req, res, next) {
     upload.single('img')(req, res, function (err) {
       if (err) {

@@ -17,6 +17,7 @@ module.exports = (app) => {
   // member
   // app.get('/api/getListRestourant',Member.getListRestourant)
   app.post('/api/getListRestourant',Member.getListRestourant)
+  app.post('/api/getReservationHistoryPage',Member.getReservationHistoryPage)
   app.get('/api/getListRestourantTrending',Member.getListRestaurantTrending)
   app.get('/api/getRestoDetail/:id',Member.getRestoDetail)
   app.get('/api/maxValueResto',Member.getMaxValue)
@@ -71,4 +72,5 @@ module.exports = (app) => {
   app.post('/api/upload/:direct/:id',Uploaders.uploadImg)
   app.post('/api/uploadSingle/:direct',Uploaders.uploadImg)
   app.post('/api/upload/:direct',Uploaders.uploadMultiImgResto)
+  app.post('/api/uploadSingleBase64/:direct',Uploaders.uploadImgBase64)
 }

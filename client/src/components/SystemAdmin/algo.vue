@@ -49,6 +49,12 @@
         </v-layout>
         </v-container>
       </v-layout>
+      <v-flex xs12 class="py-2 px-3" v-if="bestResult">
+        Best Iterasi : <br>
+        &emsp; Nilai Fitness : {{bestResult.data[0].fitness}}
+        &emsp; Percobaan : {{bestResult.percobaan}}
+        &emsp; Iterasi : {{bestResult.it}}
+      </v-flex>
     </v-card>
   </div>
   <div class='container-loading' v-else>
@@ -72,6 +78,7 @@ export default {
     listResto: [],
     data: [],
     load: false,
+    bestResult: null,
     coRateItems: [
       {caption: 0.9, value: 0.9},
       {caption: 0.8, value: 0.8},
@@ -110,26 +117,29 @@ export default {
       Algorithm.test(this, this.filter).then(res => {
         if (res.data.length !== 0) {
           this.data = res.data[0].Data
+          this.bestResult = this.data.filter(e => { return e.code === 'x0x' })[0]
+          console.log(this.data.filter(e => { return e.code === 'x0x' })[0])
+          console.log(this.data.filter(e => { return e.code === 'x1x' })[0])
           this.TableRow = [
             {
               iterasi: 100,
-              data: this.data.filter(e => { return e.iterasi === 1 })
+              data: this.data.filter(e => { return e.iterasi === 20 })
             },
             {
               iterasi: 150,
-              data: this.data.filter(e => { return e.iterasi === 2 })
+              data: this.data.filter(e => { return e.iterasi === 40 })
             },
             {
               iterasi: 200,
-              data: this.data.filter(e => { return e.iterasi === 3 })
+              data: this.data.filter(e => { return e.iterasi === 60 })
             },
             {
               iterasi: 250,
-              data: this.data.filter(e => { return e.iterasi === 4 })
+              data: this.data.filter(e => { return e.iterasi === 80 })
             },
             {
               iterasi: 300,
-              data: this.data.filter(e => { return e.iterasi === 5 })
+              data: this.data.filter(e => { return e.iterasi === 100 })
             }
           ]
         }

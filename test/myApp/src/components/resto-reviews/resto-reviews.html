@@ -1,0 +1,64 @@
+<!-- Generated template for the RestoReviewsComponent component -->
+<div *ngIf=getData()>
+  <ion-grid no-padding>
+    <span padding>Review of Rabbito</span>
+    <ion-row align-items-center>
+      <ion-col col-8>
+        <ion-col col-12 *ngFor="let item of rvChart; let i = index" [attr.data-index]="i">
+          <ion-row align-items-center>
+            <ion-col col-3>
+              <span class="rv-text">{{i+1}}</span>
+              <ion-icon name="star"></ion-icon>
+            </ion-col>
+            <ion-col col-9>
+              <div class="rv-percent" [style.width]="(item === 0?'5':(item/max * 100)-10)+'%'"></div>
+              <span class="mx-2">{{item}}</span>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-col>
+      <ion-col col-4>
+        <div class="force-center">
+          <span class="tittle">{{resto.Rate?resto.Rate.toFixed(1):0}}</span>
+          <ion-icon name="star" class="medium-icon"></ion-icon>
+        </div>
+        <div class="force-center">
+          {{resto.Reviews.length}} Reviews
+        </div>
+      </ion-col>
+      <ion-col col12>
+        <ion-list class="rv-cont">
+          <ion-item *ngFor="let item of resto.Reviews; let i = index" [attr.data-index]="i">
+            <ion-avatar item-start>
+                <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)" *ngIf="item.src">
+              <!-- <ion-icon name="time"></ion-icon> -->
+            </ion-avatar>
+            <h2>{{item.userName}}</h2>
+            <p>{{item.comment}}</p>
+            <ion-avatar item-end>
+              {{item.rate}}
+              <ion-icon name="star"></ion-icon>
+            </ion-avatar>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+      <ion-col col-12>
+        <ion-row>
+          <ion-col col-12 no-padding>
+            <ion-item no-padding>
+              <ion-input no-padding clearInput [(ngModel)]="data.comment" placeholder="Type comment here...." style="padding: 0;border-top: 1px solid #dedede;">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col col-6>
+            <rating [(ngModel)]="data.rate">
+            </rating>
+          </ion-col>
+          <ion-col col-6 no-padding>
+            <button ion-button full no-margin (click)="sendReview()">Send</button>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>

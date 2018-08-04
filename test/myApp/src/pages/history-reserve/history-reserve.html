@@ -1,0 +1,86 @@
+<!--
+  Generated template for the HistoryReservePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Reservation History</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <div [ngSwitch]='status'>
+      <div *ngSwitchCase="'active'">
+        <ion-card no-margin style="width:100%" class="no-border">
+            <!-- List History -->
+          <ion-toolbar>
+            <ion-segment [(ngModel)]="segment" color="danger" class="cst-segment">
+              <ion-segment-button value="inprog" (click)="refreshData()">
+                <ion-icon small name="md-bonfire"></ion-icon>
+                In Progress
+              </ion-segment-button>
+              <ion-segment-button value="history" (click)="refreshData()" color="danger">
+                <ion-icon name="md-refresh-circle"></ion-icon>
+                History
+              </ion-segment-button>
+            </ion-segment>
+          </ion-toolbar>
+
+          <ion-card-content no-padding>
+              <ion-row *ngFor="let item of data; let i = index" [attr.data-index]="i" class="card-history-content">
+                <ion-col col-12 class="img-cont pointer" (click)="toDetail(item.Id)" no-padding>
+                  <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)" style="width:100%;height:100%;">
+                </ion-col>
+                <ion-col col-12 no-padding>
+                  <ion-row class="cst-card-history-tittle">
+                    <ion-col col-7 align-items-center>
+                      {{item.Resto.Name}}
+                    </ion-col>
+                    <ion-col col-5 class="text-xs-center">
+                      {{item.reserveDate | date:'dd MMM yyyy'}}<br>
+                      {{item.reserveDate | date:'HH:mm'}} - {{item.DurationC | date:'HH:mm'}}
+                    </ion-col>
+                  </ion-row>
+                  <ion-row  class="cst-card-history-item">
+                    <ion-col col-3>
+                      <b>Progress</b>
+                    </ion-col>
+                    <ion-col col-9 class="cst-card-history-item-label">
+                      {{getStatus(item.Status)}}
+                    </ion-col>
+                    <ion-col col-3 class="pt-2" *ngIf="item.Status === 4">
+                      <b>Reject Note</b>
+                    </ion-col>
+                    <ion-col col-9 class="pt-2 cst-card-history-item-label" *ngIf="item.Status === 4">
+                      {{item.rejectNote?item.rejectNote:'-'}}
+                    </ion-col>
+                    <ion-col col-3 class="pt-2">
+                      <b>Note</b>
+                    </ion-col>
+                    <ion-col col-6 class="pt-2 cst-card-history-item-label">
+                      {{item.Note?item.Note:'-'}}
+                    </ion-col>
+                    <ion-col col-3 text-xs-right>
+                      <!-- <v-btn @click="upload(item)" icon class="ma-0" :class="{'btn--small theme--dark primary': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
+                        <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'primary--text': $vuetify.breakpoint.smAndUp}">cloud_download</v-icon>
+                      </v-btn>
+                      <v-btn @click="cancel(item)" icon class="ma-0" :class="{'btn--small theme--dark error': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
+                        <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'error--text': $vuetify.breakpoint.smAndUp}">delete</v-icon>
+                      </v-btn> -->
+                    </ion-col>
+                  </ion-row>
+                </ion-col>
+              </ion-row>
+          </ion-card-content>
+        </ion-card>
+        <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="page < totalPage">
+          <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data..."></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+    </div>
+  </div>
+</ion-content>

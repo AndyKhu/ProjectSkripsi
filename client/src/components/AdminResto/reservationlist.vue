@@ -21,7 +21,7 @@
           <v-flex xs12 class="pa-2">
             <v-layout row wrap>
               <v-flex xs8 class="py-2 px-1">
-                <DateTimePicker :disabled="form" v-model="reserveDate" dateOnly :label="'Reservation Date'" inLine disabledMinDate @input="getTbReservationScheduleByDate"/>
+                <DateTimePicker v-model="reserveDate" dateOnly :label="'Reservation Date'" inLine disabledMinDate @input="getTbReservationScheduleByDate"/>
               </v-flex>
               <v-flex xs4 class="text-xs-right py-2 px-3">
                 <v-tooltip bottom>

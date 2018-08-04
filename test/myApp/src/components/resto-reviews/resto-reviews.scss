@@ -1,0 +1,47 @@
+resto-reviews {
+  .rv-text{
+    font-size: 18px;
+    color: #424242;
+    font-weight: bold;
+  }
+  .rv-percent{
+    display: inline-block;
+    background: #e54436;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    width: 5%;
+    height: 15px;
+  }
+  .force-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+  .medium-icon {
+    font-size: 27px; //Preferred size here
+  }
+  .tittle {
+    font-size: 2.6rem;
+    font-weight: 500;
+  }
+  .rv-cont {
+    height: 350px;
+    overflow-y: scroll;
+    border-top: 1px solid #dedede;
+  }
+  ul {
+    padding: 0px 10px;
+    margin: 0px;
+  
+    &.rating li {
+      padding: 0px !important;
+      background: none;
+      color: #ffb400;
+  
+      ion-icon {
+        font-size: 30px;
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+page-home {
+  .cst-card {
+    height: 345px;
+    cursor: pointer;
+    img {
+      height: 200px;
+    }
+  }
+  .cst-search-bar {
+    // padding-right: 0;
+    // padding-left: 0;
+    padding: 0;
+  }
+  .cst-search-bar input {
+    box-shadow: none !important;
+    border: 1px solid #dedede;
+    border-right: none;
+    height: 40px !important;
+  }
+  .cst-button {
+    border: 1px solid #dedede;
+    height: 40px;
+  }
+  .padding-horizontal-10px {
+    padding: 10px;
+    padding-bottom: 0;
+  }
+  .cst-select {
+    max-width: 100%
+  }
+  .filter-cst {
+    border: 1px solid #dedede;
+    border-top: none;
+  }
+}

@@ -1,0 +1,21 @@
+page-myprofile {
+  .profile-cont {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .profile-cont img {
+    width: 150px !important;
+    height: 130px !important;
+    border-radius: 50%;    
+  }
+  .item-inner, {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .item{
+    border-bottom: 1px solid #dedede !important;
+    border-bottom-color: #dedede !important;
+    box-shadow: none !important;
+  }
+}

@@ -1,0 +1,67 @@
+<!--
+  Generated template for the MyprofilePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>My Profile</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div [ngSwitch]='status'>
+    <div *ngSwitchCase="'active'">
+      <ion-item>
+        <div class="profile-cont">
+          <img [src]="data.src" (click)="getImage()" id="testImg">
+        </div>
+      </ion-item>
+      <ion-list>
+        <ion-list-header no-margin style="background:#F5F5F5">
+          General
+        </ion-list-header>
+        <ion-item>
+          <ion-label stacked>Name</ion-label>
+          <ion-input [(ngModel)]="data.fullName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Email</ion-label>
+          <ion-input [(ngModel)]="data.Email" readonly></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Phone</ion-label>
+          <ion-input [(ngModel)]="data.Phone"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Age</ion-label>
+          <ion-input [(ngModel)]="data.Age"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Weight</ion-label>
+          <ion-input [(ngModel)]="data.Weight"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked>Height</ion-label>
+          <ion-input [(ngModel)]="data.Height"></ion-input>
+        </ion-item>
+        <ion-list-header no-margin style="background:#F5F5F5">
+          Action
+        </ion-list-header>
+        <ion-item>
+          <button ion-button full color="secondary" (click)="update()">Update Account</button>
+        </ion-item>
+        <ion-item>
+          <button ion-button full color="danger" (click)="closeConfirm()">Close Account</button>
+        </ion-item>
+        <ion-item>
+          <button ion-button full color="dark" (click)="toChangePassword()">Change Password</button>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,21 @@
+<!-- Generated template for the RestoMenuComponent component -->
+<div>
+  <ion-col col-12 padding-vertical *ngFor="let item of resto.FoodMenu; let i = index" [attr.data-index]="i">
+    <div class="card-food-menu-cont">
+      <div class="img-container">
+        <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)">
+      </div>
+      <div class="price-cst-cont">
+        <div class="price-cst">
+          <p class="price-text">{{priceFormated(item.Price)}}</p>
+        </div>
+      </div>
+      <ion-row padding-horizontal no-margin>
+      <ion-col col-10 padding-vertikal>
+        {{formatTitle(item.Name)}} <br>
+        <span class="foodmenu-subtittle">{{item.Description?item.Description:'-'}}</span>
+      </ion-col>
+      </ion-row>
+    </div>
+  </ion-col>
+</div>

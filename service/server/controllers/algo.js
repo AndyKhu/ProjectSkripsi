@@ -15,9 +15,8 @@ if (config.use_env_variable) {
 }
 module.exports = {
   execute(req, res, next) {
-    console.log(req.body)
     let config = {
-      iterasi: 5,
+      iterasi: 100,
       percobaan: 10,
       // coRates: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
       // muRates: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
@@ -25,7 +24,7 @@ module.exports = {
       muRates: [req.body.muRate],
       restoFilter: [req.body.resto],
       // stoplist: [100,150,200,250,300]
-      stoplist: [1,2,3,4,5]
+      // stoplist: [20,40,60,80,100]
     }
     let tmp = []
     getListResto(config.restoFilter).then(listResto => {
@@ -40,8 +39,11 @@ module.exports = {
 // Algo Function
 function overAll(config, Resto) {
   let n = 6 // Jumlah Kromosom
+  let index = 0
+  let bestI = 0
   let totalgen = Resto.Reservation.length
   let finalresult = []
+  let datats2 = {}
   for (let per = 0 ; per < config.percobaan; per++) {
     // let result = []
     for (let it = 0; it < config.iterasi; it++) {
@@ -52,6 +54,9 @@ function overAll(config, Resto) {
           let kromosominduk = getkromosominduk(kromosom)
           let resultCO = crossover(coVal, kromosominduk) // Jalankan Fungsi CrossOver
           let resultNormalCO = saveCOkromosom(resultCO)
+          if (resultCO.length === 0) {
+            resultCO = _.cloneDeep(getkromosominduk(kromosom))
+          }
           let kromosomMutasi = getkromosomMutasi(resultCO)
           let resultMU = mutasi(muVal, kromosomMutasi, Resto)
           let kromosomNormalMutasi = getkromosomVND1(resultMU, totalgen)        
@@ -62,18 +67,28 @@ function overAll(config, Resto) {
           //fungsi Algoritma VND Moving Two Operation
           let resultVND2 = MovingTwoOperation(kromosomVND1, Resto, tmp)
           let resultSelection = selection(kromosom, resultNormalCO, kromosomNormalMutasi, resultVND1, resultVND2, n)
+          if(bestI < resultSelection[0].fitness){
+            bestI = resultSelection[0].fitness
+            datats2 = {data: resultSelection, percobaan: per+1, it: it+1, code: 'x0x'}
+          }
+          // if(resultSelection[0].fitness === 0.5 || resultSelection[0].fitness === '0.5'){
+          //   // bestI = resultSelection[0].fitness
+          //   datats2 = {data: resultSelection, percobaan: per+1, it: it+1, code: 'x0x'}
+          //   finalresult.push({kromosom: kromosom, resultCO: resultNormalCO, resultMU: kromosomNormalMutasi, resultVND1: resultVND1, resultVND2: resultVND2, code: 'x1x'})
+          // }
           finalresult.push({percobaan: per+1, iterasi: it+1, fitness: resultSelection[0].fitness})
+          console.log("percobaan : "+per + " & It : "+it+" & Fitness : "+ resultSelection[0].fitness)      
+          // finalresult.push({kromosom: kromosom, resultCO: resultNormalCO, resultMU: kromosomNormalMutasi, resultVND1: resultVND1, resultVND2: resultVND2})
           // resultchild.push({coRate: coVal, muRate: muVal, resultSelection })
         })
       })
-      if(config.stoplist.indexOf(it+1) !== -1){
-        // let rmse1 = kromosomI.map(item => item.fitness).reduce((prev, next) => prev + next)
-        // let rmse2 = Math.sqrt((n-rmse1)/n)
-        // result.push({iterasi: it+1, data: resultchild})
-      }
     }
     // finalresult.push({percobaan: per+1, hasil: result})
   }
+  finalresult.push(datats2)
+  Models.Tb_User_Reservation_Schedule.destroy({where: {Status: 0}, force: true })
+  saveToDb(datats2.data , Resto)
+
   return finalresult
 }
 function selection(kromosom, resultCO, resultMU, resultVND1, resultVND2,n) {
@@ -99,13 +114,11 @@ function selection(kromosom, resultCO, resultMU, resultVND1, resultVND2,n) {
   })
   xtmp2 = _.cloneDeep(tmpkromosomSelection)
   // for(let i = 0;i<4;i++){
-  // console.log(kromosomSelection.length)
   while (true) {
     if (kromosomSelection.length >= n) {
       break
     }
     let random = Math.round(((Math.random() * 1) + 0) * 100) / 100
-    // console.log('a : '+random)
     let probKromosom = tmpkromosomSelection.filter((e) => { return e.maxprob >= random && e.minprob <= random })
     if (probKromosom.length !== 0) {
       kromosomSelection.push(probKromosom[0])
@@ -122,14 +135,11 @@ function crossover(coVal, induk) {
   tmpinduk.forEach((item, index) => {
     //random nilai dari 0 sampai 1 (ex: 0.55,0.13,0.24)
     let tmpx = Math.round(((Math.random() * 1) + 0) * 100) / 100
-    console.log("coRate: "+tmpx)
-    console.log(coRate)
     if (tmpx < coRate) {
       // random nilai dari 2 sampai panjang reservasi - 1 
       // (ex: total reservasi = 20 maka di random nilai dari 2 sampai 19)
       // karena Array dimulai dari 0 maka random di mulai dari (1 s/d 18)
       let coRandomSplit = Math.floor((Math.random() * (item[0].length - 2))) + 1
-      console.log("coSplit: "+coRandomSplit)
       let krimA = item[0].slice(coRandomSplit, item[0].length)
       item[0].splice(coRandomSplit, item[0].length - 1)
       let krimB = item[1].slice(coRandomSplit, item[1].length)
@@ -151,20 +161,17 @@ function mutasi(muVal, kromosom, Resto) {
   for (let i = 0; i < genMutasi; i++) {
     // nilai random dari 0 s/d 1
     let tmpx = Math.round(((Math.random() * 1) + 0) * 100) / 100
-    console.log("muRate: "+tmpx)
     // jika nilai random lebih kecil dari mutasi rate
     if (tmpx < mutasionRate) {
       if (kromosomMutasi.length !== 0) {
         // nilai random dari 0 s/d total gen sisa setelah croosover
         let tmpM = Math.floor((Math.random() * (kromosomMutasi.length - 1)) + 0);
-        console.log("muSplit: "+tmpM)
         // variable seat yang cocok dengan kromosom yang akan di mutasi
         let tmp = Resto.Seats.filter((e) => { return e.seatFrom <= kromosomMutasi[tmpM].totalSeats && e.seatEnd >= kromosomMutasi[tmpM].totalSeats })
         // nilai random dari 0 s/d jumlah seat (st)
         if (tmp.length !== 0) {
           let x = Math.floor((Math.random() * tmp.length) + 0);
           kromosomMutasi[tmpM].seatId = tmp[x].Id
-          console.log("seatMU: "+ tmp[x].Id)
         }
         // tukar seat kromosom yang akan di mutasi dengan hasil random
       }
@@ -229,7 +236,6 @@ function MovingTwoOperation(kromosom, Resto, tmp) {
   kromosomVND1.forEach((val, index) => {
     // get Id Reservasi Bentrok Per kromosom
     let IdReservasiBentrok = ReservasiBentrok(val)
-    // console.log(IdReservasiBentrok)
     // Perulangan ID Reservasi Bentrok
     IdReservasiBentrok.forEach((IdBentrok, index) => {
       // Split ID reservasi Bentrok (['01,02'] -> ['01','02'])
@@ -433,7 +439,7 @@ function getListResto(restoId) {
     where: { Status: true , Id: restoId},
     include: [
       {
-        where: { Status: { $in: [2, 3] } },
+        where: { Status: { $in: [2, 3, 7] } },
         model: Models.Tb_User_Reservation,
         as: 'Reservation'
       },
@@ -442,4 +448,115 @@ function getListResto(restoId) {
         as: 'Seats'
       }]
   })
+}
+
+function ReservasiBentrokgetBest(x){
+  let xtmp = []
+  x.forEach((a, pindex) => {
+    let otmp = null
+    x.forEach((b, nindex) => {
+      if(a.reserveId != b.reserveId && dateCheckComplete(b.timeS,b.timeE,a.timeS,a.timeE) && a.seatId == b.seatId){
+        if(otmp == null) otmp = a
+        if(otmp.Duration < b.Duration)
+          otmp = b
+        else if (otmp.Duration === b.Duration && otmp.totalSeats < b.totalSeats)
+          otmp = b
+        else if (otmp.Duration === b.Duration && otmp.totalSeats === b.totalSeats){
+          if(xtmp.filter(e => {return e.reserveId === b.reserveId}).length !== 0)
+            otmp = b
+          else 
+            otmp = a
+        }
+      }
+    })
+    if(otmp)
+      xtmp.push(otmp)
+  })
+  let unique_array = _.uniqWith(xtmp,_.isEqual) 
+  // unique_array.forEach((a,ai) =>) 
+  return unique_array
+}
+
+function ReservasiBentrok2(x){
+  let xtmp = []
+  x.forEach((a, pindex) => {
+    x.forEach((b, nindex) => {
+      if(a.reserveId != b.reserveId){
+        if(dateCheckComplete(b.timeS,b.timeE,a.timeS,a.timeE)){
+          if(a.seatId == b.seatId){
+            xtmp.push({reserveId: a.reserveId, seatId: a.seatId, timeS: a.timeS, timeE: a.timeE})
+            xtmp.push({reserveId: b.reserveId, seatId: b.seatId, timeS: b.timeS, timeE: b.timeE})
+          }
+        }
+      }
+    })
+  })
+  let unique_array = _.uniqWith(xtmp,_.isEqual) 
+  // unique_array.forEach((a,ai) =>) 
+  return unique_array
+}
+
+function saveToDb(kromosomI,val) {
+  if(kromosomI){
+    if(kromosomI[0].fitness === 1){
+      let saveData = []
+      kromosomI[0].kromosom.forEach((krs,index)=> {
+        saveData.push({
+          Id: guid(),
+          Id_Reserve: krs.reserveId,
+          Id_Seat: krs.seatId,
+          Id_Resto: val.Id,
+          Status: 0
+        })
+        Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
+      })
+      Models.Tb_User_Reservation_Schedule.bulkCreate(saveData)
+    }else {
+      let bentrokList = ReservasiBentrok2(kromosomI[0].kromosom)
+      let bentrokBest = ReservasiBentrokgetBest(kromosomI[0].kromosom)
+      let saveData = []
+      kromosomI[0].kromosom.forEach((krs,index)=> {
+        if(bentrokList.filter((e)=> {return e.reserveId === krs.reserveId && e.seatId === krs.seatId}).length === 0){
+          saveData.push({
+            Id: guid(),
+            Id_Reserve: krs.reserveId,
+            Id_Seat: krs.seatId,
+            Id_Resto: val.Id,
+            Status: 0
+          })
+          Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
+        }else {
+          if(bentrokBest.filter((e)=> {return e.reserveId === krs.reserveId && e.seatId === krs.seatId}).length === 0) {
+            saveData.push({
+              Id: guid(),
+              Id_Reserve: krs.reserveId,
+              Id_Seat: krs.seatId,
+              Id_Resto: val.Id,
+              Status: 3
+            })
+            Models.Tb_User_Reservation.update({Status: 7, PID: 'new', rejectNote: 'Algo Note'},{where: {Id: krs.reserveId}})
+          } else {
+            saveData.push({
+              Id: guid(),
+              Id_Reserve: krs.reserveId,
+              Id_Seat: krs.seatId,
+              Id_Resto: val.Id,
+              Status: 0
+            })
+            Models.Tb_User_Reservation.update({Status: 3, PID: 'new'},{where: {Id: krs.reserveId}})
+          }
+        }
+      })
+      Models.Tb_User_Reservation_Schedule.bulkCreate(saveData)
+    }
+  }
+}
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1)
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 }

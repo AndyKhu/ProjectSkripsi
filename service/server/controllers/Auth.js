@@ -38,6 +38,7 @@ module.exports = {
           res.status(400).send({ message: 'User Not Found'})
         }
         else{
+          console.log(data)
           let newPass = bcrypt.hashSync(data.newpass, bcrypt.genSaltSync(8), null)
           let status = bcrypt.compareSync(data.pass, user.Password)
           let status2 = bcrypt.compareSync(data.newpass, user.Password)

@@ -1,0 +1,66 @@
+<!-- Generated template for the RestoInfoComponent component -->
+<div>
+  <ion-list>
+    <ion-list-header no-margin>
+      General Information
+    </ion-list-header>
+    <ion-item>
+      <ion-avatar item-start>
+        <ion-icon name="time"></ion-icon>
+      </ion-avatar>
+      <h2>Operation Time</h2>
+      <p>{{resto.OD}} - {{resto.CD}}<br>{{resto.OT}} - {{resto.CT}}</p>
+    </ion-item>
+    <ion-item>
+      <ion-avatar item-start>
+        <ion-icon name="card"></ion-icon>
+      </ion-avatar>
+      <h2>Price Range</h2>
+      <p>{{resto.PriceFrom |currency : 'Rp.' : true : '1.0'}} - {{resto.PriceEnd |currency : 'Rp.' : true : '1.0'}}</p>
+    </ion-item>
+    <ion-item>
+      <ion-avatar item-start>
+        <ion-icon name="md-navigate"></ion-icon>
+      </ion-avatar>
+      <h2>Address</h2>
+      <p>{{resto.Address}}</p>
+    </ion-item>
+    <ion-item>
+      <ion-avatar item-start>
+        <ion-icon name="md-call"></ion-icon>
+      </ion-avatar>
+      <h2>Phone</h2>
+      <p>{{resto.Phone}}</p>
+    </ion-item>
+    <ion-item>
+      <ion-avatar item-start>
+        <ion-icon name="home"></ion-icon>
+      </ion-avatar>
+      <h2>Website</h2>
+      <p>{{resto.Website}}</p>
+    </ion-item>
+    <ion-list-header no-margin>
+      Dinning Style
+    </ion-list-header>
+    <ion-item>
+      <ion-icon name="md-restaurant" item-start></ion-icon>
+      {{resto.Type}}
+    </ion-item>
+    <ion-list-header no-margin>
+      Payment List
+    </ion-list-header>
+    <ion-item *ngFor="let item of resto.Account">
+      <ion-avatar item-start>
+      </ion-avatar>
+      <h2>{{item.BankName}}</h2>
+      <p>{{item.AccountNumber}}</p>
+    </ion-item>
+    <ion-list-header no-margin>
+      Facillity
+    </ion-list-header>
+    <ion-item *ngFor="let item of resto.Facility">
+      <ion-icon name="{{item.Icon}}" item-start></ion-icon>
+      {{item.Name}}
+    </ion-item>
+  </ion-list>
+</div>

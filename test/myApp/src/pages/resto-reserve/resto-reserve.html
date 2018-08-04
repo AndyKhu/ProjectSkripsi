@@ -1,0 +1,91 @@
+<!--
+  Generated template for the RestoReservePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Resto Reserve</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding [ngSwitch]='load' >
+  <div *ngSwitchCase="'active'">
+    <ion-list *ngIf="type">
+      <ion-item>
+        <ion-label stacked>Full Name</ion-label>
+        <ion-input [(ngModel)]="data.Name"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Phone Number</ion-label>
+        <ion-input [(ngModel)]="data.Phone"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Reserve Date</ion-label>
+        <ion-datetime displayFormat="DD MMM YYYY HH:mm" pickerFormat="DD MMM YYYY HH:mm" [(ngModel)]="data.reserveDate"></ion-datetime>
+        <!-- <ion-input [(ngModel)]="data.reserveDate"></ion-input> -->
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Duration</ion-label>
+        <ion-select [(ngModel)]="data.Duration">
+            <ion-option value="60">1 Jam</ion-option>
+            <ion-option value="90">1 Jam 30 Menit</ion-option>
+            <ion-option value="120">2 Jam</ion-option>
+            <ion-option value="150">2 Jam 30 Menit</ion-option>
+            <ion-option value="180">3 Jam</ion-option>
+            <ion-option value="210">3 Jam 30 Menit</ion-option>
+            <ion-option value="240">4 Jam</ion-option>
+            <ion-option value="270">4 Jam 30 Menit</ion-option>
+            <ion-option value="300">5 Jam</ion-option>
+          </ion-select>
+        <!-- <ion-input [(ngModel)]="data.Duration"></ion-input> -->
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Number of Seats</ion-label>
+        <ion-input [(ngModel)]="data.totalSeats" type="number" min="1"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Note</ion-label>
+        <ion-input [(ngModel)]="data.Note"></ion-input>
+      </ion-item>
+      <ion-item>
+          <button ion-button no-margin (click)="next()">next</button>
+      </ion-item>
+    </ion-list>
+    <div *ngIf="!type">
+      <ion-grid class="list-menu-cont">
+      <ion-row>
+        <ion-col col-12 *ngFor="let item of resto.FoodMenu; let i = index">
+          <div class="card-food-menu-cont">
+            <div class="img-container">
+              <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)">
+            </div>
+            <div class="price-cst-cont">
+              <div class="price-cst">
+                <p class="price-text">{{priceFormated(item.Price)}}</p>
+              </div>
+            </div>
+            <ion-row class="mx-2 mb-0">
+              <ion-col col-8 class="card-cst-description">
+                {{formatTitle(item.Name)}} <br>
+                <span class="foodmenu-subtittle">{{item.Description}}</span>
+              </ion-col>
+              <ion-col col-4 class="force-center">
+                <ion-input [(ngModel)]="item.Amount" type="number" min="1" placeholder="0" class="input-cst-card"></ion-input>
+                <!-- <formNumberSmall :min="0" :max="99" v-model="item.Amount"/> -->
+              </ion-col>
+            </ion-row>
+          </div>
+        </ion-col>
+      </ion-row>
+      </ion-grid>
+      <ion-row justify-content-end>
+        <button ion-button (click)="Reserve()">Reserve</button>
+      </ion-row>
+    </div>
+    </div>
+</ion-content>
