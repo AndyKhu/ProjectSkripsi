@@ -33,7 +33,7 @@
 
           <ion-card-content no-padding>
               <ion-row *ngFor="let item of data; let i = index" [attr.data-index]="i" class="card-history-content">
-                <ion-col col-12 class="img-cont pointer" (click)="toDetail(item.Id)" no-padding>
+                <ion-col col-12 class="img-cont pointer" (click)="toDetail(item)" no-padding>
                   <img [src]="this.sanitizer.bypassSecurityTrustUrl(item.src)" style="width:100%;height:100%;">
                 </ion-col>
                 <ion-col col-12 no-padding>

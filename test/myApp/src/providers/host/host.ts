@@ -40,6 +40,10 @@ export class HostProvider {
     return axios.get(`${this.link}/checkAuth`, {headers: {'Authorization': token}})
   }
 
+  getReservationHistoryOne (Id) {
+    return axios.get(`${this.link}/api/getReservationHistoryOne/${Id}`)
+  }
+
   getUserFavorite (Id) {
     return axios.get(`${this.link}/api/getUserFavorite/${Id}`)
   }

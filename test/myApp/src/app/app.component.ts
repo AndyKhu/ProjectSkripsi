@@ -15,20 +15,21 @@ import { HostProvider } from '../providers/host/host';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
   rootPage:any;
-  pages: Array<{title: string, component: any}>;
+  pages: Array<{title: string, component: any, icon: string}>;
+  accountpages: Array<{title: string, component: any, icon: string}>;
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen,public hostService: HostProvider) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
+      // Here you can do any higher level native things you might need.s
       statusBar.styleDefault();
       splashScreen.hide();
        // used for an example of ngFor and navigation
       this.pages = [
-        { title: 'Home', component: HomePage },
-        { title: 'Reservation History', component: HistoryReservePage },
-        { title: 'My Favorite', component: MyfavoritePage },
-        { title: 'My Profile', component: MyprofilePage }
+        // { title: 'Home', component: HomePage, icon: 'md-home'},
+        { title: 'Reservation History', component: HistoryReservePage, icon: 'md-refresh-circle' },
+        { title: 'My Favorite', component: MyfavoritePage, icon: 'md-restaurant'}
       ];
+      this.accountpages = [{ title: 'My Profile', component: MyprofilePage, icon: 'md-contact'}]
       this.checkPreviousAuthorization();
     });
   }
@@ -43,7 +44,7 @@ export class MyApp {
       this.nav.setRoot(AuthPage)
     } else {
       this.hostService.checkAuth().then(cb => {
-        this.openPage(this.pages[0])      
+        this.nav.setRoot(HomePage)
       }).catch(err => {
         this.nav.setRoot(AuthPage)
       })

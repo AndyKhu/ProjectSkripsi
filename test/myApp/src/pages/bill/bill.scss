@@ -1,0 +1,45 @@
+page-bill {
+  .card-header-cst{
+    background: #4989fc;
+    color: #FFF;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: arial;
+  }
+  .cst-title{
+    color: #FFF;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: arial;
+  }
+  .label-tittle{
+    font-size: 16px;
+    font-weight: bold;
+    color: #424242;
+  }
+  .label-sub {
+    color: #616161;
+    font-size: 14px;
+    word-wrap: break-word;
+  }
+  .border-bottom{
+    border-bottom: 1px solid #bdbdbd
+  }
+  .Menu-border-bottom{
+    border-bottom: 1px solid #bdbdbd
+  }
+  .ion-cst{
+    font-size: 24px;
+  }
+  .row-cst{
+    padding: 5px;
+  }
+  .card-cst{
+    width: 100%
+  }
+  .force-center-left{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}

@@ -15,7 +15,8 @@ import { AuthPage } from '../pages/auth/auth';
 import { RegisterPage } from '../pages/register/register';
 import { ChangePasswordPage } from '../pages/change-password/change-password';
 import { RestoDetailPage } from '../pages/resto-detail/resto-detail';
-import { RestoReservePage} from '../pages/resto-reserve/resto-reserve'
+import { RestoReservePage} from '../pages/resto-reserve/resto-reserve';
+import { BillPage} from '../pages/bill/bill';
 import { HistoryReservePage } from '../pages/history-reserve/history-reserve';
 import { HistorypageDetailPage } from '../pages/historypage-detail/historypage-detail';
 import { HostProvider } from '../providers/host/host';
@@ -35,6 +36,7 @@ import { Ionic2RatingModule } from 'ionic2-rating';
     HistoryReservePage,
     HistorypageDetailPage,
     ChangePasswordPage,
+    BillPage,
     RegisterPage
   ],
   imports: [
@@ -55,6 +57,7 @@ import { Ionic2RatingModule } from 'ionic2-rating';
     HistoryReservePage,
     ChangePasswordPage,
     HistorypageDetailPage,
+    BillPage,
     RegisterPage
   ],
   providers: [

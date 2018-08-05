@@ -1,5 +1,23 @@
 // http://ionicframework.com/docs/theming/
-
+.ion-cst{
+  margin: 0 10px;
+}
+.item-cst{
+  color:#212121;
+  cursor: pointer
+}
+.item-cst:hover{
+  background: #424242;
+  color: #FFF;
+}
+.item-cst:hover .item-inner{
+  border: none;
+}
+.header-cst{
+  font-size: 16px;
+  font-weight: 500;
+  color: #616161;
+}
 
 // App Global Sass
 // --------------------------------------------------

@@ -1,0 +1,105 @@
+<!--
+  Generated template for the BillPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <div class="force-center-left">
+      <button ion-button color="light" clear icon-only *ngIf="back === true" (click)="backtoHome()">
+        <ion-icon name="md-arrow-dropleft"></ion-icon>
+      </button>
+      <span class="cst-title">Bill</span>
+    </div>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-card no-margin margin-bottom class="card-cst">
+    <ion-card-header class="card-header-cst">
+      Customer Detail
+    </ion-card-header>
+    <ion-card-content no-padding>
+      <ion-row>
+        <ion-col col-11 offset-1 no-padding>
+          <ion-row class="border-bottom row-cst">
+            <ion-col col-7 class="label-tittle">
+              Customer Name
+            </ion-col>
+            <ion-col col-5 class="label-sub" text-right>
+              {{data.Name}}
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col col-11 offset-1 no-padding>
+          <ion-row class="row-cst">
+            <ion-col col-7 class="label-tittle">
+              Phone Number
+            </ion-col>
+            <ion-col col-5 class="label-sub" text-right>
+              {{data.Phone}}
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+  <ion-card no-margin margin-bottom class="card-cst">
+    <ion-card-header class="card-header-cst">
+      Menu Detail
+    </ion-card-header>
+    <ion-card-content no-padding>
+      <ion-row>
+        <ion-col col-11 offset-1 no-padding *ngFor="let item of data.FoodMenu; let i = index" [attr.data-index]="i">
+          <ion-row class="Menu-border-bottom row-cst">
+            <ion-col col-7 class="label-tittle">
+              {{item.Menu.Name}}
+            </ion-col>
+            <ion-col col-5 class="label-sub" text-right>
+              {{item.Amount}}
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+  <ion-card no-margin class="card-cst">
+      <ion-card-header class="card-header-cst">
+        Payment Detail
+      </ion-card-header>
+      <ion-card-content no-padding>
+        <ion-row align-items-center  class="row-cst border-bottom">
+          <ion-col col-1 no-padding text-center>
+            <ion-icon class="ion-cst" name="md-basket"></ion-icon>
+          </ion-col>
+          <ion-col col-11 class="label-tittle">
+            Reservation Cost ({{data.Resto.Name}})
+          </ion-col>
+          <ion-col col-11 offset-1 no-padding>
+            <ion-row class="row-cst">
+              <ion-col col-12>
+                <p class="ma-2 label-sub">Seat : {{data.totalSeats}}<br></p>
+                <p class="ma-2 label-sub"> Duration : {{menitToHour(data.Duration)}}<br></p>
+                <p class="ma-2 label-sub">Reservation Price : {{data.Resto.ReservePrice |currency : '&nbsp;' : true : '1.0'}} / Hour</p>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+        <ion-row align-items-center  class="row-cst">
+          <ion-col col-1 no-padding text-center>
+            <ion-icon class="ion-cst" name="md-cart"></ion-icon>
+          </ion-col>
+          <ion-col col-4 class="label-tittle">
+            Total Cost
+          </ion-col>
+          <ion-col col-7 class="label-sub" text-right>
+            {{data.Cost |currency : 'Rp.' : true : '1.0'}}
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+</ion-content>

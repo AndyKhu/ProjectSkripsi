@@ -115,8 +115,8 @@ export class HistoryReservePage {
     })
   }
 
-  toDetail (Id) {
-    this.navCtrl.push(HistorypageDetailPage,{Id: Id})
+  toDetail (data) {
+    this.navCtrl.push(HistorypageDetailPage,{data: data})
   }
 
   getStatus (val) {

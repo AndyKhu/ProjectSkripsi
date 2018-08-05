@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { HostProvider } from '../../providers/host/host';
 import { DomSanitizer } from '@angular/platform-browser';
+import { BillPage } from '../bill/bill';
 import moment from 'moment'
 /**
  * Generated class for the RestoReservePage page.
@@ -22,10 +23,13 @@ export class RestoReservePage {
   user:any
   load:any
   constructor(public navCtrl: NavController, public navParams: NavParams,public sanitizer: DomSanitizer,public hostService: HostProvider) {
+    let tommorow = new Date()
+    tommorow.setDate(new Date().getDate() + 1)
     this.load = 'load'
     let day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     this.type = true
     this.data = {}
+    this.data.reserveDate = tommorow.toISOString()
     hostService.getRestoDetail(navParams.get('Id')).then(cb => {
       this.resto = cb.data      
       hostService.checkAuth().then(cb => {
@@ -86,12 +90,17 @@ export class RestoReservePage {
     this.data.FoodMenu = this.resto.FoodMenu.filter(o => o.Amount)
     this.data.RestoId = this.resto.Id
     this.data.Id_User = this.user.Id
+    this.data.Status = 1
     this.data.Cost = this.resto.ReservePrice * (this.data.Duration / 60)
     if (this.data.FoodMenu.length === 0) {
       this.hostService.presentToast(`Menu Can't be Empty`)
     } else {
       this.hostService.saveRestoReserve(this.data).then(res => {
-        this.hostService.presentToast(`Reserve Sucess`)
+        this.hostService.getReservationHistoryOne(res.data.Id).then(cb => {
+          console.log(cb.data)
+          this.hostService.presentToast(`Reserve Sucess`)
+          this.navCtrl.setRoot(BillPage,{data: cb.data, back: true})
+        })
         // this.$router.push({name: 'Bill', params: { id: res.data.Id }})
       }).catch(err => {
         console.log(err)

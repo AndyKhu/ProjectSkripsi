@@ -36,6 +36,7 @@ module.exports = (app) => {
   app.put('/api/cancelReservation/:id',Member.cancelReservation)
   app.put('/api/updateNotif/:id',Member.updateNotif)
   app.post('/api/HistoryReservationUpload',Member.HistoryReservationUpload)
+  app.get('/api/getReservationHistoryOne/:id',Member.getReservationHistoryOne)
   app.post('/api/fortesting',Algo.execute)
 
   //Admin Resto

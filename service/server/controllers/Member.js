@@ -245,6 +245,34 @@ module.exports = {
       res.status(400).send({ errmsg: 'Failed to Comment' })
     })
   },
+  getReservationHistoryOne (req,res,next) {
+    Models.Tb_User_Reservation.findOne({
+      where: {Id: req.params.id},
+      include: [
+        {
+          model: Models.Tb_User_Reservation_Menu,
+          as: 'FoodMenu',
+          include: [
+            {
+              model: Models.Tb_Resto_Menu,
+              as: 'Menu'
+            }
+          ]
+        },
+        {
+          model: Models.Tb_Resto,
+          as: 'Resto'
+        }
+      ]
+    }).then((cb) => {
+      cb.dataValues.DurationC = new Date(new Date(cb.reserveDate).getTime() + cb.Duration*60000);
+      cb.FoodMenu.forEach((fm, index) => {
+        let bitmap = fs.readFileSync(path.join(`uploads/${cb.RestoId}/${fm.Menu.PID}`))
+        fm.dataValues.file = bitmap
+      })
+      res.status(200).send(cb);
+    })
+  },
   getReservationHistoryPage(req, res, next) {
     let body = req.body
     console.log(body)
