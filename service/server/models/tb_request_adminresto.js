@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
     restoName: DataTypes.STRING,
     Status: DataTypes.INTEGER,
     PID: DataTypes.STRING,
+    PID2: DataTypes.STRING,
+    PID3: DataTypes.STRING,
     Pname: DataTypes.STRING,
     Ptype: DataTypes.STRING
   })

@@ -62,9 +62,9 @@ export class RestoReservePage {
     let a = new Date()
     a.setDate(new Date().getDate() + 1)
     a.setMinutes(0)
-    let reservedt = moment(moment(new Date(this.data.reserveDate)).format('DD MMM YYYY'), 'DD MMM YYYY').toDate()
+    let reservedt = moment(moment(new Date(this.data.reserveDate.replace("Z",""))).format('DD MMM YYYY'), 'DD MMM YYYY').toDate()
     let todaydt = moment(moment(new Date(a)).format('DD MMM YYYY'), 'DD MMM YYYY').toDate()
-    let reserveTime = moment(moment(new Date(this.data.reserveDate)).format('HH:mm'), 'HH:mm').toDate()
+    let reserveTime = moment(moment(new Date(this.data.reserveDate.replace("Z",""))).format('HH:mm'), 'HH:mm').toDate()
     let reserveEnd = moment(reserveTime).add(this.data.Duration, 'minutes').toDate()
     let OpenTime = moment(moment(new Date(this.resto.OpenTime)).format('HH:mm'), 'HH:mm').toDate()
     let CloseTime = moment(moment(new Date(this.resto.CloseTime)).format('HH:mm'), 'HH:mm').toDate()
@@ -91,6 +91,7 @@ export class RestoReservePage {
     this.data.RestoId = this.resto.Id
     this.data.Id_User = this.user.Id
     this.data.Status = 1
+    this.data.reserveDate = new Date(this.data.reserveDate.replace("Z",""))
     this.data.Cost = this.resto.ReservePrice * (this.data.Duration / 60)
     if (this.data.FoodMenu.length === 0) {
       this.hostService.presentToast(`Menu Can't be Empty`)

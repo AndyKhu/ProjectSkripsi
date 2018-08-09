@@ -13,6 +13,7 @@ module.exports = (app) => {
   app.post('/api/login',Auth.Login,Auth.signincb)
   app.post('/api/createReqAdmin',Auth.createReqAdmin)
   app.post('/api/changePass',Auth.changePass)
+  app.post('/api/verification/:id/:user',Auth.verification)
   
   // member
   // app.get('/api/getListRestourant',Member.getListRestourant)
@@ -42,6 +43,7 @@ module.exports = (app) => {
   //Admin Resto
   app.get('/api/getTbRestoByuserID/:id',AdminResto.getTbRestoByuserID)
   app.get('/api/getTbReservationConfirm/:id',AdminResto.getTbReservationConfirm)
+  app.get('/api/getTbReservationConfirm2/:id',AdminResto.getTbReservationConfirm2)
   app.post('/api/getTbReservationSchedule',AdminResto.getTbReservationSchedule)
   app.post('/api/getTbReservationSchedule2',AdminResto.getTbReservationSchedule2)
   app.get('/api/getTbRestoByuserIDmin/:id',AdminResto.getTbRestoByuserIDmin)

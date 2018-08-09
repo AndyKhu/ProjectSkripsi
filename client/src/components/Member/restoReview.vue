@@ -116,7 +116,8 @@ export default {
       this.max = Math.max.apply(Math, this.rvChart)
     },
     sendReview () {
-      if (this.getuser() !== null && this.data.comment !== null && this.data.rate !== null && this.getuser().Reservation.filter(e => { return e.restoId === this.resto.Id }).length !== 0) {
+      console.log(this.getuser())
+      if (this.getuser() !== null && this.data.comment !== null && this.data.rate !== null && this.getuser().Reservation.filter(e => { return e.RestoId === this.resto.Id }).length !== 0) {
         this.data.userId = this.getuser().Id
         this.data.userName = this.getuser().fullName
         this.data.PID = this.getuser().DpId
@@ -158,7 +159,7 @@ export default {
         })
       } else {
         this.$store.dispatch('setDialogMsg', {
-          txtmsg: this.data.comment ? this.data.rate ? this.getuser().Reservation.filter(e => { return e.restoId === this.resto.Id }).length !== 0 ? 'Login First' : 'you must be reserve at least 1x to review' : `Rate Can't be empty` : `Comment Can't be empty`,
+          txtmsg: this.data.comment ? this.data.rate ? this.getuser().Reservation.filter(e => { return e.RestoId === this.resto.Id }).length !== 0 ? 'Login First' : 'you must be reserve at least 1x to review' : `Rate Can't be empty` : `Comment Can't be empty`,
           status: true,
           color: 'error'
         })

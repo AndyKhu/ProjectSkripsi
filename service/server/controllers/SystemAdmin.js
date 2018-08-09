@@ -52,17 +52,23 @@ module.exports = {
   },
   getTbRequestAdminInProgress(req, res, next) {
     Models.Tb_Request_AdminResto.findAll({
-      where: {},
-      attributes: ['Id','Email','fullName','Password','restoName','PID','Pname','Ptype','Status']
+      where: {Status: {$in: [1,0]}},
+      attributes: ['Id','Email','fullName','Password','restoName','PID','Pname','Ptype','Status','PID2','PID3']
     }).then(list => {
       list.forEach(obj => { 
         res.set({'Content-Type': obj.Ptype})
         let bitmap = fs.readFileSync(path.join(`uploads/reqAdmin/`, obj.PID))
+        let bitmap2 = fs.readFileSync(path.join(`uploads/reqAdmin/`, obj.PID2))
+        let bitmap3 = fs.readFileSync(path.join(`uploads/reqAdmin/`, obj.PID3))
         obj.dataValues.Img = bitmap
+        obj.dataValues.Img2 = bitmap2
+        obj.dataValues.Img3 = bitmap3
       })
       res.json(list)
-    }).catch(err =>
-      res.status(400).send({ error: err })
+    }).catch(err => {
+        console.log(err)
+        res.status(400).send({ error: err })
+      }
     )
   },
   getTbReview (req,res,next){
@@ -116,6 +122,19 @@ module.exports = {
     Models.Tb_Request_AdminResto.update({Status:2},{where: {Id: data.Id }}).then(pro => {
       Models.Tb_User.create(User).then(pro2 => {
         Models.Tb_Resto.create({Id: guid(), Name: data.restoName, Id_User: data.Id, Status: true}).then(pro3 => {
+          let mailOptions = {
+            from: 'vamkre01@gmail.com',
+            to: data.Email,
+            subject: 'Admin Resto Request',
+            text: 'Your Request Has been Approve by Admin'
+          }
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          })
           res.sendStatus(200)
         })
       })

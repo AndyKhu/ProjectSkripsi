@@ -15,6 +15,14 @@ if (config.use_env_variable) {
     config.database, config.username, config.password, config
   )
 }
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'vamkre01@gmail.com',
+    pass: 'Andy159753'
+  }
+})
 module.exports = {
   //get
   getTbRestoByuserID(req, res, next) {
@@ -68,7 +76,7 @@ module.exports = {
       include: [
         {
           model: Models.Tb_Resto_Review,
-          where: {Status: 0},     
+          where: {Status: {$in: [0,3]}},     
           required: false,     
           as: 'Reviews',
           attributes: ['Id','comment','rate','userId','userName','userPID','Id_Resto']
@@ -171,7 +179,8 @@ module.exports = {
         },
         {
           model: Models.Tb_User_Reservation_Upload,
-          as: 'Upload'
+          as: 'Upload',
+          required: true
         }
       ]
     }).then(cb => {
@@ -179,6 +188,23 @@ module.exports = {
         let bitmap = fs.readFileSync(path.join(`uploads/${val.Id}/${val.Upload.PID}`))
         val.dataValues.file = bitmap
       })
+      res.status(200).send(cb)
+    }).catch(err => {
+      console.log(err)
+      res.status(400).send({ error: err})
+    })
+  },
+  getTbReservationConfirm2(req,res,next) {
+    Models.Tb_User_Reservation.findAll({where: {RestoId: req.params.id,Status: 0},
+      include: [
+        {
+          model: Models.Tb_User_Reservation_Menu,
+          as: 'FoodMenu',
+          include: [{model: Models.Tb_Resto_Menu, as: 'Menu'}]
+        }
+      ]
+    }).then(cb => {
+      console.log(cb)
       res.status(200).send(cb)
     }).catch(err => {
       console.log(err)
@@ -249,8 +275,33 @@ module.exports = {
   },
   updateTbReservationConfirm(req,res,next) {
     let data = req.body
+    let msg = ''
     Models.Tb_User_Reservation.update({Status: req.params.status, rejectNote: data.Note, PID: 'new'},{where: {Id: req.params.id}}).then(cb => {
-      res.status(200).send(cb)
+      Models.Tb_User.findOne({where: {Id: data.userId}}).then(user => {
+        if(!user) res.status(400).send({ message: 'User Not Found'})
+        else {
+          if (req.params.status === 4 || req.params.status === '4') {
+            msg =  `Your Request Has been Reject by AdminResto For Reason:\n ${data.Note}`
+          } else {
+            msg =  `Your Request Has been Accept by AdminResto`
+          }
+
+          let mailOptions = {
+            from: 'vamkre01@gmail.com',
+            to: user.Email,
+            subject: 'Admin Resto Confirmation',
+            text: msg
+          }
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          })
+          res.status(200).send(cb)
+        }
+      })
     }).catch(err => {
       console.log(err)
       res.status(400).send({ error: err})

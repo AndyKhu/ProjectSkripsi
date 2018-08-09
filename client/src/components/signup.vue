@@ -65,6 +65,28 @@
                         </v-btn>
                       </v-flex>
                     </v-layout>
+                    <v-layout row wrap class="pb-3" v-if="usertype !== 'Member'">
+                      <v-flex xs9 class="force-center-left txt-cst">
+                        KTP
+                      </v-flex>
+                      <v-flex xs3>
+                        <input @change="ImgChange2" type="file" id="target2" style="display: none" accept="image/*"/>
+                        <v-btn block dark color="green" @click="click2">
+                          <v-icon dark>cloud_upload</v-icon>
+                        </v-btn>
+                      </v-flex>
+                    </v-layout>
+                    <v-layout row wrap class="pb-3" v-if="usertype !== 'Member'">
+                      <v-flex xs9 class="force-center-left txt-cst">
+                        NPWP
+                      </v-flex>
+                      <v-flex xs3>
+                        <input @change="ImgChange3" type="file" id="target3" style="display: none" accept="image/*"/>
+                        <v-btn block dark color="green" @click="click3">
+                          <v-icon dark>cloud_upload</v-icon>
+                        </v-btn>
+                      </v-flex>
+                    </v-layout>
                     <span style="color:#757575">Already Have Account ? <router-link :to="{name: 'Login'}">Login Here</router-link></span>
                     <v-alert :type="getMessage().type || 'info'" :value="getMessage() !== null"
                          dismissible @input="closeMessage" v-if="getMessage() !== null ">{{getMessage().message}}</v-alert>
@@ -103,7 +125,9 @@ export default {
       usertype: 'Member',
       type: ['Member', 'Admin Resto'],
       restoname: '',
-      Img: null
+      Img: null,
+      Img2: null,
+      Img3: null
     }
   },
   methods: {
@@ -120,6 +144,8 @@ export default {
           auth.signUp(this, credentials, '/')
         } else {
           credentials.Img = this.Img
+          credentials.Img2 = this.Img2
+          credentials.Img3 = this.Img3
           auth.signupA(this, credentials, '/')
         }
       }
@@ -162,6 +188,20 @@ export default {
             color: 'error'
           })
           return false
+        } else if (!this.Img2) {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: `KTP is Required`,
+            status: true,
+            color: 'error'
+          })
+          return false
+        } else if (!this.Img3) {
+          this.$store.dispatch('setDialogMsg', {
+            txtmsg: `NPWP is Required`,
+            status: true,
+            color: 'error'
+          })
+          return false
         }
       }
       return true
@@ -185,10 +225,28 @@ export default {
     click () {
       document.getElementById('target').click()
     },
+    click2 () {
+      document.getElementById('target2').click()
+    },
+    click3 () {
+      document.getElementById('target3').click()
+    },
     ImgChange (e) {
       let tl = e.target.files.length
       if (tl !== 0) {
         this.Img = e.target.files[0]
+      }
+    },
+    ImgChange2 (e) {
+      let tl = e.target.files.length
+      if (tl !== 0) {
+        this.Img2 = e.target.files[0]
+      }
+    },
+    ImgChange3 (e) {
+      let tl = e.target.files.length
+      if (tl !== 0) {
+        this.Img3 = e.target.files[0]
       }
     }
   }

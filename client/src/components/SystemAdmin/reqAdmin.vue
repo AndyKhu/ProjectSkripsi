@@ -26,6 +26,7 @@
         <v-checkbox
           :label="`Rejected Record`"
           v-model="showAll"
+          @change="refresh"
         ></v-checkbox>
       </v-flex>
       <v-data-table
@@ -39,6 +40,16 @@
               <td>{{ props.item.restoName }}</td>
               <td class="text-xs-center">
                 <v-btn icon class="mx-0" @click="show(props.item.Img)">
+                  <v-icon color="blue darken-1">assignment</v-icon>
+                </v-btn>
+              </td>
+              <td class="text-xs-center">
+                <v-btn icon class="mx-0" @click="show(props.item.Img2)">
+                  <v-icon color="blue darken-1">assignment</v-icon>
+                </v-btn>
+              </td>
+              <td class="text-xs-center">
+                <v-btn icon class="mx-0" @click="show(props.item.Img3)">
                   <v-icon color="blue darken-1">assignment</v-icon>
                 </v-btn>
               </td>
@@ -76,6 +87,8 @@ export default {
       {text: 'Name', value: 'fullName', sortable: false},
       {text: 'Restaurant Name', value: 'restoName', sortable: false},
       {text: 'Business Permit', value: 'Img', sortable: false, align: 'center'},
+      {text: 'KTP', value: 'Img2', sortable: false, align: 'center'},
+      {text: 'NPWP', value: 'Img3', sortable: false, align: 'center'},
       {text: 'Approve', value: ' ', width: '30px', sortable: false, align: 'center'},
       {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}],
     headers2: [
@@ -83,6 +96,8 @@ export default {
       {text: 'Name', value: 'fullName', sortable: false},
       {text: 'Restaurant Name', value: 'restoName', sortable: false},
       {text: 'Business Permit', value: 'Img', sortable: false, align: 'center'},
+      {text: 'KTP', value: 'Img2', sortable: false, align: 'center'},
+      {text: 'NPWP', value: 'Img3', sortable: false, align: 'center'},
       {text: 'Approve', value: ' ', width: '30px', sortable: false, align: 'center'}]
   }),
   methods: {

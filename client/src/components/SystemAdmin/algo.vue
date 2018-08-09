@@ -91,11 +91,11 @@ export default {
       {caption: 0.1, value: 0.1}
     ],
     TableRow: [
-      {iterasi: 100, data: []},
-      {iterasi: 150, data: []},
-      {iterasi: 200, data: []},
-      {iterasi: 250, data: []},
-      {iterasi: 300, data: []}
+      {iterasi: 20, data: []},
+      {iterasi: 40, data: []},
+      {iterasi: 60, data: []},
+      {iterasi: 80, data: []},
+      {iterasi: 100, data: []}
     ],
     filter: {
       coRate: null,
@@ -122,23 +122,23 @@ export default {
           console.log(this.data.filter(e => { return e.code === 'x1x' })[0])
           this.TableRow = [
             {
-              iterasi: 100,
+              iterasi: 20,
               data: this.data.filter(e => { return e.iterasi === 20 })
             },
             {
-              iterasi: 150,
+              iterasi: 40,
               data: this.data.filter(e => { return e.iterasi === 40 })
             },
             {
-              iterasi: 200,
+              iterasi: 60,
               data: this.data.filter(e => { return e.iterasi === 60 })
             },
             {
-              iterasi: 250,
+              iterasi: 80,
               data: this.data.filter(e => { return e.iterasi === 80 })
             },
             {
-              iterasi: 300,
+              iterasi: 100,
               data: this.data.filter(e => { return e.iterasi === 100 })
             }
           ]

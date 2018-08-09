@@ -18,7 +18,8 @@
     <div *ngSwitchCase="'active'">
       <ion-item>
         <div class="profile-cont">
-          <img [src]="data.src" (click)="getImage()" id="testImg">
+          <img [src]="data.src" (click)="getImage()" id="testImg" *ngIf="data.src">
+          <img [src]="'http://via.placeholder.com/350x150'" (click)="getImage()" id="testImg" *ngIf="!data.src">
         </div>
       </ion-item>
       <ion-list>
@@ -49,9 +50,9 @@
           <ion-label stacked>Height</ion-label>
           <ion-input [(ngModel)]="data.Height"></ion-input>
         </ion-item>
-        <ion-list-header no-margin style="background:#F5F5F5">
-          Action
-        </ion-list-header>
+        <!-- <ion-list-header no-margin style="background:#F5F5F5"> -->
+          <!-- Action -->
+        <!-- </ion-list-header> -->
         <ion-item>
           <button ion-button full color="secondary" (click)="update()">Update Account</button>
         </ion-item>

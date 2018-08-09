@@ -8,6 +8,7 @@ import { MyfavoritePage } from '../pages/myfavorite/myfavorite';
 import { MyprofilePage } from '../pages/myprofile/myprofile';
 import { HistoryReservePage } from '../pages/history-reserve/history-reserve';
 import { AuthPage } from '../pages/auth/auth';
+import { VerificationPage } from '../pages/verification/verification';
 import { HostProvider } from '../providers/host/host';
 @Component({
   templateUrl: 'app.html'

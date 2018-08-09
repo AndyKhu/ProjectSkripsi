@@ -10,8 +10,14 @@ export default {
   getCountReservasi (context, data) {
     return axios.post(`${context.$store.getters.ROOT_URL}/api/getCountReservasi`, data)
   },
+  getTbReservationConfirm2 (context, restoId) {
+    return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReservationConfirm2/${restoId}`).then(cb => {
+      return cb
+    })
+  },
   getTbReservationConfirm (context, restoId) {
     return axios.get(`${context.$store.getters.ROOT_URL}/api/getTbReservationConfirm/${restoId}`).then(cb => {
+      console.log(cb)
       cb.data.forEach((val, index) => {
         let x = new Blob([new Uint8Array(val.file.data)])
         let showImg = URL.createObjectURL(x)
@@ -42,9 +48,10 @@ export default {
   updateTbReservationSchedule (context, data) {
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationSchedule/${data.Reservation.Id}/${data.Id}`)
   },
-  updateTbReservationConfirm (context, ReserveId, status, Note) {
+  updateTbReservationConfirm (context, ReserveId, status, Note,userId) {
     let data = {
-      Note: Note
+      Note: Note,
+      userId: userId,
     }
     return axios.put(`${context.$store.getters.ROOT_URL}/api/updateTbReservationConfirm/${ReserveId}/${status ? 2 : 4}`, data)
   },

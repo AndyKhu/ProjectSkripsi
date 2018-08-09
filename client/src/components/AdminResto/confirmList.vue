@@ -16,9 +16,17 @@
             </v-layout>
           </v-flex>
           <v-flex xs12 class="pa-2">
+            <v-flex xs12 class="px-3">
+            <v-checkbox
+              :label="`Unpaid`"
+              v-model="unpaid"
+              @change="refresh"
+              hide-details
+            ></v-checkbox>
+            </v-flex>
             <v-data-table
               class="table-cst"
-              :headers="headers"
+              :headers="unpaid?headers2:headers"
               :items="items">
               <template slot="items" slot-scope="props">
                   <td>{{ props.item.Name }}</td>
@@ -31,17 +39,17 @@
                       <v-icon color="blue darken-1">restaurant_menu</v-icon>
                     </v-btn>
                   </td>
-                  <td class="text-xs-center">
-                    <v-btn icon class="mx-0" @click="showPic(props.item)">
+                  <td class="text-xs-center" v-if="!unpaid">
+                    <v-btn icon class="mx-0" @click="showPic(props.item)" >
                       <v-icon color="blue darken-1">assignment</v-icon>
                     </v-btn>
                   </td>
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" v-if="!unpaid">
                     <v-btn icon class="mx-0" @click="confirm(props.item, true)">
                       <v-icon color="green">check_circle</v-icon>
                     </v-btn>
                   </td>
-                  <td class="text-xs-center">
+                  <td class="text-xs-center" v-if="!unpaid">
                     <v-btn icon class="mx-0" @click="reject(props.item)">
                       <v-icon color="pink">cancel</v-icon>
                     </v-btn>
@@ -124,6 +132,7 @@ export default {
   data: () => ({
     cdialog: false,
     dialog: false,
+    unpaid: false,
     dialogState: '',
     Note: '',
     tmp: null,
@@ -139,16 +148,29 @@ export default {
       {text: 'Menu', value: ' ', width: '30px', sortable: false, align: 'center'},
       {text: 'Receipt', value: ' ', width: '30px', sortable: false, align: 'center'},
       {text: 'Confirm', value: ' ', width: '30px', sortable: false, align: 'center'},
-      {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}]
+      {text: 'Reject', value: ' ', width: '30px', sortable: false, align: 'center'}],
+    headers2: [
+      {text: 'Name', value: 'Name', sortable: false},
+      {text: 'Reservation Date', value: 'ReserveDate', width: '180px', sortable: false},
+      {text: 'Seat', value: 'Seat', width: '50px', sortable: false, align: 'center'},
+      {text: 'Duration', value: 'Duration', width: '100px', sortable: false, align: 'center'},
+      {text: 'Cost', value: 'Cost', sortable: false, width: '150px'},
+      {text: 'Menu', value: ' ', width: '30px', sortable: false, align: 'center'}]
   }),
   mounted () {
     this.refresh()
   },
   methods: {
     refresh () {
-      AdminResto.getTbReservationConfirm(this, this.$route.params.id).then(cb => {
-        this.items = cb.data
-      })
+      if(this.unpaid){
+        AdminResto.getTbReservationConfirm2(this, this.$route.params.id).then(cb => {
+          this.items = cb.data
+        })
+      } else {
+        AdminResto.getTbReservationConfirm(this, this.$route.params.id).then(cb => {
+          this.items = cb.data
+        })
+      }
     },
     rejectC () {
       if (this.Note === null || this.Note === '') {
@@ -172,7 +194,7 @@ export default {
       setTimeout(() => document.addEventListener('keyup', this.hide), 0)
     },
     confirm (value, status) {
-      AdminResto.updateTbReservationConfirm(this, value.Id, status, value.Note ? value.Note : '').then(cb => {
+      AdminResto.updateTbReservationConfirm(this, value.Id, status, value.Note ? value.Note : '',value.Id_User).then(cb => {
         this.items.splice(this.items.indexOf(value), 1)
         this.$store.dispatch('setDialogMsg', {
           txtmsg: `${status ? 'Confirm' : 'Reject'} Success`,

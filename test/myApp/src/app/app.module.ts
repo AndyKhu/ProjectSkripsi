@@ -13,6 +13,8 @@ import { MyfavoritePage } from '../pages/myfavorite/myfavorite';
 import { MyprofilePage } from '../pages/myprofile/myprofile';
 import { AuthPage } from '../pages/auth/auth';
 import { RegisterPage } from '../pages/register/register';
+import { ConfirmUploadPage } from '../pages/confirm-upload/confirm-upload';
+import { VerificationPage } from '../pages/verification/verification';
 import { ChangePasswordPage } from '../pages/change-password/change-password';
 import { RestoDetailPage } from '../pages/resto-detail/resto-detail';
 import { RestoReservePage} from '../pages/resto-reserve/resto-reserve';
@@ -36,6 +38,8 @@ import { Ionic2RatingModule } from 'ionic2-rating';
     HistoryReservePage,
     HistorypageDetailPage,
     ChangePasswordPage,
+    VerificationPage,
+    ConfirmUploadPage,
     BillPage,
     RegisterPage
   ],
@@ -56,6 +60,8 @@ import { Ionic2RatingModule } from 'ionic2-rating';
     RestoDetailPage,
     HistoryReservePage,
     ChangePasswordPage,
+    VerificationPage,
+    ConfirmUploadPage,
     HistorypageDetailPage,
     BillPage,
     RegisterPage

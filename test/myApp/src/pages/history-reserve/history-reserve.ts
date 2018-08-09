@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HostProvider } from '../../providers/host/host';
 import { HistorypageDetailPage } from '../../pages/historypage-detail/historypage-detail';
+import { ConfirmUploadPage } from '../../pages/confirm-upload/confirm-upload';
 
 /**
  * Generated class for the HistoryReservePage page.
@@ -23,7 +24,7 @@ export class HistoryReservePage {
   totalPage: any
   page: number
   segment: any
-  constructor(public navCtrl: NavController, public navParams: NavParams,public sanitizer: DomSanitizer,public hostService: HostProvider) {
+  constructor(private alertCtrl: AlertController,public navCtrl: NavController, public navParams: NavParams,public sanitizer: DomSanitizer,public hostService: HostProvider) {
     this.segment = 'inprog'
     this.page = 1
     this.status = 'loading'
@@ -59,7 +60,9 @@ export class HistoryReservePage {
       }
     })
   }
-  
+  upload (item) {
+    this.navCtrl.push(ConfirmUploadPage,{item: item,parent: this})
+  }
   refreshData () {
     this.page = 1;
     let data = {
@@ -86,7 +89,28 @@ export class HistoryReservePage {
       this.data = cb.data.result
     })
   }
-
+  cancel(item) {
+    this.alertCtrl.create({
+      title: 'Confirm',
+      message: 'Do you want to cancel this reservation?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.hostService.cancelReservation(item.Id).then(cb => {
+              this.data.splice(this.data.indexOf(item), 1)
+            })
+          }
+        }
+      ]
+    }).present()
+  }
   doInfinite(infiniteScroll) {
     this.page = this.page + 1;
     let data = {

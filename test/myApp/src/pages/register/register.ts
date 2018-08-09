@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { HostProvider } from '../../providers/host/host';
 import { HomePage } from '../home/home';
+import { VerificationPage } from '../verification/verification';
 /**
  * Generated class for the RegisterPage page.
  *
@@ -34,8 +35,9 @@ export class RegisterPage {
       if(this.authForm.value.password === this.authForm.value.confirmpassword){
         this.authForm.value.Id = this.guid()
         this.hostService.signUp(this.authForm.value).then(cb => {
-          localStorage.setItem('authToken', cb.data.token)          
-          this.navCtrl.setRoot(HomePage)
+
+          // localStorage.setItem('authToken', cb.data.token)
+          this.navCtrl.setRoot(VerificationPage)
         }).catch(err => {
           this.hostService.presentToast('Failed To Register')
         })

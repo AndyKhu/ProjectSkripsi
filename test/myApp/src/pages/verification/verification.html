@@ -1,0 +1,24 @@
+<!--
+  Generated template for the VerificationPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Verification</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <div [ngSwitch]='status'>
+    <div *ngSwitchCase="'active'">
+      <b>You're almost there! <br> <br> </b> we've sent a verification email to the address you provided.
+      <br>Clicking the confirmation link in that email let us know the email address is both valid and yours.
+      <button margin-vertical small ion-button (click)="back()">Back To Home</button>
+    </div>
+  </div>
+</ion-content>

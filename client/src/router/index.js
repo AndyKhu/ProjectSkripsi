@@ -6,6 +6,8 @@ import NotFoundPage from '@/components/NotFoundPage'
 import profilePage from '@/components/profilePage'
 import historyPage from '@/components/historyPage'
 import ChangePassword from '@/components/changePassword'
+import AfterRegister from '@/components/AfterRegister'
+import Verification from '@/components/verification'
 // Member
 import Member from '@/components/Member/index'
 import ListResto from '@/components/Member/listresto'
@@ -32,6 +34,14 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   routes: [
+    {
+      path: '/AfterRegister',
+      component: AfterRegister
+    },
+    {
+      path: '/confirm/:id/:user',
+      component: Verification
+    },
     {
       path: '/',
       meta: { checksAuth: true },

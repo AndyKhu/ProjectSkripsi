@@ -8,6 +8,9 @@ function guid () {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
 }
 export default {
+  verification (context, type, user) {
+    return axios.post(`${context.$store.getters.ROOT_URL}/api/verification/${type}/${user}`)
+  },
   login (context, creds, redirect) {
     axios.post(`${context.$store.getters.ROOT_URL}/api/login`, creds)
       .then(res => {
@@ -28,15 +31,7 @@ export default {
     creds.Id = guid()
     axios.post(`${context.$store.getters.ROOT_URL}/api/signup`, creds)
       .then(res => {
-        localStorage.setItem('authToken', res.data.token)
-        context.$store.dispatch('setUser', res.data.user)
-        if (res.data.user.Type === 'AdminResto') {
-          context.$router.push('/mainAR')
-        } else if (res.data.user.Type === 'SYSTEM') {
-          context.$router.push('/mainSA')
-        } else {
-          context.$router.push('/')
-        }
+        context.$router.push('/AfterRegister')
       }).catch((err) => {
         context.$store.dispatch('setErrorMsg', {codeS: err.response.status, type: 'error'})
       })
@@ -47,20 +42,32 @@ export default {
     let formdata = new FormData()
     formdata.append('img', creds.Img)
     return axios.post(`${context.$store.getters.ROOT_URL}/api/upload/reqAdmin/${fileId}`, formdata).then(proc => {
-      let data = {
-        Id: creds.Id,
-        Email: creds.email,
-        Password: creds.password,
-        fullName: creds.fullName,
-        restoName: creds.restoName,
-        PID: proc.data.PID,
-        Pname: proc.data.Pname,
-        Ptype: proc.data.Ptype
-      }
-      axios.post(`${context.$store.getters.ROOT_URL}/api/createReqAdmin`, data).then(proc2 => {
-        context.$router.push('/')
-      }).catch(err => {
-        context.$store.dispatch('setErrorMsg', {codeS: err.response.status, type: 'error'})
+      fileId = guid()
+      formdata = new FormData()
+      formdata.append('img', creds.Img2)
+      axios.post(`${context.$store.getters.ROOT_URL}/api/upload/reqAdmin/${fileId}`, formdata).then(proc2 => {
+        fileId = guid()
+        formdata = new FormData()
+        formdata.append('img', creds.Img3)
+        axios.post(`${context.$store.getters.ROOT_URL}/api/upload/reqAdmin/${fileId}`, formdata).then(proc3 => {
+          let data = {
+            Id: creds.Id,
+            Email: creds.email,
+            Password: creds.password,
+            fullName: creds.fullName,
+            restoName: creds.restoName,
+            PID: proc.data.PID,
+            PID2: proc2.data.PID,
+            PID3: proc3.data.PID,
+            Pname: proc.data.Pname,
+            Ptype: proc.data.Ptype
+          }
+          axios.post(`${context.$store.getters.ROOT_URL}/api/createReqAdmin`, data).then(proc2 => {
+            context.$router.push('/AfterRegister')
+          }).catch(err => {
+            context.$store.dispatch('setErrorMsg', {codeS: err.response.status, type: 'error'})
+          })
+        })
       })
     })
   },

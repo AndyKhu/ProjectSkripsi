@@ -66,12 +66,12 @@
                       {{item.Note?item.Note:'-'}}
                     </ion-col>
                     <ion-col col-3 text-xs-right>
-                      <!-- <v-btn @click="upload(item)" icon class="ma-0" :class="{'btn--small theme--dark primary': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
-                        <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'primary--text': $vuetify.breakpoint.smAndUp}">cloud_download</v-icon>
-                      </v-btn>
-                      <v-btn @click="cancel(item)" icon class="ma-0" :class="{'btn--small theme--dark error': $vuetify.breakpoint.xsOnly}" v-if="item.Status === 0 || item.Status === 1">
-                        <v-icon :class="{'small-icon': $vuetify.breakpoint.xsOnly, 'error--text': $vuetify.breakpoint.smAndUp}">delete</v-icon>
-                      </v-btn> -->
+                      <button small round ion-button icon-only no-margin color="primary" (click)="upload(item)" *ngIf="item.Status === 0 || item.Status === 1">
+                        <ion-icon name="md-cloud-upload"></ion-icon>
+                      </button>
+                      <button small round ion-button icon-only no-margin color="danger" (click)="cancel(item)" *ngIf="item.Status === 0 || item.Status === 1">
+                        <ion-icon name="md-trash"></ion-icon>
+                      </button>
                     </ion-col>
                   </ion-row>
                 </ion-col>

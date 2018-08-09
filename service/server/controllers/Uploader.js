@@ -3,6 +3,8 @@ const UPLOAD_PATH = 'uploads'
 const multer = require('multer')
 const fs = require('fs')
 const path = require('path')
+const mkdirp = require('mkdirp')
+const getDirName = path.dirname
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     if (!fs.existsSync(`${UPLOAD_PATH}`)) {
@@ -27,17 +29,32 @@ module.exports = {
   uploadImgBase64(req,res,next) {
     let filename = guid()
     let base64Data = req.body.src.replace(/^data:image\/jpeg;base64,/,"")
-    if (!fs.existsSync(`./uploads`)) {
-      fs.mkdirSync(`./uploads`)
-    }
-    if (!fs.existsSync(`./uploads/${req.params.direct}`)) {
-      fs.mkdirSync(`./uploads/${req.params.direct}`)
-    }
+    // if (!fs.existsSync(`./uploads`)) {
+    //   fs.mkdirSync(`./uploads`)
+    // }
+    // console.log(req.params.direct)
+    // if (!fs.existsSync(`./uploads/${req.params.direct}`)) {
+    //   console.log(req.params.direct)
+    //   fs.mkdirSync(`./uploads/${req.params.direct}`)
+    // }
     let url = `./uploads/${req.params.direct}/${filename}`
-    fs.writeFile(url,base64Data,'base64', function(err){
-      console.log(err)
-    })
-    res.status(200).send({PID: filename})
+
+    mkdirp(getDirName(url), function (err) {
+      if (err) {
+        console.log(err)
+        res.status(400).send({PID: filename}) 
+      } else {
+        fs.writeFile(url,base64Data,'base64', function(err){
+          if(err) {
+            console.log(err)
+            res.status(400).send({PID: filename}) 
+          }
+          else {
+            res.status(200).send({PID: filename})    
+          }
+        })
+      }
+    });
   },
   async uploadImg(req, res, next) {
     upload.single('img')(req, res, function (err) {
