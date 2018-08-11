@@ -17,11 +17,13 @@ module.exports = {
   execute(req, res, next) {
     let config = {
       iterasi: 100,
-      percobaan: 10,
+      percobaan: 1,
       // coRates: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
       // muRates: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9],
-      coRates: [req.body.coRate],
-      muRates: [req.body.muRate],
+      // coRates: [req.body.coRate],
+      // muRates: [req.body.muRate],
+      coRates: [0.9],
+      muRates: [0.9],
       restoFilter: [req.body.resto],
       // stoplist: [100,150,200,250,300]
       // stoplist: [20,40,60,80,100]
@@ -44,12 +46,16 @@ function overAll(config, Resto) {
   let totalgen = Resto.Reservation.length
   let finalresult = []
   let datats2 = {}
+  let coba = {}
   for (let per = 0 ; per < config.percobaan; per++) {
     // let result = []
-    for (let it = 0; it < config.iterasi; it++) {
+    
       // let resultchild = []
       config.coRates.forEach((coVal) => {
         config.muRates.forEach((muVal) => {
+          bestI = 0
+          coba = {}
+          for (let it = 0; it < config.iterasi; it++) {
           let kromosom = getKrimsonR(Resto, n)
           let kromosominduk = getkromosominduk(kromosom)
           let resultCO = crossover(coVal, kromosominduk) // Jalankan Fungsi CrossOver
@@ -69,25 +75,33 @@ function overAll(config, Resto) {
           let resultSelection = selection(kromosom, resultNormalCO, kromosomNormalMutasi, resultVND1, resultVND2, n)
           if(bestI < resultSelection[0].fitness){
             bestI = resultSelection[0].fitness
-            datats2 = {data: resultSelection, percobaan: per+1, it: it+1, code: 'x0x'}
+            coba = {percobaan: muVal, iterasi: coVal,fitness:resultSelection[0].fitness, x: it, reservasi: resultSelection[0]}
+            // datats2 = {data: resultSelection, percobaan: per+1, it: it+1, code: 'x0x'}
           }
           // if(resultSelection[0].fitness === 0.5 || resultSelection[0].fitness === '0.5'){
           //   // bestI = resultSelection[0].fitness
           //   datats2 = {data: resultSelection, percobaan: per+1, it: it+1, code: 'x0x'}
           //   finalresult.push({kromosom: kromosom, resultCO: resultNormalCO, resultMU: kromosomNormalMutasi, resultVND1: resultVND1, resultVND2: resultVND2, code: 'x1x'})
           // }
-          finalresult.push({percobaan: per+1, iterasi: it+1, fitness: resultSelection[0].fitness})
-          console.log("percobaan : "+per + " & It : "+it+" & Fitness : "+ resultSelection[0].fitness)      
+          // finalresult.push({percobaan: per+1, iterasi: it+1, fitness: resultSelection[0].fitness})
+          console.log("coRate : "+coVal + " & muRate : "+muVal+" & Iterasi: "+it+" & Fitness : "+ resultSelection[0].fitness)      
           // finalresult.push({kromosom: kromosom, resultCO: resultNormalCO, resultMU: kromosomNormalMutasi, resultVND1: resultVND1, resultVND2: resultVND2})
           // resultchild.push({coRate: coVal, muRate: muVal, resultSelection })
+          // if(resultSelection[0].fitness == 1 || it === 99) {
+          //   finalresult.push()
+          // }
+          if(resultSelection[0].fitness === 1 || resultSelection[0].fitness === '1') {
+            break;
+          }
+        }
+        finalresult.push(coba)
         })
       })
     }
     // finalresult.push({percobaan: per+1, hasil: result})
-  }
-  finalresult.push(datats2)
+  // finalresult.push(datats2)
   Models.Tb_User_Reservation_Schedule.destroy({where: {Status: 0}, force: true })
-  saveToDb(datats2.data , Resto)
+  // saveToDb(datats2.data , Resto)
 
   return finalresult
 }
@@ -378,7 +392,7 @@ function getKrimsonR(Resto, n) {
       if (tmp.length !== 0) {
         let x = Math.floor((Math.random() * tmp.length) + 0);
         let constTimeE = new Date(val.reserveDate.getTime() + val.Duration * 60000)
-        krimsontmp.push({ reserveId: val.Id, seatId: tmp[x].Id, totalSeats: val.totalSeats, timeS: val.reserveDate, timeE: constTimeE, restoO: Resto.OpenTime, restoC: Resto.CloseTime, Duration: val.Duration })
+        krimsontmp.push({ reserveId: val.Id, seatId: tmp[x].Id, noSeat: tmp[x].noSeat, totalSeats: val.totalSeats, timeS: val.reserveDate, timeE: constTimeE, restoO: Resto.OpenTime, restoC: Resto.CloseTime, Duration: val.Duration , createdAt: val.createdAt})
       }
     })
     krimsonR.push(krimsontmp)
